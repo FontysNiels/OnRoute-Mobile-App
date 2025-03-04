@@ -81,4 +81,3 @@ jobs:
             -Dsonar.sources=lib
             -Dsonar.host.url=https://sonarcloud.io
             -Dsonar.coverage.exclusions=**/*.g.dart,**/*.freezed.dart
-            -Dsonar.coverageReportPaths=coverage/lcov.info
