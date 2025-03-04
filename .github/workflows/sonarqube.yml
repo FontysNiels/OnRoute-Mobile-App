@@ -1,21 +1,21 @@
-name: Code Quality Scan
-on:
-  push:
-  pull_request:
-    types: [opened, synchronize, reopened]
-jobs:
-  sonarcloud:
-    name: SonarQube Cloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: SonarQube Cloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+# name: Code Quality Scan
+# on:
+#   push:
+#   pull_request:
+#     types: [opened, synchronize, reopened]
+# jobs:
+#   sonarcloud:
+#     name: SonarQube Cloud
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+#       - name: SonarQube Cloud Scan
+#         uses: SonarSource/sonarcloud-github-action@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+#           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 # name: Build
 # on:
@@ -39,3 +39,47 @@ jobs:
 #         uses: SonarSource/sonarqube-scan-action@v5
 #         env:
 #           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+name: SonarQube Flutter Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarqube:
+    name: SonarQube
+    runs-on: ubuntu-latest  # Changed from Windows to Ubuntu
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Ensures full commit history for better analysis
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.13.0'  # Set to your preferred Flutter version
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Tests with Coverage
+        run: flutter test --coverage
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=your_project_key
+            -Dsonar.organization=your_organization
+            -Dsonar.sources=lib
+            -Dsonar.tests=test
+            -Dsonar.host.url=https://sonarcloud.io
+            -Dsonar.coverage.exclusions=**/*.g.dart,**/*.freezed.dart
+            -Dsonar.coverageReportPaths=coverage/lcov.info
