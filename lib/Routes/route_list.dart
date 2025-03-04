@@ -9,38 +9,11 @@ class RoutesList extends StatelessWidget {
       appBar: AppBar(title: const Text('Routes'), centerTitle: true),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: SearchAnchor(
-              builder: (BuildContext context, SearchController controller) {
-                return SearchBar(
-                  controller: controller,
-                  padding: const WidgetStatePropertyAll<EdgeInsets>(
-                    EdgeInsets.symmetric(horizontal: 16.0),
-                  ),
-                  onTap: () {
-                    controller.openView();
-                  },
-                  onChanged: (_) {
-                    controller.openView();
-                  },
-                  leading: const Icon(Icons.search),
-                );
-              },
-              suggestionsBuilder: (
-                BuildContext context,
-                SearchController controller,
-              ) {
-                return List<Widget>.generate(5, (int index) {
-                  return ListTile(title: Text('Suggestion $index'), onTap: () {});
-                });
-              },
-            ),
-          ),
           Expanded(
             child: ListView(
               scrollDirection: Axis.vertical,
               children: <Widget>[
+                Searchbar(),
                 RouteCard(),
                 RouteCard(),
                 RouteCard(),
@@ -54,6 +27,43 @@ class RoutesList extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class Searchbar extends StatelessWidget {
+  const Searchbar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(18.0),
+      child: SearchAnchor(
+        builder: (BuildContext context, SearchController controller) {
+          return SearchBar(
+            hintText: 'Search for routes',
+            controller: controller,
+            padding: const WidgetStatePropertyAll<EdgeInsets>(
+              EdgeInsets.symmetric(horizontal: 16.0),
+            ),
+            onTap: () {
+              controller.openView();
+            },
+            onChanged: (_) {
+              controller.openView();
+            },
+            leading: const Icon(Icons.search),
+          );
+        },
+        suggestionsBuilder: (
+          BuildContext context,
+          SearchController controller,
+        ) {
+          return List<Widget>.generate(5, (int index) {
+            return ListTile(title: Text('Suggestion $index'), onTap: () {});
+          });
+        },
       ),
     );
   }
@@ -83,7 +93,7 @@ class RouteCard extends StatelessWidget {
                       style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                         // color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                      "Titel",
+                      "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
                       // "Dit is zeker weten een heeeelee langeeeeeee Titel",
                       overflow: TextOverflow.ellipsis,
                     ),

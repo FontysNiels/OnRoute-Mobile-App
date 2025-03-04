@@ -21,7 +21,6 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
- 
   @override
   void initState() {
     super.initState();
@@ -43,8 +42,8 @@ class _MapWidgetState extends State<MapWidget> {
   StreamSubscription? _autoPanModeSubscription;
   var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
   // A flag for when the map view is ready and controls can be used.
- var _ready = false;
- 
+  var _ready = false;
+
   @override
   void dispose() {
     // When exiting, stop the location data source and cancel subscriptions.
@@ -58,60 +57,58 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     print(_ready);
-    return MaterialApp(
-      home: Scaffold(
-        body: SafeArea(
-          top: false,
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    // Add a map view to the widget tree and set a controller.
-                    child: ArcGISMapView(
-                      controllerProvider: () => _mapViewController,
-                      onMapViewReady: onMapViewReady,
-                    ),
-                  ),
-                  Center(
-                    child: ElevatedButton(
-                      onPressed:
-                          _status == LocationDataSourceStatus.failedToStart
-                              ? null
-                              : () => setState(() => _settingsVisible = true),
-                      child: const Text('Location Settings'),
-                    ),
-                  ),
-                ],
-              ),
-              // Display a progress indicator and prevent interaction until state is ready.
-              Visibility(
-                visible: !_ready,
-                child: SizedBox.expand(
-                  child: Container(
-                    color: Colors.white30,
-                    child: const Center(child: CircularProgressIndicator()),
+    return Scaffold(
+      body: SafeArea(
+        top: false,
+        child: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  // Add a map view to the widget tree and set a controller.
+                  child: ArcGISMapView(
+                    controllerProvider: () => _mapViewController,
+                    onMapViewReady: onMapViewReady,
                   ),
                 ),
+                Center(
+                  child: ElevatedButton(
+                    onPressed:
+                        _status == LocationDataSourceStatus.failedToStart
+                            ? null
+                            : () => setState(() => _settingsVisible = true),
+                    child: const Text('Location Settings'),
+                  ),
+                ),
+              ],
+            ),
+            // Display a progress indicator and prevent interaction until state is ready.
+            Visibility(
+              visible: !_ready,
+              child: SizedBox.expand(
+                child: Container(
+                  color: Colors.white30,
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
               ),
+            ),
 
-              Align(
-                alignment: Alignment.topRight,
-                child: FloatingActionButton(
-                  onPressed:
-                      () => {
-                        _mapViewController.locationDisplay.autoPanMode =
-                            LocationDisplayAutoPanMode.recenter,
-                      },
-                  child: Icon(Icons.gps_fixed),
-                ),
+            Align(
+              alignment: Alignment.topRight,
+              child: FloatingActionButton(
+                onPressed:
+                    () => {
+                      _mapViewController.locationDisplay.autoPanMode =
+                          LocationDisplayAutoPanMode.recenter,
+                    },
+                child: Icon(Icons.gps_fixed),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        // The Settings bottom sheet.
-        bottomSheet: _settingsVisible ? buildSettings(context) : null,
       ),
+      // The Settings bottom sheet.
+      bottomSheet: _settingsVisible ? buildSettings(context) : null,
     );
   }
 
@@ -200,20 +197,24 @@ class _MapWidgetState extends State<MapWidget> {
     print("onMapViewReady called");
     try {
       // set the map to the map view controller
-      final map = ArcGISMap.withBasemapStyle(BasemapStyle.arcGISChartedTerritory);
+
+      final map = ArcGISMap.withBasemapStyle(
+        BasemapStyle.arcGISChartedTerritory,
+      );
       _mapViewController.arcGISMap = map;
       print("Map set to map view controller");
-      // set the viewpoint of the map view controller
-      // _mapViewController.setViewpoint(
-      //   Viewpoint.withLatLongScale(
-      //     latitude: 51.598289,
-      //     longitude: 5.528469,
-      //     scale: 5000,
-      //   ),
-      // );
+      // set the viewpoint of the map view controller (BraGIS, HEEL ver uitgezoomed, dus je start op nederland)
+      _mapViewController.setViewpoint(
+        Viewpoint.withLatLongScale(
+          latitude: 51.598289,
+          longitude: 5.528469,
+          scale: 2155000,
+        ),
+      );
 
       // _mapViewController.onScaleChanged.listen((scale) {
-      //   // _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.recenter;
+      //   _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
+
       // });
 
       // Create a map with the Navigation Night basemap style.
@@ -221,17 +222,19 @@ class _MapWidgetState extends State<MapWidget> {
       //   BasemapStyle.arcGISNavigationNight,
       // );
 
+      _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
-      //  _mapViewController.locationDisplay.initialZoomScale = 15000;
       _mapViewController.locationDisplay.autoPanMode =
-          LocationDisplayAutoPanMode.compassNavigation;
+          LocationDisplayAutoPanMode.navigation;
       _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
         setState(() => _autoPanMode = mode);
       });
 
       // Subscribe to status changes and changes to the auto-pan mode.
-      _statusSubscription = _locationDataSource.onStatusChanged.listen((status) {
+      _statusSubscription = _locationDataSource.onStatusChanged.listen((
+        status,
+      ) {
         setState(() => _status = status);
       });
       setState(() => _status = _locationDataSource.status);

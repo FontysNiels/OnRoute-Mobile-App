@@ -14,9 +14,9 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  int currentPageIndex = 1;
   @override
   Widget build(BuildContext context) {
-
     // return MaterialApp(home: MapWidget());
     return MaterialApp(
       theme: ThemeData(
@@ -41,7 +41,38 @@ class _MainAppState extends State<MainApp> {
           // ···
         ),
       ),
-      home: RoutesList(),
+      home: Scaffold(
+        bottomNavigationBar: NavigationBar(
+          onDestinationSelected: (int index) {
+            setState(() {
+              currentPageIndex = index;
+            });
+          },
+          indicatorColor: const Color.fromARGB(255, 235, 138, 138),
+          selectedIndex: currentPageIndex,
+          destinations: const <Widget>[
+            NavigationDestination(
+              selectedIcon: Icon(Icons.home),
+              icon: Icon(Icons.map),
+              label: 'Kaart',
+            ),
+            NavigationDestination(
+              icon: Badge(child: Icon(Icons.explore)),
+              label: 'Routes',
+            ),
+            NavigationDestination(
+              icon: Badge(label: Text('2'), child: Icon(Icons.question_mark)),
+              label: 't.b.d.',
+            ),
+          ],
+        ),
+        body:
+            <Widget>[
+              MapWidget(),
+              RoutesList(),
+              Placeholder(),
+            ][currentPageIndex],
+      ),
     );
   }
 }
