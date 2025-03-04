@@ -76,8 +76,8 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=your_project_key
-            -Dsonar.organization=your_organization
+            -Dsonar.projectKey=FontysNiels_OnRoute-Mobile-App
+            -Dsonar.organization=fontysniels
             -Dsonar.sources=lib
             -Dsonar.tests=test
             -Dsonar.host.url=https://sonarcloud.io
