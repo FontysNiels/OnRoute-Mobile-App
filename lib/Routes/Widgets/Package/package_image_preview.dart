@@ -51,6 +51,7 @@ class PackegImagePreview extends StatelessWidget {
                 textAlign: TextAlign.end,
               ),
             ),
+            // child: TextButton(onPressed: () {}, child: const Text('Zie alle')),
           ),
         ],
       ),

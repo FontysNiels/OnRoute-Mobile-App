@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../material_design_indicator.dart';
+import '../../material_design_indicator.dart';
 
 class PackageTabs extends StatefulWidget {
-  const PackageTabs({super.key});
+  final Function setIndex;
+  const PackageTabs({super.key, required this.setIndex});
 
   @override
   State<PackageTabs> createState() => _PackageTabsState();
@@ -12,11 +13,9 @@ class PackageTabs extends StatefulWidget {
 class _PackageTabsState extends State<PackageTabs>
     with TickerProviderStateMixin {
   late TabController _tabController;
-  
+
   void _handleTabSelection() {
-    if (_tabController.indexIsChanging) {
-      print('Tab changed to: ${_tabController.index}');
-    }
+    widget.setIndex(_tabController.index);
   }
 
   final _tabs = [
@@ -35,6 +34,7 @@ class _PackageTabsState extends State<PackageTabs>
   @override
   void dispose() {
     super.dispose();
+    widget.setIndex(0);
     _tabController.dispose();
   }
 
@@ -43,14 +43,22 @@ class _PackageTabsState extends State<PackageTabs>
     final primaryAccent =
         Theme.of(context).colorScheme.primary; // Get primaryAccent from theme
 
-    return TabBar(
-      controller: _tabController,
-      indicatorSize: TabBarIndicatorSize.label,
-      indicator: MaterialDesignIndicator(
-        indicatorHeight: 4,
-        indicatorColor: primaryAccent, // Use primaryAccent color
+    return DecoratedBox(
+      decoration: BoxDecoration(   
+        //This is for bottom border that is needed
+        border: Border(
+          bottom: BorderSide(color: Colors.black, width: 1.6),
+        ),
       ),
-      tabs: _tabs,
+      child: TabBar(
+        controller: _tabController,
+        indicatorSize: TabBarIndicatorSize.label,
+        indicator: MaterialDesignIndicator(
+          indicatorHeight: 4,
+          indicatorColor: primaryAccent, // Use primaryAccent color
+        ),
+        tabs: _tabs,
+      ),
     );
   }
 }

@@ -19,28 +19,34 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
-    const Color primaryAppColor = Color.fromARGB(255, 254, 190, 190);
+    const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
     const Color navigationIcons = Color.fromARGB(255, 48, 48, 48);
+    const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
     return MaterialApp(
       // theme: AppTheme,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
+        // Color Scheme Changes
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: primaryAccent, // Define primaryAccent in color scheme
         ),
-        searchBarTheme: SearchBarThemeData(
-          backgroundColor: WidgetStateProperty.all(primaryAppColor),
-          elevation: WidgetStateProperty.all(0.0),
-        ),
 
+        // Appbar Theme
         appBarTheme: AppBarTheme(
           backgroundColor: primaryAppColor,
           // scrolledUnderElevation: 0
           scrolledUnderElevation: 1,
         ),
 
+        // SeachBar Theme
+        searchBarTheme: SearchBarThemeData(
+          backgroundColor: WidgetStateProperty.all(primaryAppColor),
+          elevation: WidgetStateProperty.all(0.0),
+        ),
+
+        // NavigationBar Theme
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: primaryAppColor,
           iconTheme: WidgetStateProperty.all(
@@ -48,28 +54,23 @@ class _MainAppState extends State<MainApp> {
           ),
         ),
 
-        cardColor: primaryAppColor,
-
+        // Card Theme
         cardTheme: CardTheme(
           color: primaryAppColor,
           // elevation: 0,
         ),
+
+        // TabBar Theme
         tabBarTheme: TabBarTheme(
           labelColor: primaryAccent,
-          unselectedLabelColor: const Color.fromARGB(255, 73, 69, 79),
+          unselectedLabelColor: primaryTextColor,
         ),
-        // iconTheme: IconThemeData(color: primaryAccent),
 
-        //Text Theme Changes
+        //Text Theme's
         textTheme: TextTheme(
-          bodyLarge: const TextStyle(
-            // fontSize: 18,
-            // fontWeight: FontWeight.normal,
-            // color: Color.fromARGB(255, 0, 0, 0),
-          ),
-          bodyMedium: const TextStyle(color: Color.fromARGB(255, 73, 69, 79)),
+          bodyLarge: const TextStyle(),
+          bodyMedium: const TextStyle(color: primaryTextColor),
           labelLarge: const TextStyle(color: primaryAccent),
-          // ···
         ),
       ),
       home: Scaffold(
