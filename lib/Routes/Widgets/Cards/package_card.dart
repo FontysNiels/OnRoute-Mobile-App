@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Routes/route_package.dart';
 
-class RouteCard extends StatelessWidget {
-  const RouteCard({super.key});
+class PackageCard extends StatelessWidget {
+  const PackageCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to ROUTE
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => RoutePackage()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RoutePackage()),
+        );
       },
       child: Card(
         elevation: 0,

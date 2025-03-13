@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
+import 'package:onroute_app/Routes/Widgets/Cards/package_card.dart';
 
 class RoutesList extends StatelessWidget {
   const RoutesList({super.key});
@@ -16,15 +16,16 @@ class RoutesList extends StatelessWidget {
               children: <Widget>[
                 Searchbar(),
                 // generated maken, futurebuilder ofzo
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
-                RouteCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
+                PackageCard(),
               ],
             ),
           ),
