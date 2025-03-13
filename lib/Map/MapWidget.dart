@@ -208,7 +208,7 @@ class _MapWidgetState extends State<MapWidget> {
         Viewpoint.withLatLongScale(
           latitude: 51.598289,
           longitude: 5.528469,
-          scale: 2155000,
+          scale: 25000,
         ),
       );
 

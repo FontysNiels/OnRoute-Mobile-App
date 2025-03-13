@@ -1,6 +1,7 @@
 import 'package:onroute_app/Map/MapWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
+import 'package:onroute_app/theme.dart';
 
 void main() {
   runApp(const MainApp());
@@ -19,17 +20,55 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     // return MaterialApp(home: MapWidget());
     return MaterialApp(
+      // theme: AppTheme,
       theme: ThemeData(
         useMaterial3: true,
+
         // Define the default brightness and colors.
         // colorScheme: ColorScheme.fromSeed(
         //   seedColor: const Color.fromARGB(255, 255, 0, 0),
         //   // ···
         //   // brightness: Brightness.dark,
         // ),
+        searchBarTheme: SearchBarThemeData(
+          backgroundColor: WidgetStateProperty.all(
+            Color.fromARGB(255, 254, 190, 190),
+          ),
+          elevation: WidgetStateProperty.all(0.0),
+        ),
 
-        // Define the default `TextTheme`. Use this to specify the default
-        // text styling for headlines, titles, bodies of text, and more.
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color.fromARGB(255, 254, 190, 190),
+          // scrolledUnderElevation: 0
+          scrolledUnderElevation: 1,
+        ),
+
+        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        // ),
+
+        // navigationRailTheme: NavigationRailThemeData(
+        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        // ),
+
+        // navigationDrawerTheme: NavigationDrawerThemeData(
+        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        // ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        ),
+
+        cardColor: Color.fromARGB(255, 254, 190, 190),
+
+        cardTheme: CardTheme(
+          color: const Color.fromARGB(255, 254, 190, 190),
+          // elevation: 0,
+        ),
+        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        // ),
+
+        //Text Theme Changes
         textTheme: TextTheme(
           bodyLarge: const TextStyle(
             // fontSize: 18,
