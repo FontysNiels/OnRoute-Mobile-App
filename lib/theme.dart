@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-ThemeData AppTheme = ThemeData(
+ThemeData appTheme = ThemeData(
   useMaterial3: true,
 
   // Define the default brightness and colors.

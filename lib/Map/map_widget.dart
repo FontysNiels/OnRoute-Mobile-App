@@ -56,7 +56,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(_ready);
+    // print(_ready);
     return Scaffold(
       body: SafeArea(
         top: false,
@@ -194,7 +194,7 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   Future<void> onMapViewReady() async {
-    print("onMapViewReady called");
+    // print("onMapViewReady called");
     try {
       // set the map to the map view controller
 
@@ -202,7 +202,7 @@ class _MapWidgetState extends State<MapWidget> {
         BasemapStyle.arcGISChartedTerritory,
       );
       _mapViewController.arcGISMap = map;
-      print("Map set to map view controller");
+      // print("Map set to map view controller");
       // set the viewpoint of the map view controller (BraGIS, HEEL ver uitgezoomed, dus je start op nederland)
       _mapViewController.setViewpoint(
         Viewpoint.withLatLongScale(
@@ -263,7 +263,7 @@ class _MapWidgetState extends State<MapWidget> {
       // Set the ready state variable to true to enable the UI.
       setState(() {
         _ready = true;
-        print("_ready set to true");
+        // print("_ready set to true");
       });
     } catch (e) {
       print("Error in onMapViewReady: $e");

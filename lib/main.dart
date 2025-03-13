@@ -1,4 +1,4 @@
-import 'package:onroute_app/Map/MapWidget.dart';
+import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
 import 'package:onroute_app/theme.dart';
