@@ -7,9 +7,10 @@ environment:
   sdk: ^3.7.0
 
 dependencies:
+
+  arcgis_maps: ^200.6.0+4426
   flutter:
     sdk: flutter
-  arcgis_maps: ^200.6.0+4426
   flutter_dotenv: ^5.2.1 
 
 dev_dependencies:
@@ -22,3 +23,4 @@ flutter:
 
   assets:
   - .env
+  - assets/temp.png
