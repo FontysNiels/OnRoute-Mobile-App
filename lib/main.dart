@@ -1,6 +1,7 @@
-import 'package:onroute_app/Map/MapWidget.dart';
+import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
+import 'package:onroute_app/temp.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
@@ -18,66 +19,59 @@ class _MainAppState extends State<MainApp> {
   int currentPageIndex = 1;
   @override
   Widget build(BuildContext context) {
-    // return MaterialApp(home: MapWidget());
+    const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
+    const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
+    const Color navigationIcons = Color.fromARGB(255, 48, 48, 48);
+    const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
+
     return MaterialApp(
       // theme: AppTheme,
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-
-        // Define the default brightness and colors.
-        // colorScheme: ColorScheme.fromSeed(
-        //   seedColor: const Color.fromARGB(255, 255, 0, 0),
-        //   // ···
-        //   // brightness: Brightness.dark,
-        // ),
-        searchBarTheme: SearchBarThemeData(
-          backgroundColor: WidgetStateProperty.all(
-            Color.fromARGB(255, 254, 190, 190),
-          ),
-          elevation: WidgetStateProperty.all(0.0),
+        // Color Scheme Changes
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: primaryAccent, // Define primaryAccent in color scheme
         ),
 
+        // Appbar Theme
         appBarTheme: AppBarTheme(
-          backgroundColor: Color.fromARGB(255, 254, 190, 190),
+          backgroundColor: primaryAppColor,
           // scrolledUnderElevation: 0
           scrolledUnderElevation: 1,
         ),
 
-        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
-        // ),
-
-        // navigationRailTheme: NavigationRailThemeData(
-        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
-        // ),
-
-        // navigationDrawerTheme: NavigationDrawerThemeData(
-        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
-        // ),
-        navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: Color.fromARGB(255, 254, 190, 190),
+        // SeachBar Theme
+        searchBarTheme: SearchBarThemeData(
+          backgroundColor: WidgetStateProperty.all(primaryAppColor),
+          elevation: WidgetStateProperty.all(0.0),
         ),
 
-        cardColor: Color.fromARGB(255, 254, 190, 190),
+        // NavigationBar Theme
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: primaryAppColor,
+          iconTheme: WidgetStateProperty.all(
+            IconThemeData(color: navigationIcons),
+          ),
+        ),
 
+        // Card Theme
         cardTheme: CardTheme(
-          color: const Color.fromARGB(255, 254, 190, 190),
+          color: primaryAppColor,
           // elevation: 0,
         ),
-        // bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        //   backgroundColor: Color.fromARGB(255, 254, 190, 190),
-        // ),
 
-        //Text Theme Changes
+        // TabBar Theme
+        tabBarTheme: TabBarTheme(
+          labelColor: primaryAccent,
+          unselectedLabelColor: primaryTextColor,
+        ),
+
+        //Text Theme's
         textTheme: TextTheme(
-          bodyLarge: const TextStyle(
-            // fontSize: 18,
-            // fontWeight: FontWeight.normal,
-            // color: Color.fromARGB(255, 0, 0, 0),
-          ),
-          bodyMedium: const TextStyle(color: Color.fromARGB(255, 73, 69, 79)),
-
-          // ···
+          bodyLarge: const TextStyle(),
+          bodyMedium: const TextStyle(color: primaryTextColor),
+          labelLarge: const TextStyle(color: primaryAccent),
         ),
       ),
       home: Scaffold(
@@ -91,7 +85,7 @@ class _MainAppState extends State<MainApp> {
           selectedIndex: currentPageIndex,
           destinations: const <Widget>[
             NavigationDestination(
-              selectedIcon: Icon(Icons.home),
+              selectedIcon: Icon(Icons.map),
               icon: Icon(Icons.map),
               label: 'Kaart',
             ),
@@ -109,7 +103,7 @@ class _MainAppState extends State<MainApp> {
             <Widget>[
               MapWidget(),
               RoutesList(),
-              Placeholder(),
+              OfflineMapPage(),
             ][currentPageIndex],
       ),
     );
