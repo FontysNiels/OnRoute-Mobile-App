@@ -1,6 +1,7 @@
 import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
+import 'package:onroute_app/temp.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
@@ -102,7 +103,7 @@ class _MainAppState extends State<MainApp> {
             <Widget>[
               MapWidget(),
               RoutesList(),
-              Placeholder(),
+              OfflineMapPage(),
             ][currentPageIndex],
       ),
     );
