@@ -1,18 +1,18 @@
-class Root {
+class RouteLayerData {
   // final double opacity;
   // final bool visibility;
   final List<Layer> layers;
   final List<int> visibleLayers;
 
-  Root({
+  RouteLayerData({
     // required this.opacity,
     // required this.visibility,
     required this.layers,
     required this.visibleLayers,
   });
 
-  factory Root.fromJson(Map<String, dynamic> json) {
-    return Root(
+  factory RouteLayerData.fromJson(Map<String, dynamic> json) {
+    return RouteLayerData(
       // opacity: json['opacity'],
       // visibility: json['visibility'],
       layers:
@@ -81,13 +81,17 @@ class Feature {
 class RouteGeometry {
   final RouteSpatialReference spatialReference;
   final List<dynamic>? paths;
+  final double? x;
+  final double? y;
 
-  RouteGeometry({required this.spatialReference, this.paths});
+  RouteGeometry({required this.spatialReference, this.paths, this.x, this.y});
 
   factory RouteGeometry.fromJson(Map<String, dynamic> json) {
     return RouteGeometry(
       spatialReference: RouteSpatialReference.fromJson(json['spatialReference']),
       paths: json['paths'],
+      x: json['x'],
+      y: json['y'],
     );
   }
 }

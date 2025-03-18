@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:onroute_app/Classes/Routes.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/math.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -115,7 +115,7 @@ class _OfflineMapPageState extends State<OfflineMapPage> {
         child: FloatingActionButton(
           onPressed: () async {
             var response = await createMarker();
-            Root routeInfo = Root.fromJson(jsonDecode(response.body));
+            RouteLayerData routeInfo = RouteLayerData.fromJson(jsonDecode(response.body));
             // log(response.body);
 
             // Full route info
@@ -169,7 +169,7 @@ class _OfflineMapPageState extends State<OfflineMapPage> {
     );
 
      var response = await createMarker();
-            Root routeInfo = Root.fromJson(jsonDecode(response.body));
+            RouteLayerData routeInfo = RouteLayerData.fromJson(jsonDecode(response.body));
             // log(response.body);
 
             // Full route info
@@ -190,7 +190,7 @@ class _OfflineMapPageState extends State<OfflineMapPage> {
     //      ] ],
     //     "spatialReference":{"latestWkid":3857,"wkid":102100}}''';
 
-    
+
     final roadOneGeometry = Geometry.fromJsonString(polylineOneJson);
 
     final startPoint = ArcGISPoint(

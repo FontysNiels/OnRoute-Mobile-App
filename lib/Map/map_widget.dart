@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:http/http.dart' as http;
 
 Future<void> initialize() async {
   await dotenv.load(fileName: ".env");
@@ -24,7 +26,6 @@ class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
     super.initState();
-    // requestLocationPermission();
     initialize();
   }
 
@@ -43,6 +44,11 @@ class _MapWidgetState extends State<MapWidget> {
   var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
   // A flag for when the map view is ready and controls can be used.
   var _ready = false;
+  final _directionsGraphicsOverlay = GraphicsOverlay();
+  // Create a graphics overlay.
+  final _graphicsOverlay = GraphicsOverlay();
+  // Create symbols which will be used for each geometry type.
+  late final SimpleLineSymbol _polylineSymbol;
 
   @override
   void dispose() {
@@ -222,6 +228,13 @@ class _MapWidgetState extends State<MapWidget> {
       //   BasemapStyle.arcGISNavigationNight,
       // );
 
+      // Add the graphics overlay to the map view.
+      _mapViewController.graphicsOverlays.add(_graphicsOverlay);
+      // Configure some initial graphics.
+      _graphicsOverlay.graphics.addAll(await initialGraphics());
+      // Set an initial viewpoint over the graphics.
+      _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
+
       _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
@@ -231,6 +244,8 @@ class _MapWidgetState extends State<MapWidget> {
         setState(() => _autoPanMode = mode);
       });
 
+      // Setting the location type, probably don't need this later on
+      //////////////////////////////////////////////////////////////////////////////////////////
       // Subscribe to status changes and changes to the auto-pan mode.
       _statusSubscription = _locationDataSource.onStatusChanged.listen((
         status,
@@ -247,6 +262,7 @@ class _MapWidgetState extends State<MapWidget> {
       setState(
         () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
       );
+      //////////////////////////////////////////////////////////////////////////////////////////
 
       // Attempt to start the location data source (this will prompt the user for permission).
       try {
@@ -268,5 +284,72 @@ class _MapWidgetState extends State<MapWidget> {
     } catch (e) {
       print("Error in onMapViewReady: $e");
     }
+  }
+
+  Future<http.Response> getRouteData() async {
+    // Get Car Id (By License Plate)
+    final response = await http.get(
+      Uri.parse(
+        'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/4f4cea7adeb0463c9ccb4a92d2c62dbf/data',
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        // 'Authorization': 'Bearer ${_credentials!.accessToken}',
+      },
+    );
+    return response;
+  }
+
+  Future<List<Graphic>> initialGraphics() async {
+    var response = await getRouteData();
+    RouteLayerData routeInfo = RouteLayerData.fromJson(
+      jsonDecode(response.body),
+    );
+
+    // POINTS /////////////////////////////////////////////////////////
+    for (var element in routeInfo.layers[2].featureSet.features) {
+      if (element.geometry.x != null) {
+        final parsedX = element.geometry.x;
+        final parsedY = element.geometry.y;
+
+        final startPoint = ArcGISPoint(
+          x: parsedX!,
+          y: parsedY!,
+          spatialReference: SpatialReference.webMercator,
+        );
+
+        final routeStartCircleSymbol = SimpleMarkerSymbol(
+          style: SimpleMarkerSymbolStyle.circle,
+          color: Colors.blue,
+          size: 15.0,
+        );
+        // Add the start and end points to the stops graphics overlay.
+        _directionsGraphicsOverlay.graphics.addAll([
+          Graphic(geometry: startPoint, symbol: routeStartCircleSymbol),
+        ]);
+      }
+    }
+
+    // ROUTES /////////////////////////////////////////////////////////
+
+    // Create symbols for each geometry type.
+    _polylineSymbol = SimpleLineSymbol(
+      style: SimpleLineSymbolStyle.solid,
+      color: Colors.blue,
+      width: 2,
+    );
+
+    List<Graphic> graphics = [];
+    for (var element in routeInfo.layers[1].featureSet.features) {
+      final polylineJson = '''
+            {"paths": ${element.geometry.paths},
+            "spatialReference":${element.geometry.spatialReference.toString()}}''';
+
+      final routePart = Geometry.fromJsonString(polylineJson);
+      graphics.add(Graphic(geometry: routePart, symbol: _polylineSymbol));
+    }
+
+    // Return a list of graphics for each geometry type.
+    return graphics;
   }
 }
