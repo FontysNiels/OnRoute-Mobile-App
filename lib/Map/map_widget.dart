@@ -4,8 +4,11 @@ import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:http/http.dart' as http;
+import 'package:onroute_app/Functions/api_calls.dart';
+
+import 'package:onroute_app/Functions/generate_route_components.dart';
 
 Future<void> initialize() async {
   await dotenv.load(fileName: ".env");
@@ -25,13 +28,13 @@ class MapWidget extends StatefulWidget {
 class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
-    super.initState();
     initialize();
+    super.initState();
   }
 
   // create a controller for the map view
   final _mapViewController = ArcGISMapView.createController();
-
+  late ArcGISMap _webMap;
   // A flag for when the settings bottom sheet is visible.
   var _settingsVisible = false;
   // Create the system location data source.
@@ -52,12 +55,20 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   void dispose() {
-    // When exiting, stop the location data source and cancel subscriptions.
-    _locationDataSource.stop();
-    _statusSubscription?.cancel();
-    _autoPanModeSubscription?.cancel();
-
+    _cleanUpResources();
     super.dispose();
+  }
+
+  Future<void> _cleanUpResources() async {
+    try {
+      await _locationDataSource.stop();
+      await _statusSubscription?.cancel();
+      await _autoPanModeSubscription?.cancel();
+    } catch (e) {
+      print("heyy");
+
+      print(e);
+    }
   }
 
   @override
@@ -82,7 +93,10 @@ class _MapWidgetState extends State<MapWidget> {
                     onPressed:
                         _status == LocationDataSourceStatus.failedToStart
                             ? null
-                            : () => setState(() => _settingsVisible = true),
+                            : () => {
+                              if (mounted)
+                                {setState(() => _settingsVisible = true)},
+                            },
                     child: const Text('Location Settings'),
                   ),
                 ),
@@ -108,6 +122,13 @@ class _MapWidgetState extends State<MapWidget> {
                           LocationDisplayAutoPanMode.recenter,
                     },
                 child: Icon(Icons.gps_fixed),
+              ),
+            ),
+            Center(
+              child: FloatingActionButton(
+                onPressed: () async {
+                  _graphicsOverlay.graphics.addAll(await initialGraphics());
+                },
               ),
             ),
           ],
@@ -142,7 +163,10 @@ class _MapWidgetState extends State<MapWidget> {
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close),
-                onPressed: () => setState(() => _settingsVisible = false),
+                onPressed:
+                    () => {
+                      if (mounted) {setState(() => _settingsVisible = false)},
+                    },
               ),
             ],
           ),
@@ -204,10 +228,10 @@ class _MapWidgetState extends State<MapWidget> {
     try {
       // set the map to the map view controller
 
-      final map = ArcGISMap.withBasemapStyle(
-        BasemapStyle.arcGISChartedTerritory,
-      );
-      _mapViewController.arcGISMap = map;
+      // final map = ArcGISMap.withBasemapStyle(
+      //   BasemapStyle.arcGISChartedTerritory,
+      // );
+      // _mapViewController.arcGISMap = map;
       // print("Map set to map view controller");
       // set the viewpoint of the map view controller (BraGIS, HEEL ver uitgezoomed, dus je start op nederland)
       _mapViewController.setViewpoint(
@@ -218,6 +242,20 @@ class _MapWidgetState extends State<MapWidget> {
         ),
       );
 
+      PortalConnection connection = PortalConnection.anonymous;
+      final portalItem = PortalItem.withPortalAndItemId(
+        // portal: portal,
+        // itemId: 'acc027394bc84c2fb04d1ed317aac674',
+        portal: Portal(
+          Uri.parse('https://gisportal.bragis.nl/arcgis'),
+          connection: connection,
+        ),
+        itemId: '65e1dc5d7178478d8b30d4f93f683a91',
+        // itemId: '50dd5ef186644d91902c2e77ddd7c414',
+      );
+
+      _webMap = ArcGISMap.withItem(portalItem);
+      _mapViewController.arcGISMap = _webMap;
       // _mapViewController.onScaleChanged.listen((scale) {
       //   _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
 
@@ -231,7 +269,9 @@ class _MapWidgetState extends State<MapWidget> {
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
       // Configure some initial graphics.
-      _graphicsOverlay.graphics.addAll(await initialGraphics());
+
+      // _graphicsOverlay.graphics.addAll(await initialGraphics());
+
       // Set an initial viewpoint over the graphics.
       _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
 
@@ -241,7 +281,9 @@ class _MapWidgetState extends State<MapWidget> {
       _mapViewController.locationDisplay.autoPanMode =
           LocationDisplayAutoPanMode.navigation;
       _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
-        setState(() => _autoPanMode = mode);
+        if (mounted) {
+          setState(() => _autoPanMode = mode);
+        }
       });
 
       // Setting the location type, probably don't need this later on
@@ -250,18 +292,26 @@ class _MapWidgetState extends State<MapWidget> {
       _statusSubscription = _locationDataSource.onStatusChanged.listen((
         status,
       ) {
-        setState(() => _status = status);
+        if (mounted) {
+          setState(() => _status = status);
+        }
       });
-      setState(() => _status = _locationDataSource.status);
-      _autoPanModeSubscription = _mapViewController
-          .locationDisplay
-          .onAutoPanModeChanged
-          .listen((mode) {
-            setState(() => _autoPanMode = mode);
-          });
-      setState(
-        () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
-      );
+      if (mounted) {
+        setState(() => _status = _locationDataSource.status);
+        _autoPanModeSubscription = _mapViewController
+            .locationDisplay
+            .onAutoPanModeChanged
+            .listen((mode) {
+              if (mounted) {
+                setState(() => _autoPanMode = mode);
+              }
+            });
+      }
+      if (mounted) {
+        setState(
+          () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
+        );
+      }
       //////////////////////////////////////////////////////////////////////////////////////////
 
       // Attempt to start the location data source (this will prompt the user for permission).
@@ -277,68 +327,94 @@ class _MapWidgetState extends State<MapWidget> {
       }
 
       // Set the ready state variable to true to enable the UI.
-      setState(() {
-        _ready = true;
-        // print("_ready set to true");
-      });
+      if (mounted) {
+        setState(() {
+          _ready = true;
+          // print("_ready set to true");
+        });
+      }
     } catch (e) {
       print("Error in onMapViewReady: $e");
     }
   }
 
-  Future<http.Response> getRouteData() async {
-    // Get Car Id (By License Plate)
-    final response = await http.get(
-      Uri.parse(
-        'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/4f4cea7adeb0463c9ccb4a92d2c62dbf/data',
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        // 'Authorization': 'Bearer ${_credentials!.accessToken}',
-      },
-    );
-    return response;
-  }
-
   Future<List<Graphic>> initialGraphics() async {
+    // Create symbol for line.
+    _polylineSymbol = SimpleLineSymbol(
+      style: SimpleLineSymbolStyle.solid,
+      color: Colors.blue,
+      width: 4,
+    );
+
+    // Get data from route <IN ONMAPVIEW ZETTEN>
     var response = await getRouteData();
     RouteLayerData routeInfo = RouteLayerData.fromJson(
       jsonDecode(response.body),
     );
 
-    // POINTS /////////////////////////////////////////////////////////
-    for (var element in routeInfo.layers[2].featureSet.features) {
-      if (element.geometry.x != null) {
-        final parsedX = element.geometry.x;
-        final parsedY = element.geometry.y;
+    List<DescriptionPoint> routeDirections = [];
 
-        final startPoint = ArcGISPoint(
+    for (var element in routeInfo.layers[2].featureSet.features) {
+      if (element.geometry.x == null) {
+        continue;
+      }
+      final parsedX = element.geometry.x;
+      final parsedY = element.geometry.y;
+
+      // Works, but when it repeats like "vertrek bij Location 1" it doesnt work....
+      // if (element.attributes['DisplayText'].contains(
+      //   element.attributes['Name'].toString(),
+      // )) {
+
+      //   final yes = routeInfo.layers[3].featureSet.features;
+
+      //   int test = element.attributes['ObjectID'];
+
+      //   if (test != null) {
+      //     try {
+      //       print(
+      //         yes.firstWhere(
+      //           (feature) => feature.attributes['ObjectID'] == test,
+      //         ),
+      //       );
+      //       element.attributes['DisplayText'] = element
+      //           .attributes['DisplayText']
+      //           .replaceAll(
+      //             element.attributes['Name'].toString(),
+      //             yes
+      //                 .firstWhere(
+      //                   (feature) => feature.attributes['ObjectID'] == test,
+      //                 )
+      //                 ?.attributes['Name'],
+      //           );
+
+      //           print( element.attributes['DisplayText']);
+      //     } catch (e) {
+      //       print("NOT IN THERE");
+      //     }
+      //   }
+      // }
+
+      routeDirections.add(
+        DescriptionPoint(
+          description: element.attributes['DisplayText'],
           x: parsedX!,
           y: parsedY!,
-          spatialReference: SpatialReference.webMercator,
-        );
+        ),
+      );
+    }
+    // print('------------');
+    // for (var i = 0; i < routeDirections.length; i++) {
+    //   print(routeDirections[i].toString());
+    // }
 
-        final routeStartCircleSymbol = SimpleMarkerSymbol(
-          style: SimpleMarkerSymbolStyle.circle,
-          color: Colors.blue,
-          size: 15.0,
-        );
-        // Add the start and end points to the stops graphics overlay.
-        _directionsGraphicsOverlay.graphics.addAll([
-          Graphic(geometry: startPoint, symbol: routeStartCircleSymbol),
-        ]);
-      }
+    // Generate Points
+    List<Graphic> pointGraphics = generatePointGraphics(routeInfo);
+    for (var i = 0; i < pointGraphics.length; i++) {
+      _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
     }
 
-    // ROUTES /////////////////////////////////////////////////////////
-
-    // Create symbols for each geometry type.
-    _polylineSymbol = SimpleLineSymbol(
-      style: SimpleLineSymbolStyle.solid,
-      color: Colors.blue,
-      width: 2,
-    );
-
+    // Generate Lines
     List<Graphic> graphics = [];
     for (var element in routeInfo.layers[1].featureSet.features) {
       final polylineJson = '''

@@ -1,3 +1,4 @@
+import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
@@ -5,6 +6,10 @@ import 'package:onroute_app/temp.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
+  FlutterError.onError = (FlutterErrorDetails details) {
+    print(details);
+    // Log or handle the error details
+  };
   runApp(const MainApp());
 }
 
@@ -99,12 +104,23 @@ class _MainAppState extends State<MainApp> {
             ),
           ],
         ),
-        body:
+        //   body:
+        //       <Widget>[
+        //         MapWidget(),
+        //         RoutesList(),
+        //         OfflineMapPage(),
+        //       ][currentPageIndex],
+        // ),
+        body: Stack(
+          children: [
+            MapWidget(),
             <Widget>[
-              MapWidget(),
+              Container(),
               RoutesList(),
               OfflineMapPage(),
             ][currentPageIndex],
+          ],
+        ),
       ),
     );
   }

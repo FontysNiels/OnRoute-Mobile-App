@@ -57,7 +57,9 @@ class FeatureSet {
               .map((feature) => Feature.fromJson(feature))
               .toList(),
       geometryType: json['geometryType'],
-      spatialReference: RouteSpatialReference.fromJson(json['spatialReference']),
+      spatialReference: RouteSpatialReference.fromJson(
+        json['spatialReference'],
+      ),
     );
   }
 }
@@ -66,14 +68,21 @@ class Feature {
   final Map<String, dynamic> attributes;
   final RouteGeometry geometry;
   final Symbol? symbol;
+  // final String? displayText;
 
-  Feature({required this.attributes, required this.geometry, this.symbol});
+  Feature({
+    required this.attributes,
+    required this.geometry,
+    this.symbol,
+    // this.displayText,
+  });
 
   factory Feature.fromJson(Map<String, dynamic> json) {
     return Feature(
       attributes: Map<String, dynamic>.from(json['attributes']),
       geometry: RouteGeometry.fromJson(json['geometry']),
       symbol: json['symbol'] != null ? Symbol.fromJson(json['symbol']) : null,
+      // displayText: json['displayText'],
     );
   }
 }
@@ -88,7 +97,9 @@ class RouteGeometry {
 
   factory RouteGeometry.fromJson(Map<String, dynamic> json) {
     return RouteGeometry(
-      spatialReference: RouteSpatialReference.fromJson(json['spatialReference']),
+      spatialReference: RouteSpatialReference.fromJson(
+        json['spatialReference'],
+      ),
       paths: json['paths'],
       x: json['x'],
       y: json['y'],
@@ -105,8 +116,12 @@ class RouteSpatialReference {
   String toString() {
     return '{"latestWkid": $latestWkid, "wkid": $wkid}';
   }
+
   factory RouteSpatialReference.fromJson(Map<String, dynamic> json) {
-    return RouteSpatialReference(latestWkid: json['latestWkid'], wkid: json['wkid']);
+    return RouteSpatialReference(
+      latestWkid: json['latestWkid'],
+      wkid: json['wkid'],
+    );
   }
 }
 
