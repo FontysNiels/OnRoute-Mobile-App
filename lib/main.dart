@@ -1,13 +1,14 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
-import 'package:onroute_app/temp.dart';
+import 'package:onroute_app/Map/bottom_sheet_widget.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
-    print(details);
+    // print(details);
     // Log or handle the error details
   };
   runApp(const MainApp());
@@ -20,14 +21,33 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+Future<void> initialize() async {
+  await dotenv.load(fileName: ".env");
+  // gets and sets API key from .env file
+  String apiKey = dotenv.env['API_KEY'] ?? 'default_api_key';
+  // sets the API key for the ArcGIS environment
+  ArcGISEnvironment.apiKey = apiKey;
+}
+
 class _MainAppState extends State<MainApp> {
-  int currentPageIndex = 1;
+  @override
+  void initState() {
+    initialize();
+    super.initState();
+  }
+
+  // int currentPageIndex = 1;
+  int currentPageIndex = 0;
   @override
   Widget build(BuildContext context) {
     const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
     const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
     const Color navigationIcons = Color.fromARGB(255, 48, 48, 48);
     const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double screenHeight = MediaQuery.of(context).size.height;
+    print('Screen width: $screenWidth, Screen height: $screenHeight');
 
     return MaterialApp(
       // theme: AppTheme,
@@ -72,6 +92,10 @@ class _MainAppState extends State<MainApp> {
           unselectedLabelColor: primaryTextColor,
         ),
 
+        dividerTheme: DividerThemeData(
+          color: primaryAppColor
+        ),
+
         //Text Theme's
         textTheme: TextTheme(
           bodyLarge: const TextStyle(),
@@ -80,45 +104,38 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
-        bottomNavigationBar: NavigationBar(
-          onDestinationSelected: (int index) {
-            setState(() {
-              currentPageIndex = index;
-            });
-          },
-          indicatorColor: const Color.fromARGB(255, 235, 138, 138),
-          selectedIndex: currentPageIndex,
-          destinations: const <Widget>[
-            NavigationDestination(
-              selectedIcon: Icon(Icons.map),
-              icon: Icon(Icons.map),
-              label: 'Kaart',
-            ),
-            NavigationDestination(
-              icon: Badge(child: Icon(Icons.explore)),
-              label: 'Routes',
-            ),
-            NavigationDestination(
-              icon: Badge(label: Text('2'), child: Icon(Icons.question_mark)),
-              label: 't.b.d.',
-            ),
-          ],
-        ),
-        //   body:
-        //       <Widget>[
-        //         MapWidget(),
-        //         RoutesList(),
-        //         OfflineMapPage(),
-        //       ][currentPageIndex],
+        // bottomNavigationBar: NavigationBar(
+        //   onDestinationSelected: (int index) {
+        //     setState(() {
+        //       currentPageIndex = index;
+        //     });
+        //   },
+        //   indicatorColor: const Color.fromARGB(255, 235, 138, 138),
+        //   selectedIndex: currentPageIndex,
+        //   destinations: const <Widget>[
+        //     NavigationDestination(
+        //       selectedIcon: Icon(Icons.map),
+        //       icon: Icon(Icons.map),
+        //       label: 'Kaart',
+        //     ),
+        //     NavigationDestination(
+        //       icon: Badge(child: Icon(Icons.explore)),
+        //       label: 'Routes',
+        //     ),
+        //     NavigationDestination(
+        //       icon: Badge(label: Text('2'), child: Icon(Icons.question_mark)),
+        //       label: 't.b.d.',
+        //     ),
+        //   ],
         // ),
-        body: Stack(
+        body: IndexedStack(
+          index: currentPageIndex, // Controls which child is displayed
           children: [
+            // AsyncMapPage(),
             MapWidget(),
-            <Widget>[
-              Container(),
-              RoutesList(),
-              OfflineMapPage(),
-            ][currentPageIndex],
+            RoutesList(),
+            // TempMapPage(), // This ensures the map remains loaded in memory
+            BottomSheetWidget(),
           ],
         ),
       ),

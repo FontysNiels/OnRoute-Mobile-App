@@ -42,9 +42,12 @@ class PackageCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge!.copyWith(),
                             // 2 lines van maken? Titels zijn vrij lang
                             "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(

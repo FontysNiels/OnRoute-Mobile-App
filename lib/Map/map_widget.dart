@@ -3,20 +3,13 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 
 import 'package:onroute_app/Functions/generate_route_components.dart';
-
-Future<void> initialize() async {
-  await dotenv.load(fileName: ".env");
-  // gets and sets API key from .env file
-  String apiKey = dotenv.env['API_KEY'] ?? 'default_api_key';
-  // sets the API key for the ArcGIS environment
-  ArcGISEnvironment.apiKey = apiKey;
-}
+import 'package:onroute_app/Routes/route_package.dart';
+import 'package:onroute_app/Map/bottom_sheet_widget.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({super.key});
@@ -28,8 +21,25 @@ class MapWidget extends StatefulWidget {
 class _MapWidgetState extends State<MapWidget> {
   @override
   void initState() {
-    initialize();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _cleanUpResources();
+    // _mapViewController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _cleanUpResources() async {
+    try {
+      await _locationDataSource.stop();
+      await _statusSubscription?.cancel();
+      await _autoPanModeSubscription?.cancel();
+    } catch (e) {
+      print("ERROR GEVONDEN:");
+      print(e);
+    }
   }
 
   // create a controller for the map view
@@ -52,24 +62,6 @@ class _MapWidgetState extends State<MapWidget> {
   final _graphicsOverlay = GraphicsOverlay();
   // Create symbols which will be used for each geometry type.
   late final SimpleLineSymbol _polylineSymbol;
-
-  @override
-  void dispose() {
-    _cleanUpResources();
-    super.dispose();
-  }
-
-  Future<void> _cleanUpResources() async {
-    try {
-      await _locationDataSource.stop();
-      await _statusSubscription?.cancel();
-      await _autoPanModeSubscription?.cancel();
-    } catch (e) {
-      print("heyy");
-
-      print(e);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +123,8 @@ class _MapWidgetState extends State<MapWidget> {
                 },
               ),
             ),
+
+            BottomSheetWidget(),
           ],
         ),
       ),
@@ -227,13 +221,6 @@ class _MapWidgetState extends State<MapWidget> {
     // print("onMapViewReady called");
     try {
       // set the map to the map view controller
-
-      // final map = ArcGISMap.withBasemapStyle(
-      //   BasemapStyle.arcGISChartedTerritory,
-      // );
-      // _mapViewController.arcGISMap = map;
-      // print("Map set to map view controller");
-      // set the viewpoint of the map view controller (BraGIS, HEEL ver uitgezoomed, dus je start op nederland)
       _mapViewController.setViewpoint(
         Viewpoint.withLatLongScale(
           latitude: 51.598289,
@@ -250,8 +237,7 @@ class _MapWidgetState extends State<MapWidget> {
           Uri.parse('https://gisportal.bragis.nl/arcgis'),
           connection: connection,
         ),
-        itemId: '65e1dc5d7178478d8b30d4f93f683a91',
-        // itemId: '50dd5ef186644d91902c2e77ddd7c414',
+        itemId: '50dd5ef186644d91902c2e77ddd7c414',
       );
 
       _webMap = ArcGISMap.withItem(portalItem);
@@ -261,15 +247,10 @@ class _MapWidgetState extends State<MapWidget> {
 
       // });
 
-      // Create a map with the Navigation Night basemap style.
-      // _mapViewController.arcGISMap = ArcGISMap.withBasemapStyle(
-      //   BasemapStyle.arcGISNavigationNight,
-      // );
-
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
-      // Configure some initial graphics.
 
+      // Configure some initial graphics.
       // _graphicsOverlay.graphics.addAll(await initialGraphics());
 
       // Set an initial viewpoint over the graphics.
@@ -352,6 +333,31 @@ class _MapWidgetState extends State<MapWidget> {
       jsonDecode(response.body),
     );
 
+    // Route Directtions (Move to separate function)
+    getRouteDirections(routeInfo);
+
+    // Generate Points
+    List<Graphic> pointGraphics = generatePointGraphics(routeInfo);
+    for (var i = 0; i < pointGraphics.length; i++) {
+      _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
+    }
+
+    // Generate Lines
+    List<Graphic> graphics = [];
+    for (var element in routeInfo.layers[1].featureSet.features) {
+      final polylineJson = '''
+            {"paths": ${element.geometry.paths},
+            "spatialReference":${element.geometry.spatialReference.toString()}}''';
+
+      final routePart = Geometry.fromJsonString(polylineJson);
+      graphics.add(Graphic(geometry: routePart, symbol: _polylineSymbol));
+    }
+
+    // Return a list of graphics for each geometry type.
+    return graphics;
+  }
+
+  void getRouteDirections(RouteLayerData routeInfo) {
     List<DescriptionPoint> routeDirections = [];
 
     for (var element in routeInfo.layers[2].featureSet.features) {
@@ -407,25 +413,5 @@ class _MapWidgetState extends State<MapWidget> {
     // for (var i = 0; i < routeDirections.length; i++) {
     //   print(routeDirections[i].toString());
     // }
-
-    // Generate Points
-    List<Graphic> pointGraphics = generatePointGraphics(routeInfo);
-    for (var i = 0; i < pointGraphics.length; i++) {
-      _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
-    }
-
-    // Generate Lines
-    List<Graphic> graphics = [];
-    for (var element in routeInfo.layers[1].featureSet.features) {
-      final polylineJson = '''
-            {"paths": ${element.geometry.paths},
-            "spatialReference":${element.geometry.spatialReference.toString()}}''';
-
-      final routePart = Geometry.fromJsonString(polylineJson);
-      graphics.add(Graphic(geometry: routePart, symbol: _polylineSymbol));
-    }
-
-    // Return a list of graphics for each geometry type.
-    return graphics;
   }
 }
