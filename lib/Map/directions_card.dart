@@ -22,8 +22,10 @@ class DirectionsCard extends StatefulWidget {
 
 class _DirectionsCardState extends State<DirectionsCard> {
   int metersToNextDirection = 0;
+  // int metersToNextDirectionOld = 0;
   // Maak een functie die check of de user bij de start weg loopt
   int i = 1;
+  bool skipNextCheck = false;
 
   @override
   Widget build(BuildContext context) {
@@ -54,27 +56,41 @@ class _DirectionsCardState extends State<DirectionsCard> {
         const metersPerDegree = 111320; // Approximation for latitude
         final distanceInMeters = distance * metersPerDegree;
 
-        // Print the distance in meters
-        // print(
-        //   'Distance to next point: ${distanceInMeters.toStringAsFixed(2)} meters',
-        // );
-
-        // Update distance to nect direction
-        setState(() {
-          metersToNextDirection = distanceInMeters.toInt();
-        });
-
         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
-        // If distance to next direction < 10m next direction
         if (distance < thresholdDistance) {
-          print("User has passed the current direction's coordinates.");
           // Move to the next direction if available
           if (i < widget._directionsList.length - 1) {
+            print("User has passed the current direction's coordinates.");
             setState(() {
               i++;
+              // metersToNextDirection = distanceInMeters.toInt();
+              skipNextCheck = true; // Skip the next check
+              // ^ uit setstate zetten?
             });
           }
+        } else if (!skipNextCheck) {
+          // if user walks away from point
+          if (metersToNextDirection < distanceInMeters.toInt() &&
+              metersToNextDirection != 0) {
+            // checken of het verschil groter is dan 5-10 meter
+            if (i < widget._directionsList.length - 1) {
+              i++;
+              print(
+                "${widget._directionsList[i].description} : Significant decrease in distance detected.",
+              );
+            }
+          }
+        } else {
+          skipNextCheck = false; // Reset the flag after skipping
         }
+
+        // DEZE IN DE UITLOOPCHECK ZETTEN, ALS HET BLIJFT UITLOPEN ZAL HIJ DIE OLD UPDATEN EN DUS IS EEN MINIMAAL LASTIG TE ZETTEN
+        // DUS ALLEEN OLD AANPASSEN ALS HET NIET WEGLOOPT (ALS IK EEN MARGIN WIL HEBBEN VAN EEN BEPAALDE AFSTAND)
+        // Update distance to nect direction
+        setState(() {
+          // metersToNextDirectionOld = metersToNextDirection;
+          metersToNextDirection = distanceInMeters.toInt();
+        });
       }
     });
 
