@@ -21,3 +21,19 @@ ArcGISPoint convertToArcGISPoint(double latitude, double longitude) {
     spatialReference: SpatialReference.webMercator,
   );
 }
+
+List convertToLatLng(double x, double y) {
+  // Earth's radius in meters for Web Mercator projection
+  const double earthRadius = 6378137.0;
+
+  // Convert from Web Mercator (EPSG:3857) coordinates to latitude and longitude
+  double lonRad = x / earthRadius;
+  double latRad = 2 * atan(exp(y / earthRadius)) - pi / 2;
+
+  // Convert radians to degrees
+  double latitude = latRad * 180.0 / pi;
+  double longitude = lonRad * 180.0 / pi;
+
+  // Return the latitude and longitude as a LatLng object
+  return [latitude, longitude];
+}

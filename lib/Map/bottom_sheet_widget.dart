@@ -12,6 +12,14 @@ class BottomSheetWidget extends StatelessWidget {
       {"...": "....", "locally": true},
       {"...": "....", "locally": true},
       {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
+      {"...": "....", "locally": false},
     ];
 
     return test;
@@ -23,9 +31,11 @@ class BottomSheetWidget extends StatelessWidget {
       children: [
         // Persistent bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.2,
+          initialChildSize: 0.1,
+          snap: true,
+          snapSizes: [0.1, 0.4, 0.6, 0.9],
           minChildSize: 0.1,
-          maxChildSize: 0.8,
+          maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
               decoration: BoxDecoration(
@@ -80,7 +90,7 @@ class BottomSheetWidget extends StatelessWidget {
                           return PackageCard();
                         }).toList(),
                       );
-                    } 
+                    }
                     // Make this an ONLINE CHECK, since there are always routes it shouldn't be that big of a problem tho
                     else {
                       listItems.add(
@@ -101,6 +111,7 @@ class BottomSheetWidget extends StatelessWidget {
                     }
 
                     return ListView(
+                      
                       padding: const EdgeInsets.all(5),
                       controller: scrollController,
                       children: listItems,

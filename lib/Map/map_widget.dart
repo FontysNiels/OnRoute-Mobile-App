@@ -1,15 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
-
 import 'package:onroute_app/Functions/generate_route_components.dart';
-import 'package:onroute_app/Routes/route_package.dart';
 import 'package:onroute_app/Map/bottom_sheet_widget.dart';
+import 'package:onroute_app/Map/directions_card.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({super.key});
@@ -26,20 +24,10 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   void dispose() {
-    _cleanUpResources();
-    // _mapViewController.dispose();
+    _locationDataSource.stop();
+    _statusSubscription?.cancel();
+    _autoPanModeSubscription?.cancel();
     super.dispose();
-  }
-
-  Future<void> _cleanUpResources() async {
-    try {
-      await _locationDataSource.stop();
-      await _statusSubscription?.cancel();
-      await _autoPanModeSubscription?.cancel();
-    } catch (e) {
-      print("ERROR GEVONDEN:");
-      print(e);
-    }
   }
 
   // create a controller for the map view
@@ -61,11 +49,10 @@ class _MapWidgetState extends State<MapWidget> {
   // Create a graphics overlay.
   final _graphicsOverlay = GraphicsOverlay();
   // Create symbols which will be used for each geometry type.
-  late final SimpleLineSymbol _polylineSymbol;
+  List<DescriptionPoint> _directionsList = [];
 
   @override
   Widget build(BuildContext context) {
-    // print(_ready);
     return Scaffold(
       body: SafeArea(
         top: false,
@@ -80,20 +67,54 @@ class _MapWidgetState extends State<MapWidget> {
                     onMapViewReady: onMapViewReady,
                   ),
                 ),
-                Center(
-                  child: ElevatedButton(
-                    onPressed:
-                        _status == LocationDataSourceStatus.failedToStart
-                            ? null
-                            : () => {
-                              if (mounted)
-                                {setState(() => _settingsVisible = true)},
-                            },
-                    child: const Text('Location Settings'),
-                  ),
-                ),
               ],
             ),
+
+            Align(
+              alignment: Alignment.centerRight,
+              child: FloatingActionButton(
+                onPressed:
+                    () => {
+                      _mapViewController.locationDisplay.autoPanMode =
+                          LocationDisplayAutoPanMode.recenter,
+                    },
+                child: Icon(Icons.gps_fixed),
+              ),
+            ),
+
+            _directionsList.isNotEmpty
+                ? DirectionsCard(
+                  directionsList: _directionsList,
+                  mapViewController: _mapViewController,
+                )
+                : Container(),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text("Route Toevoegen"),
+                    onPressed: () async {
+                      _graphicsOverlay.graphics.addAll(await initialGraphics());
+                    },
+                  ),
+                  TextButton(
+                    child: Text("Route Verwijderen"),
+                    onPressed: () async {
+                      setState(() {
+                        _directionsList.clear();
+                        _graphicsOverlay.graphics.clear();
+                        _directionsGraphicsOverlay.graphics.clear();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            BottomSheetWidget(),
+
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
               visible: !_ready,
@@ -104,116 +125,11 @@ class _MapWidgetState extends State<MapWidget> {
                 ),
               ),
             ),
-
-            Align(
-              alignment: Alignment.topRight,
-              child: FloatingActionButton(
-                onPressed:
-                    () => {
-                      _mapViewController.locationDisplay.autoPanMode =
-                          LocationDisplayAutoPanMode.recenter,
-                    },
-                child: Icon(Icons.gps_fixed),
-              ),
-            ),
-            Center(
-              child: FloatingActionButton(
-                onPressed: () async {
-                  _graphicsOverlay.graphics.addAll(await initialGraphics());
-                },
-              ),
-            ),
-
-            BottomSheetWidget(),
           ],
         ),
       ),
       // The Settings bottom sheet.
-      bottomSheet: _settingsVisible ? buildSettings(context) : null,
-    );
-  }
-
-  Widget buildSettings(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(
-        20.0,
-        20.0,
-        20.0,
-        max(
-          20.0,
-          View.of(context).viewPadding.bottom /
-              View.of(context).devicePixelRatio,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              Text(
-                'Location Settings',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed:
-                    () => {
-                      if (mounted) {setState(() => _settingsVisible = false)},
-                    },
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Text('Show Location'),
-              const Spacer(),
-              // A switch to start and stop the location data source.
-              Switch(
-                value: _status == LocationDataSourceStatus.started,
-                onChanged: (_) {
-                  if (_status == LocationDataSourceStatus.started) {
-                    _mapViewController.locationDisplay.stop();
-                  } else {
-                    _mapViewController.locationDisplay.start();
-                  }
-                },
-              ),
-            ],
-          ),
-          Row(
-            children: [
-              const Text('Auto-Pan Mode'),
-              const Spacer(),
-              // A dropdown button to select the auto-pan mode.
-              DropdownButton(
-                value: _autoPanMode,
-                onChanged: (value) {
-                  _mapViewController.locationDisplay.autoPanMode = value!;
-                },
-                items: const [
-                  DropdownMenuItem(
-                    value: LocationDisplayAutoPanMode.off,
-                    child: Text('Off'),
-                  ),
-                  DropdownMenuItem(
-                    value: LocationDisplayAutoPanMode.recenter,
-                    child: Text('Recenter'),
-                  ),
-                  DropdownMenuItem(
-                    value: LocationDisplayAutoPanMode.navigation,
-                    child: Text('Navigation'),
-                  ),
-                  DropdownMenuItem(
-                    value: LocationDisplayAutoPanMode.compassNavigation,
-                    child: Text('Compass'),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
+      // bottomSheet: _settingsVisible ? buildSettings(context) : null,
     );
   }
 
@@ -232,7 +148,6 @@ class _MapWidgetState extends State<MapWidget> {
       PortalConnection connection = PortalConnection.anonymous;
       final portalItem = PortalItem.withPortalAndItemId(
         // portal: portal,
-        // itemId: 'acc027394bc84c2fb04d1ed317aac674',
         portal: Portal(
           Uri.parse('https://gisportal.bragis.nl/arcgis'),
           connection: connection,
@@ -321,7 +236,7 @@ class _MapWidgetState extends State<MapWidget> {
 
   Future<List<Graphic>> initialGraphics() async {
     // Create symbol for line.
-    _polylineSymbol = SimpleLineSymbol(
+    late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
       color: Colors.blue,
       width: 4,
@@ -350,7 +265,7 @@ class _MapWidgetState extends State<MapWidget> {
             "spatialReference":${element.geometry.spatialReference.toString()}}''';
 
       final routePart = Geometry.fromJsonString(polylineJson);
-      graphics.add(Graphic(geometry: routePart, symbol: _polylineSymbol));
+      graphics.add(Graphic(geometry: routePart, symbol: polylineSymbol));
     }
 
     // Return a list of graphics for each geometry type.
@@ -409,9 +324,55 @@ class _MapWidgetState extends State<MapWidget> {
         ),
       );
     }
-    // print('------------');
-    // for (var i = 0; i < routeDirections.length; i++) {
-    //   print(routeDirections[i].toString());
-    // }
+    setState(() {
+      _directionsList = routeDirections;
+    });
+  }
+}
+
+class locationsettings extends StatelessWidget {
+  const locationsettings({
+    super.key,
+    required LocationDisplayAutoPanMode autoPanMode,
+    required ArcGISMapViewController mapViewController,
+  }) : _autoPanMode = autoPanMode,
+       _mapViewController = mapViewController;
+
+  final LocationDisplayAutoPanMode _autoPanMode;
+  final ArcGISMapViewController _mapViewController;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        const Text('Auto-Pan Mode'),
+        const Spacer(),
+        // A dropdown button to select the auto-pan mode.
+        DropdownButton(
+          value: _autoPanMode,
+          onChanged: (value) {
+            _mapViewController.locationDisplay.autoPanMode = value!;
+          },
+          items: const [
+            DropdownMenuItem(
+              value: LocationDisplayAutoPanMode.off,
+              child: Text('Off'),
+            ),
+            DropdownMenuItem(
+              value: LocationDisplayAutoPanMode.recenter,
+              child: Text('Recenter'),
+            ),
+            DropdownMenuItem(
+              value: LocationDisplayAutoPanMode.navigation,
+              child: Text('Navigation'),
+            ),
+            DropdownMenuItem(
+              value: LocationDisplayAutoPanMode.compassNavigation,
+              child: Text('Compass'),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }
