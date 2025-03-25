@@ -30,8 +30,12 @@ class _DirectionsCardState extends State<DirectionsCard> {
   bool skipNextCheck = false;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
     widget._mapViewController.locationDisplay.onLocationChanged.listen((mode) {
+      print(i);
       if (widget._directionsList.isNotEmpty) {
         // Calculate the distance between the user's current position and the direction's coordinates
         final userPosition =
@@ -60,8 +64,16 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
         // Distance between the user and the next point
         final directionXYnext = convertToLatLng(
-          widget._directionsList[i + 1].x,
-          widget._directionsList[i + 1].y,
+          widget
+              ._directionsList[i == widget._directionsList.length - 1
+                  ? i
+                  : i + 1]
+              .x,
+          widget
+              ._directionsList[i == widget._directionsList.length - 1
+                  ? i
+                  : i + 1]
+              .y,
         );
         final directionXnext = directionXYnext[1];
         final directionYnext = directionXYnext[0];
@@ -74,14 +86,18 @@ class _DirectionsCardState extends State<DirectionsCard> {
         final distanceInMeterToNext = distanceNext * metersPerDegree;
 
         // Distance between the current and next point
-        final distanceBetweenPoints =
-            widget
-                ._routeInfo
-                .layers[1]
-                .featureSet
-                .features[i - 1]
-                .attributes['Meters']
-                .toInt();
+        var distanceBetweenPoints = 0;
+        final matchingFeatures = widget._routeInfo.layers[1].featureSet.features
+            .where(
+              (feature) => feature.attributes['DirectionPointID'] == (i + 1),
+            );
+
+        if (matchingFeatures.isNotEmpty) {
+          distanceBetweenPoints =
+              matchingFeatures.first.attributes['Meters'].toInt();
+        } else {
+          // distanceBetweenPoints = 0; // Default value if no matching feature is found
+        }
         // print("points distance: $distanceBetweenPoints");
         // print('nect distance $distanceInMeterToNext');
         // print('current distance $distanceInMeters');
@@ -97,10 +113,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
             });
           }
         } else if (!skipNextCheck) {
-          // if user walks away from point and is getting closer to next point
+          // if user walks away from point and is getting closer to next point (start point test only, so if you start halfway it doesnt work)
           if (metersToNextDirection < distanceInMeters.toInt() &&
               distanceBetweenPoints > distanceInMeterToNext &&
-              metersToNextDirection != 0) {
+              metersToNextDirection != 0 &&
+              distanceBetweenPoints != 0) {
             if (i < widget._directionsList.length - 1) {
               i++;
               print(
@@ -122,7 +139,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
         });
       }
     });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
       child: Card(
