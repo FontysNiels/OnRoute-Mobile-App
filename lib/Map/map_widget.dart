@@ -50,6 +50,7 @@ class _MapWidgetState extends State<MapWidget> {
   final _graphicsOverlay = GraphicsOverlay();
   // Create symbols which will be used for each geometry type.
   List<DescriptionPoint> _directionsList = [];
+  late RouteLayerData _routeInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,7 @@ class _MapWidgetState extends State<MapWidget> {
             _directionsList.isNotEmpty
                 ? DirectionsCard(
                   directionsList: _directionsList,
+                  routeInfo: _routeInfo,
                   mapViewController: _mapViewController,
                 )
                 : Container(),
@@ -247,6 +249,10 @@ class _MapWidgetState extends State<MapWidget> {
     RouteLayerData routeInfo = RouteLayerData.fromJson(
       jsonDecode(response.body),
     );
+
+    setState(() {
+      _routeInfo = routeInfo;
+    });
 
     // Route Directtions (Move to separate function)
     getRouteDirections(routeInfo);

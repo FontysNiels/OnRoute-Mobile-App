@@ -3,18 +3,22 @@ import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/math.dart';
 
 class DirectionsCard extends StatefulWidget {
   const DirectionsCard({
     super.key,
+    required RouteLayerData routeInfo,
     required List<DescriptionPoint> directionsList,
     required ArcGISMapViewController mapViewController,
   }) : _directionsList = directionsList,
+       _routeInfo = routeInfo,
        _mapViewController = mapViewController;
 
   final List<DescriptionPoint> _directionsList;
   final ArcGISMapViewController _mapViewController;
+  final RouteLayerData _routeInfo;
 
   @override
   State<DirectionsCard> createState() => _DirectionsCardState();
@@ -22,8 +26,6 @@ class DirectionsCard extends StatefulWidget {
 
 class _DirectionsCardState extends State<DirectionsCard> {
   int metersToNextDirection = 0;
-  // int metersToNextDirectionOld = 0;
-  // Maak een functie die check of de user bij de start weg loopt
   int i = 1;
   bool skipNextCheck = false;
 
@@ -56,23 +58,49 @@ class _DirectionsCardState extends State<DirectionsCard> {
         const metersPerDegree = 111320; // Approximation for latitude
         final distanceInMeters = distance * metersPerDegree;
 
+        // Distance between the user and the next point
+        final directionXYnext = convertToLatLng(
+          widget._directionsList[i + 1].x,
+          widget._directionsList[i + 1].y,
+        );
+        final directionXnext = directionXYnext[1];
+        final directionYnext = directionXYnext[0];
+
+        final distanceNext = sqrt(
+          pow(userPosition.y - directionYnext, 2) +
+              pow(userPosition.x - directionXnext, 2),
+        );
+
+        final distanceInMeterToNext = distanceNext * metersPerDegree;
+
+        // Distance between the current and next point
+        final distanceBetweenPoints =
+            widget
+                ._routeInfo
+                .layers[1]
+                .featureSet
+                .features[i - 1]
+                .attributes['Meters']
+                .toInt();
+        // print("points distance: $distanceBetweenPoints");
+        // print('nect distance $distanceInMeterToNext');
+        // print('current distance $distanceInMeters');
+
         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
         if (distance < thresholdDistance) {
-          // Move to the next direction if available
           if (i < widget._directionsList.length - 1) {
             print("User has passed the current direction's coordinates.");
             setState(() {
               i++;
-              // metersToNextDirection = distanceInMeters.toInt();
               skipNextCheck = true; // Skip the next check
               // ^ uit setstate zetten?
             });
           }
         } else if (!skipNextCheck) {
-          // if user walks away from point
+          // if user walks away from point and is getting closer to next point
           if (metersToNextDirection < distanceInMeters.toInt() &&
+              distanceBetweenPoints > distanceInMeterToNext &&
               metersToNextDirection != 0) {
-            // checken of het verschil groter is dan 5-10 meter
             if (i < widget._directionsList.length - 1) {
               i++;
               print(
@@ -86,9 +114,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
         // DEZE IN DE UITLOOPCHECK ZETTEN, ALS HET BLIJFT UITLOPEN ZAL HIJ DIE OLD UPDATEN EN DUS IS EEN MINIMAAL LASTIG TE ZETTEN
         // DUS ALLEEN OLD AANPASSEN ALS HET NIET WEGLOOPT (ALS IK EEN MARGIN WIL HEBBEN VAN EEN BEPAALDE AFSTAND)
+        // IDK OF DAT WERKT, WANT DELAYED DAN (maybe een if > distanceInMeters meer dan 50 ofzo)
+
         // Update distance to nect direction
         setState(() {
-          // metersToNextDirectionOld = metersToNextDirection;
           metersToNextDirection = distanceInMeters.toInt();
         });
       }
