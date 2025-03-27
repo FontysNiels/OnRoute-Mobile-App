@@ -1,5 +1,5 @@
 class DescriptionPoint {
-  final String description;
+  late final String description;
   final double x;
   final double y;
 

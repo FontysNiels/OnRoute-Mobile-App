@@ -26,61 +26,69 @@ class DirectionsCard extends StatefulWidget {
 
 class _DirectionsCardState extends State<DirectionsCard> {
   int metersToNextDirection = 0;
-  int i = 1;
+  int i = 0;
   bool skipNextCheck = false;
+  late final List<DescriptionPoint> _directionsList;
 
   @override
   void initState() {
     // TODO: implement initState
+    _directionsList = [];
+    for (var i = 0; i < widget._directionsList.length; i++) {
+      // _directionsList.add(widget._directionsList[i]);
+      if (i > 0) {
+        if (i == 1) {
+          _directionsList.add(widget._directionsList[i]);
+        } else if (widget._directionsList[i].x ==
+                widget._directionsList[i - 1].x &&
+            widget._directionsList[i].y == widget._directionsList[i - 1].y) {
+          _directionsList.add(widget._directionsList[i - 1]);
+        } else {
+          _directionsList.add(widget._directionsList[i]);
+        }
+      }
+    }
     super.initState();
 
     widget._mapViewController.locationDisplay.onLocationChanged.listen((mode) {
-      print(i);
+      // check that checks if user is facing a point and moving towards it?
+
       if (widget._directionsList.isNotEmpty) {
         // Calculate the distance between the user's current position and the direction's coordinates
         final userPosition =
             widget._mapViewController.locationDisplay.location!.position;
-        final directionXY = convertToLatLng(
-          widget._directionsList[i].x,
-          widget._directionsList[i].y,
+
+        final directionPointXY = convertToLatLng(
+          _directionsList[i].x,
+          _directionsList[i].y,
         );
-        final directionX = directionXY[1];
-        final directionY = directionXY[0];
+        final directionPointX = directionPointXY[1];
+        final directionPointY = directionPointXY[0];
 
-        // print('direction X: ${directionX} direction Y ${directionY}');
-        // print('User X: ${userPosition.x} User Y ${userPosition.y}');
-
-        final distance = sqrt(
-          pow(userPosition.y - directionY, 2) +
-              pow(userPosition.x - directionX, 2),
+        final distanceToDirectionPoint = sqrt(
+          pow(userPosition.y - directionPointY, 2) +
+              pow(userPosition.x - directionPointX, 2),
         );
 
         // Define a threshold distance (e.g., 10 meters)
-        const thresholdDistance =
-            0.0001; // Approx. 10 meters in lat/long degrees
+        // Approx. 10 meters in lat/long degrees
+        const thresholdDistance = 0.0001;
 
         const metersPerDegree = 111320; // Approximation for latitude
-        final distanceInMeters = distance * metersPerDegree;
+        final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
 
         // Distance between the user and the next point
-        final directionXYnext = convertToLatLng(
-          widget
-              ._directionsList[i == widget._directionsList.length - 1
-                  ? i
-                  : i + 1]
-              .x,
-          widget
-              ._directionsList[i == widget._directionsList.length - 1
-                  ? i
-                  : i + 1]
-              .y,
+        final directionPointXYnext = convertToLatLng(
+          _directionsList[i == _directionsList.length - 1 ? i : i + 1].x,
+
+          _directionsList[i == _directionsList.length - 1 ? i : i + 1].y,
         );
-        final directionXnext = directionXYnext[1];
-        final directionYnext = directionXYnext[0];
+        final directionPointXnext = directionPointXYnext[1];
+        final directionPointYnext = directionPointXYnext[0];
 
         final distanceNext = sqrt(
-          pow(userPosition.y - directionYnext, 2) +
-              pow(userPosition.x - directionXnext, 2),
+          pow(userPosition.y - directionPointYnext, 2) +
+              pow(userPosition.x - directionPointXnext, 2),
         );
 
         final distanceInMeterToNext = distanceNext * metersPerDegree;
@@ -102,8 +110,49 @@ class _DirectionsCardState extends State<DirectionsCard> {
         // print('nect distance $distanceInMeterToNext');
         // print('current distance $distanceInMeters');
 
+        // Create a list of descriptions and distances
+        List<Map<String, dynamic>> descriptionsAndDistances = [];
+
+        for (int index = 0; index < _directionsList.length; index++) {
+          final point = _directionsList[index];
+          final pointXY = convertToLatLng(point.x, point.y);
+          final pointX = pointXY[1];
+          final pointY = pointXY[0];
+
+          final distanceToPoint = sqrt(
+            pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
+          );
+
+          final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
+
+          int distanceBetweenPoints = 0;
+          final matchingFeatures = widget
+              ._routeInfo
+              .layers[1]
+              .featureSet
+              .features
+              .where(
+                (feature) =>
+                    feature.attributes['DirectionPointID'] == (index + 1),
+              );
+
+          if (matchingFeatures.isNotEmpty) {
+            distanceBetweenPoints =
+                matchingFeatures.first.attributes['Meters'].toInt();
+          }
+          descriptionsAndDistances.add({
+            // 'description': point.description,
+            'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
+            'distanceToNext': distanceBetweenPoints,
+          });
+        }
+
+        // Print the list for debugging
+        print(descriptionsAndDistances.length);
+        print(_directionsList.length);
+
         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
-        if (distance < thresholdDistance) {
+        if (distanceToDirectionPoint < thresholdDistance) {
           if (i < widget._directionsList.length - 1) {
             print("User has passed the current direction's coordinates.");
             setState(() {
@@ -113,18 +162,57 @@ class _DirectionsCardState extends State<DirectionsCard> {
             });
           }
         } else if (!skipNextCheck) {
-          // if user walks away from point and is getting closer to next point (start point test only, so if you start halfway it doesnt work)
           if (metersToNextDirection < distanceInMeters.toInt() &&
-              distanceBetweenPoints > distanceInMeterToNext &&
-              metersToNextDirection != 0 &&
-              distanceBetweenPoints != 0) {
-            if (i < widget._directionsList.length - 1) {
-              i++;
-              print(
-                "${widget._directionsList[i].description} : Significant decrease in distance detected.",
-              );
+              metersToNextDirection != 0) {
+            print('distance increasing');
+            for (
+              var iLoop = 0;
+              iLoop < descriptionsAndDistances.length;
+              iLoop++
+            ) {
+              if (iLoop != descriptionsAndDistances.length - 1) {
+                //
+                // if (iLoop <= i) {
+                //   continue;
+                // }
+
+                if (descriptionsAndDistances[iLoop +
+                        1]['userDistanceFromPoint'] <
+                    descriptionsAndDistances[iLoop]['distanceToNext']) {
+                  if (i > iLoop) {
+                    continue;
+                  }
+                  print('closer to next point');
+                  // print(descriptionsAndDistances[iLoop]);
+
+                  // descriptionsAndDistances[iLoop]['distanceToNext'] =
+                  //     descriptionsAndDistances[iLoop + 1]['distanceToNext'];
+                  // descriptionsAndDistances[iLoop + 1]['distanceToNext'] = 0;
+                  // }
+
+                  // print(widget._directionsList[i].description);
+                  // print(descriptionsAndDistances[iLoop]['distanceToNext']);
+                  // print(metersToNextDirection);
+                  // print(distanceInMeters.toInt());
+
+                  i++;
+                  break;
+                }
+              }
             }
           }
+          // if user walks away from point and is getting closer to next point (start point test only, so if you start halfway it doesnt work)
+          // if (metersToNextDirection < distanceInMeters.toInt() &&
+          //     distanceBetweenPoints > distanceInMeterToNext &&
+          //     metersToNextDirection != 0 &&
+          //     distanceBetweenPoints != 0) {
+          //   if (i < widget._directionsList.length - 1) {
+          //     i++;
+          //     print(
+          //       "${widget._directionsList[i].description} : Significant decrease in distance detected.",
+          //     );
+          //   }
+          // }
         } else {
           skipNextCheck = false; // Reset the flag after skipping
         }
@@ -164,8 +252,8 @@ class _DirectionsCardState extends State<DirectionsCard> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Text(
-                    widget._directionsList.isNotEmpty
-                        ? widget._directionsList[i].description
+                    _directionsList.isNotEmpty
+                        ? _directionsList[i].description
                         : "NIKS",
                   ),
                 ),
