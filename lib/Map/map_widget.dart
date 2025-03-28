@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
@@ -238,17 +240,29 @@ class _MapWidgetState extends State<MapWidget> {
 
   Future<List<Graphic>> initialGraphics() async {
     // Create symbol for line.
-    late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
-      style: SimpleLineSymbolStyle.solid,
-      color: Colors.blue,
-      width: 4,
-    );
 
     // Get data from route <IN ONMAPVIEW ZETTEN>
     var response = await getRouteData();
+
+    var lastding =
+        (jsonDecode(response.body)['layers'][2]['featureSet']['features']
+                as List)
+            .last;
+    // print(lastding);
+
     RouteLayerData routeInfo = RouteLayerData.fromJson(
-      jsonDecode(response.body),
+      (jsonDecode(response.body)
+          ..['layers'][2]['featureSet']['features'] =
+              (jsonDecode(response.body)['layers'][2]['featureSet']['features']
+                      as List)
+                  .where((feature) => feature['attributes']['Azimuth'] != 0.0)
+                  .toList())
+        ..['layers'][2]['featureSet']['features'].add(lastding),
+      // jsonDecode(response.body)
     );
+
+    // String jsonString = await rootBundle.loadString('assets/kut.json');
+    // RouteLayerData routeInfo = RouteLayerData.fromJson(jsonDecode(jsonString));
 
     setState(() {
       _routeInfo = routeInfo;
@@ -266,6 +280,16 @@ class _MapWidgetState extends State<MapWidget> {
     // Generate Lines
     List<Graphic> graphics = [];
     for (var element in routeInfo.layers[1].featureSet.features) {
+      late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
+        style: SimpleLineSymbolStyle.solid,
+        color: Color(
+          (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000))
+              .toInt(),
+        ).withOpacity(1.0),
+        width: 4,
+      );
+      // print(routeInfo.layers[2].featureSet.features.where((item)=> item.attributes['ObjectID'] == ));
+
       final polylineJson = '''
             {"paths": ${element.geometry.paths},
             "spatialReference":${element.geometry.spatialReference.toString()}}''';
@@ -327,6 +351,7 @@ class _MapWidgetState extends State<MapWidget> {
           description: element.attributes['DisplayText'],
           x: parsedX!,
           y: parsedY!,
+          angle: element.attributes['Azimuth'].toDouble(),
         ),
       );
     }

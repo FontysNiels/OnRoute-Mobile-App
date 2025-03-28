@@ -40,7 +40,7 @@ class Layer {
 }
 
 class FeatureSet {
-  final List<Feature> features;
+  final List<RouteFeature> features;
   final String geometryType;
   final RouteSpatialReference spatialReference;
 
@@ -54,7 +54,7 @@ class FeatureSet {
     return FeatureSet(
       features:
           (json['features'] as List)
-              .map((feature) => Feature.fromJson(feature))
+              .map((feature) => RouteFeature.fromJson(feature))
               .toList(),
       geometryType: json['geometryType'],
       spatialReference: RouteSpatialReference.fromJson(
@@ -64,21 +64,21 @@ class FeatureSet {
   }
 }
 
-class Feature {
+class RouteFeature {
   final Map<String, dynamic> attributes;
   final RouteGeometry geometry;
   final Symbol? symbol;
   // final String? displayText;
 
-  Feature({
+  RouteFeature({
     required this.attributes,
     required this.geometry,
     this.symbol,
     // this.displayText,
   });
 
-  factory Feature.fromJson(Map<String, dynamic> json) {
-    return Feature(
+  factory RouteFeature.fromJson(Map<String, dynamic> json) {
+    return RouteFeature(
       attributes: Map<String, dynamic>.from(json['attributes']),
       geometry: RouteGeometry.fromJson(json['geometry']),
       symbol: json['symbol'] != null ? Symbol.fromJson(json['symbol']) : null,

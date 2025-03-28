@@ -29,6 +29,8 @@ class _DirectionsCardState extends State<DirectionsCard> {
   int descriptionNum = 0;
   int amountOfDirections = 0;
   bool skipNextCheck = false;
+  // Create a list of descriptions and distances
+  List<Map<String, dynamic>> descriptionDistanceList = [];
   late final List<DescriptionPoint> directionList;
 
   @override
@@ -36,21 +38,13 @@ class _DirectionsCardState extends State<DirectionsCard> {
     // TODO: implement initState
     amountOfDirections = widget._directionsList.length;
     directionList = [];
+
     for (var i = 0; i < amountOfDirections; i++) {
       // _directionsList.add(widget._directionsList[i]);
-      if (i > 0) {
-        if (i == 1) {
-          directionList.add(widget._directionsList[i]);
-        } else if (widget._directionsList[i].x ==
-                widget._directionsList[i - 1].x &&
-            widget._directionsList[i].y == widget._directionsList[i - 1].y) {
-          directionList.add(widget._directionsList[i - 1]);
-        } else {
-          directionList.add(widget._directionsList[i]);
-        }
-      }
+      directionList.add(widget._directionsList[i]);
     }
     super.initState();
+    // print(directionList);
 
     widget._mapViewController.locationDisplay.onLocationChanged.listen((mode) {
       // check that checks if user is facing a point and moving towards it?
@@ -77,9 +71,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
         const thresholdDistance = 0.0001;
         const metersPerDegree = 111320; // Approximation for latitude
         final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-
-        // Create a list of descriptions and distances
-        List<Map<String, dynamic>> descriptionDistanceList = [];
+        List<Map<String, dynamic>> descriptionDistanceListTemp = [];
         for (int index = 0; index < directionList.length; index++) {
           final point = directionList[index];
           final pointXY = convertToLatLng(point.x, point.y);
@@ -94,6 +86,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
           int distanceBetweenPoints = 0;
           // Get distance between points
+
           final matchingFeatures = widget
               ._routeInfo
               .layers[1]
@@ -101,7 +94,13 @@ class _DirectionsCardState extends State<DirectionsCard> {
               .features
               .where(
                 (feature) =>
-                    feature.attributes['DirectionPointID'] == (index + 1),
+                    feature.attributes['DirectionPointID'] ==
+                    (widget
+                        ._routeInfo
+                        .layers[2]
+                        .featureSet
+                        .features[index]
+                        .attributes["ObjectID"]),
               );
 
           // Set distance between points
@@ -109,13 +108,15 @@ class _DirectionsCardState extends State<DirectionsCard> {
             distanceBetweenPoints =
                 matchingFeatures.first.attributes['Meters'].toInt();
           }
-          descriptionDistanceList.add({
+          descriptionDistanceListTemp.add({
+            'desc': point.description,
             'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
             'distanceBetweenPoints': distanceBetweenPoints,
           });
         }
 
         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
+        // print(descriptionDistanceList);
         if (distanceToDirectionPoint < thresholdDistance) {
           if (descriptionNum < amountOfDirections - 1) {
             print("User has passed the current direction's coordinates.");
@@ -137,14 +138,27 @@ class _DirectionsCardState extends State<DirectionsCard> {
             ) {
               // Can't check the one after the last
               if (iLoop != descriptionDistanceList.length - 1) {
+                // print('tempdistance ${descriptionDistanceListTemp[1]['userDistanceFromPoint']}');
+                // print('main distance ${descriptionDistanceList[1]['userDistanceFromPoint']}');
+                // print('0--------0');
+
                 // Check if user is closer than the set distance to it
-                if (descriptionDistanceList[iLoop +
-                        1]['userDistanceFromPoint'] <
-                    descriptionDistanceList[iLoop]['distanceBetweenPoints']) {
+
+                // if (descriptionDistanceList[iLoop +
+                //         1]['userDistanceFromPoint'] <
+                //     descriptionDistanceList[iLoop]['distanceBetweenPoints']) {
+                if (descriptionDistanceListTemp[iLoop]['userDistanceFromPoint'] >
+                        descriptionDistanceList[iLoop]['userDistanceFromPoint'] &&
+                    descriptionDistanceListTemp[iLoop +
+                            1]['userDistanceFromPoint'] <
+                        descriptionDistanceList[iLoop +
+                            1]['userDistanceFromPoint']) {
                   // Skip if the user is getting closer to one that they already passed
+
                   if (descriptionNum > iLoop) {
                     continue;
                   }
+
                   // Change to the next description and stop the loop
                   descriptionNum++;
                   break;
@@ -159,6 +173,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
         // Update distance to nect direction
         setState(() {
           metersToCurrentDirection = distanceInMeters.toInt();
+          descriptionDistanceList = descriptionDistanceListTemp;
         });
       }
     });

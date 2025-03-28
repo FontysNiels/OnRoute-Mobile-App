@@ -22,5 +22,6 @@ flutter:
   uses-material-design: true
 
   assets:
-  - .env
-  - assets/temp.png
+    - .env
+    - assets/temp.png
+    - assets/kut.json
