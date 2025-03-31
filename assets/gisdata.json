@@ -1,0 +1,1512 @@
+{
+    "opacity": 1,
+    "visibility": true,
+    "layers": [
+        {
+            "featureSet": {
+                "features": [
+                    {
+                        "attributes": {
+                            "ObjectID": 1,
+                            "AnalysisSettings": "{\"accumulateAttributeNames\":[\"Kilometers\",\"WalkTime\"],\"directionsLanguage\":\"nl\",\"findBestSequence\":false,\"preserveFirstStop\":true,\"preserveLastStop\":true,\"startTimeIsUTC\":true,\"travelMode\":{\"attributeParameterValues\":[{\"attributeName\":\"WalkTime\",\"parameterName\":\"Walking Speed (km/h)\",\"value\":5},{\"attributeName\":\"Avoid Private Roads\",\"parameterName\":\"Restriction Usage\",\"value\":\"AVOID_MEDIUM\"},{\"attributeName\":\"Avoid Roads Unsuitable for Pedestrians\",\"parameterName\":\"Restriction Usage\",\"value\":\"AVOID_HIGH\"},{\"attributeName\":\"Preferred for Pedestrians\",\"parameterName\":\"Restriction Usage\",\"value\":\"PREFER_LOW\"},{\"attributeName\":\"Walking\",\"parameterName\":\"Restriction Usage\",\"value\":\"PROHIBITED\"}],\"description\":\"Volgt trajecten en wegen waar voetgangers aanwezig kunnen zijn en vindt oplossingen om de reistijd te optimaliseren. De wandelsnelheid is ingesteld op 5 kilometer per uur.\",\"distanceAttributeName\":\"Kilometers\",\"id\":\"caFAgoThrvUpkFBW\",\"impedanceAttributeName\":\"WalkTime\",\"name\":\"Wandeltijd\",\"restrictionAttributeNames\":[\"Avoid Private Roads\",\"Avoid Roads Unsuitable for Pedestrians\",\"Preferred for Pedestrians\",\"Walking\"],\"simplificationTolerance\":2,\"simplificationToleranceUnits\":\"esriMeters\",\"timeAttributeName\":\"WalkTime\",\"type\":\"WALK\",\"useHierarchy\":true,\"uturnAtJunctions\":\"esriNFSBAllowBacktrack\"}}",
+                            "EndTime": 1742303603441,
+                            "EndUTCOffset": 60,
+                            "Messages": null,
+                            "RouteName": "Doornhoek, 5465 TG Meierijstad - Doornhoek 3945, 5465 TC Veghel",
+                            "StartTime": 1742302832000,
+                            "StartUTCOffset": 60,
+                            "TotalCosts": "{\"WalkTime\":12.857348157255576,\"Kilometers\":1.071453094226889}",
+                            "TotalLateMinutes": 0,
+                            "TotalMeters": 1071.4530942268889,
+                            "TotalMinutes": 12.857348157255576,
+                            "TotalWaitMinutes": 0,
+                            "Version": "1.0.0"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "paths": [
+                                [
+                                    [
+                                        615451.4206000008,
+                                        6727807.8330999985
+                                    ],
+                                    [
+                                        615393.2474999987,
+                                        6727742.078900002
+                                    ],
+                                    [
+                                        615315.8471000008,
+                                        6727652.5832
+                                    ],
+                                    [
+                                        615304.5703999996,
+                                        6727638.909900002
+                                    ],
+                                    [
+                                        615280.4475000016,
+                                        6727614.681400001
+                                    ],
+                                    [
+                                        615248.9329000004,
+                                        6727589.144699998
+                                    ],
+                                    [
+                                        615206.5425000004,
+                                        6727584.162900001
+                                    ],
+                                    [
+                                        615173.424899999,
+                                        6727601.957800001
+                                    ],
+                                    [
+                                        615143.8361999989,
+                                        6727627.566200003
+                                    ],
+                                    [
+                                        614840.8691000007,
+                                        6727896.055399999
+                                    ],
+                                    [
+                                        614750.5555999987,
+                                        6727975.858400002
+                                    ],
+                                    [
+                                        614711.3266000003,
+                                        6728010.518200003
+                                    ],
+                                    [
+                                        614725.8081,
+                                        6728026.950499997
+                                    ]
+                                ],
+                                [
+                                    [
+                                        614725.8081,
+                                        6728026.950499997
+                                    ],
+                                    [
+                                        614768.5447999984,
+                                        6728073.924099997
+                                    ],
+                                    [
+                                        614800.7718000002,
+                                        6728111.380099997
+                                    ],
+                                    [
+                                        614820.3194999993,
+                                        6728134.104699999
+                                    ],
+                                    [
+                                        614952.4334999993,
+                                        6728284.002400003
+                                    ],
+                                    [
+                                        614980.1075000018,
+                                        6728314.989500001
+                                    ],
+                                    [
+                                        615013.9375,
+                                        6728352.876699999
+                                    ],
+                                    [
+                                        615065.3894000016,
+                                        6728411.751000002
+                                    ],
+                                    [
+                                        615097.4604999982,
+                                        6728448.455700003
+                                    ],
+                                    [
+                                        615129.5317000002,
+                                        6728485.160700001
+                                    ],
+                                    [
+                                        615143.7806000002,
+                                        6728501.4701000005
+                                    ],
+                                    [
+                                        615155.7362999991,
+                                        6728515.0911
+                                    ],
+                                    [
+                                        615129.3535000011,
+                                        6728537.189499997
+                                    ],
+                                    [
+                                        615111.6195,
+                                        6728542.5940999985
+                                    ]
+                                ]
+                            ]
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                20,
+                                89,
+                                127,
+                                255
+                            ],
+                            "width": 8,
+                            "style": "esriSLSSolid"
+                        }
+                    }
+                ],
+                "geometryType": "esriGeometryPolyline",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                }
+            },
+            "layerDefinition": {
+                "capabilities": "Query,Update,Editing",
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "simple",
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                20,
+                                89,
+                                127,
+                                255
+                            ],
+                            "width": 8,
+                            "style": "esriSLSSolid"
+                        }
+                    }
+                },
+                "extent": {
+                    "spatialReference": {
+                        "latestWkid": 3857,
+                        "wkid": 102100
+                    },
+                    "xmin": 614711.3266000003,
+                    "ymin": 6727584.162900001,
+                    "xmax": 615451.4206000008,
+                    "ymax": 6728542.5940999985
+                },
+                "fields": [
+                    {
+                        "name": "ObjectID",
+                        "alias": "ObjectID",
+                        "type": "esriFieldTypeOID"
+                    },
+                    {
+                        "name": "AnalysisSettings",
+                        "alias": "Analysis Settings",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "EndTime",
+                        "alias": "End Time",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "EndUTCOffset",
+                        "alias": "End Time Offset",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "Messages",
+                        "alias": "Messages",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "RouteName",
+                        "alias": "Route Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "StartTime",
+                        "alias": "Start Time",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "StartUTCOffset",
+                        "alias": "Start Time Offset",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "TotalCosts",
+                        "alias": "Total Costs",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "TotalLateMinutes",
+                        "alias": "Total Late Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "TotalMeters",
+                        "alias": "Total Meters",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "TotalMinutes",
+                        "alias": "Total Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "TotalWaitMinutes",
+                        "alias": "Total Wait Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "Version",
+                        "alias": "Version",
+                        "type": "esriFieldTypeString"
+                    }
+                ],
+                "geometryType": "esriGeometryPolyline",
+                "hasM": false,
+                "hasZ": false,
+                "maxScale": 0,
+                "minScale": 0,
+                "name": "RouteInfo",
+                "objectIdField": "ObjectID",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                },
+                "title": "Route Details",
+                "type": "Feature Layer",
+                "typeIdField": ""
+            }
+        },
+        {
+            "featureSet": {
+                "features": [
+                    {
+                        "attributes": {
+                            "ObjectID": 1,
+                            "DirectionLineType": 1,
+                            "DirectionPointID": 2,
+                            "Meters": 619.5555411317948,
+                            "Minutes": 7.434397812791501
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "paths": [
+                                [
+                                    [
+                                        615451.4206466988,
+                                        6727807.833104923
+                                    ],
+                                    [
+                                        615393.2475298436,
+                                        6727742.07893852
+                                    ],
+                                    [
+                                        615315.847087893,
+                                        6727652.583231053
+                                    ],
+                                    [
+                                        615304.5704234776,
+                                        6727638.909864616
+                                    ],
+                                    [
+                                        615280.4474898215,
+                                        6727614.681360828
+                                    ],
+                                    [
+                                        615248.932941979,
+                                        6727589.144739283
+                                    ],
+                                    [
+                                        615206.5424798832,
+                                        6727584.162867368
+                                    ],
+                                    [
+                                        615173.4249313736,
+                                        6727601.957841133
+                                    ],
+                                    [
+                                        615143.8362107181,
+                                        6727627.566184853
+                                    ],
+                                    [
+                                        614840.8690845782,
+                                        6727896.055434369
+                                    ],
+                                    [
+                                        614750.5555816966,
+                                        6727975.858411968
+                                    ],
+                                    [
+                                        614711.3265931414,
+                                        6728010.518201776
+                                    ]
+                                ]
+                            ]
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                0,
+                                122,
+                                194,
+                                255
+                            ],
+                            "width": 6,
+                            "style": "esriSLSSolid"
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 2,
+                            "DirectionLineType": 1,
+                            "DirectionPointID": 3,
+                            "Meters": 13.539190947893909,
+                            "Minutes": 0.1624671780223954
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "paths": [
+                                [
+                                    [
+                                        614711.3265931414,
+                                        6728010.518201776
+                                    ],
+                                    [
+                                        614725.8081456954,
+                                        6728026.95047046
+                                    ]
+                                ]
+                            ]
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                0,
+                                122,
+                                194,
+                                255
+                            ],
+                            "width": 6,
+                            "style": "esriSLSSolid"
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 3,
+                            "DirectionLineType": 1,
+                            "DirectionPointID": 6,
+                            "Meters": 404.31893283140295,
+                            "Minutes": 4.852034775102606
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "paths": [
+                                [
+                                    [
+                                        614725.8081456954,
+                                        6728026.95047046
+                                    ],
+                                    [
+                                        614768.5448114102,
+                                        6728073.924135147
+                                    ],
+                                    [
+                                        614800.7718039958,
+                                        6728111.380105153
+                                    ],
+                                    [
+                                        614820.3195065765,
+                                        6728134.104672413
+                                    ],
+                                    [
+                                        614952.4334782467,
+                                        6728284.002382402
+                                    ],
+                                    [
+                                        614980.1075036603,
+                                        6728314.989472404
+                                    ],
+                                    [
+                                        615013.937496913,
+                                        6728352.876682037
+                                    ],
+                                    [
+                                        615065.3893655593,
+                                        6728411.750959955
+                                    ],
+                                    [
+                                        615097.4605108544,
+                                        6728448.455748146
+                                    ],
+                                    [
+                                        615129.5316561494,
+                                        6728485.160701871
+                                    ],
+                                    [
+                                        615143.7805509729,
+                                        6728501.470085017
+                                    ],
+                                    [
+                                        615155.7362642831,
+                                        6728515.091133361
+                                    ]
+                                ]
+                            ]
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                0,
+                                122,
+                                194,
+                                255
+                            ],
+                            "width": 6,
+                            "style": "esriSLSSolid"
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 4,
+                            "DirectionLineType": 1,
+                            "DirectionPointID": 7,
+                            "Meters": 34.039429315797285,
+                            "Minutes": 0.40844839133907307
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "paths": [
+                                [
+                                    [
+                                        615155.7362642831,
+                                        6728515.091133361
+                                    ],
+                                    [
+                                        615129.3535449683,
+                                        6728537.189540536
+                                    ],
+                                    [
+                                        615111.619459525,
+                                        6728542.594070902
+                                    ]
+                                ]
+                            ]
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                0,
+                                122,
+                                194,
+                                255
+                            ],
+                            "width": 6,
+                            "style": "esriSLSSolid"
+                        }
+                    }
+                ],
+                "geometryType": "esriGeometryPolyline",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                }
+            },
+            "layerDefinition": {
+                "capabilities": "Query,Update,Editing",
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "simple",
+                        "symbol": {
+                            "type": "esriSLS",
+                            "color": [
+                                0,
+                                122,
+                                194,
+                                255
+                            ],
+                            "width": 6,
+                            "style": "esriSLSSolid"
+                        }
+                    }
+                },
+                "extent": {
+                    "spatialReference": {
+                        "latestWkid": 3857,
+                        "wkid": 102100
+                    },
+                    "xmin": 614711.3266000003,
+                    "ymin": 6727584.162900001,
+                    "xmax": 615451.4206000008,
+                    "ymax": 6728542.5940999985
+                },
+                "fields": [
+                    {
+                        "name": "ObjectID",
+                        "alias": "ObjectID",
+                        "type": "esriFieldTypeOID"
+                    },
+                    {
+                        "name": "DirectionLineType",
+                        "alias": "Line Type",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "DirectionPointID",
+                        "alias": "Direction Point ID",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "FromLevel",
+                        "alias": "From Level",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "Meters",
+                        "alias": "Meters",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "Minutes",
+                        "alias": "Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "ToLevel",
+                        "alias": "To Level",
+                        "type": "esriFieldTypeInteger"
+                    }
+                ],
+                "geometryType": "esriGeometryPolyline",
+                "hasM": false,
+                "hasZ": false,
+                "maxScale": 0,
+                "minScale": 0,
+                "name": "DirectionLines",
+                "objectIdField": "ObjectID",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                },
+                "title": "Direction Lines",
+                "type": "Feature Layer",
+                "typeIdField": ""
+            }
+        },
+        {
+            "featureSet": {
+                "features": [
+                    {
+                        "attributes": {
+                            "ObjectID": 1,
+                            "DirectionPointType": 51,
+                            "Sequence": 1,
+                            "StopID": 2,
+                            "ArrivalTime": 1742302832000,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 0,
+                            "DisplayText": "Start op Doornhoek, 5465 TG Meierijstad",
+                            "Name": "Doornhoek, 5465 TG Meierijstad",
+                            "ShortVoiceInstruction": "Start",
+                            "VoiceInstruction": "Start op Doornhoek, 5465 TG Meierijstad"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615451.4206466988,
+                            "y": 6727807.833104923
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 2,
+                            "DirectionPointType": 52,
+                            "Sequence": 2,
+                            "StopID": null,
+                            "ArrivalTime": 1742302832000,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 234.9263153076172,
+                            "DisplayText": "Ga naar het zuidwesten op Doornhoek",
+                            "Name": "Doornhoek",
+                            "ShortVoiceInstruction": "Verder rijden op Doorn hoek",
+                            "VoiceInstruction": "Ga naar het zuidwesten op Doorn hoek"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615451.4206466988,
+                            "y": 6727807.833104923
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 3,
+                            "DirectionPointType": 306,
+                            "Sequence": 3,
+                            "StopID": null,
+                            "ArrivalTime": 1742303278064,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 54.82269287109375,
+                            "DisplayText": "Maak een scherpe bocht naar rechts en blijf op Doornhoek",
+                            "Name": "Doornhoek",
+                            "ShortVoiceInstruction": "Maak een scherpe bocht naar rechts",
+                            "VoiceInstruction": "Maak een scherpe bocht naar rechts en blijf op Doorn hoek"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 614710.1640836982,
+                            "y": 6728010.489886068
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 6,
+                            "DirectionPointType": 52,
+                            "Sequence": 6,
+                            "StopID": null,
+                            "ArrivalTime": 1742303287812,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 54.82269287109375,
+                            "DisplayText": "Ga verder naar het noordoosten op Doornhoek",
+                            "Name": "Doornhoek",
+                            "ShortVoiceInstruction": "Verder rijden op Doorn hoek",
+                            "VoiceInstruction": "Ga verder naar het noordoosten op Doorn hoek"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 614725.8081456954,
+                            "y": 6728026.95047046
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 7,
+                            "DirectionPointType": 206,
+                            "Sequence": 7,
+                            "StopID": null,
+                            "ArrivalTime": 1742303578934,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 297.48583984375,
+                            "DisplayText": "Maak een scherpe bocht naar links",
+                            "ShortVoiceInstruction": "Maak een scherpe bocht naar links",
+                            "VoiceInstruction": "Maak een scherpe bocht naar links"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615156.8430026628,
+                            "y": 6728515.100273804
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 9,
+                            "DirectionPointType": 50,
+                            "Sequence": 9,
+                            "StopID": 3,
+                            "ArrivalTime": 1742303603441,
+                            "ArrivalUTCOffset": 60,
+                            "Azimuth": 0,
+                            "DisplayText": "Eindbestemming bij Doornhoek 3945, 5465 TC Veghel bereikt aan uw rechterkant",
+                            "Name": "Doornhoek 3945, 5465 TC Veghel",
+                            "ShortVoiceInstruction": "Eindbestemming bereikt",
+                            "VoiceInstruction": "Eindbestemming bij Doornhoek 3945, 5465 TC Veghel bereikt aan uw rechterkant"
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615111.619459525,
+                            "y": 6728542.594070902
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    }
+                ],
+                "geometryType": "esriGeometryPoint",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                }
+            },
+            "layerDefinition": {
+                "capabilities": "Query,Update,Editing",
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "simple",
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                255,
+                                255,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 6,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 2,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    }
+                },
+                "extent": {
+                    "spatialReference": {
+                        "latestWkid": 3857,
+                        "wkid": 102100
+                    },
+                    "xmin": 614711.3266000003,
+                    "ymin": 6727584.162900001,
+                    "xmax": 615451.4206000008,
+                    "ymax": 6728542.5940999985
+                },
+                "fields": [
+                    {
+                        "name": "ObjectID",
+                        "alias": "ObjectID",
+                        "type": "esriFieldTypeOID"
+                    },
+                    {
+                        "name": "AlternateName",
+                        "alias": "Alternative Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "ArrivalTime",
+                        "alias": "Arrival Time",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "ArrivalUTCOffset",
+                        "alias": "Arrival Time Offset",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "Azimuth",
+                        "alias": "Azimuth",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "BranchName",
+                        "alias": "Branch Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "DirectionPointType",
+                        "alias": "Directions Point Type",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "DisplayText",
+                        "alias": "Display Text",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "ExitName",
+                        "alias": "Exit Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "IntersectingName",
+                        "alias": "Intersecting Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "Level",
+                        "alias": "Level",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "Name",
+                        "alias": "Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "Sequence",
+                        "alias": "Sequence",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "ShortVoiceInstruction",
+                        "alias": "Short Voice Instruction",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "StopID",
+                        "alias": "Stop ID",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "TowardName",
+                        "alias": "Toward Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "VoiceInstruction",
+                        "alias": "Voice Instruction",
+                        "type": "esriFieldTypeString"
+                    }
+                ],
+                "geometryType": "esriGeometryPoint",
+                "hasM": false,
+                "hasZ": false,
+                "maxScale": 0,
+                "minScale": 0,
+                "name": "DirectionPoints",
+                "objectIdField": "ObjectID",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                },
+                "title": "Direction Points",
+                "type": "Feature Layer",
+                "typeIdField": ""
+            }
+        },
+        {
+            "featureSet": {
+                "features": [
+                    {
+                        "attributes": {
+                            "ObjectID": 2,
+                            "ArrivalCurbApproach": null,
+                            "ArrivalTime": 1742302832000,
+                            "ArrivalUTCOffset": 60,
+                            "CumulativeCosts": "{\"WalkTime\":0,\"Kilometers\":0}",
+                            "CumulativeMeters": 0,
+                            "CumulativeMinutes": 0,
+                            "CurbApproach": 0,
+                            "DepartureCurbApproach": 1,
+                            "DepartureTime": 1742302832000,
+                            "DepartureUTCOffset": 60,
+                            "LateMinutes": 0,
+                            "LocationType": null,
+                            "Name": "startpunt",
+                            "RouteName": null,
+                            "Sequence": 1,
+                            "ServiceCosts": "{\"WalkTime\":0,\"Kilometers\":0}",
+                            "ServiceMeters": 0,
+                            "ServiceMinutes": 0,
+                            "Status": 0,
+                            "TimeWindowEnd": null,
+                            "TimeWindowEndUTCOffset": 60,
+                            "TimeWindowStart": null,
+                            "TimeWindowStartUTCOffset": 60,
+                            "WaitMinutes": 0
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615451.4204999991,
+                            "y": 6727807.833499998
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                0,
+                                255,
+                                0,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 20,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    255,
+                                    255,
+                                    255,
+                                    255
+                                ],
+                                "width": 4,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 4,
+                            "ArrivalCurbApproach": null,
+                            "ArrivalTime": 1742303287812,
+                            "ArrivalUTCOffset": 60,
+                            "CumulativeCosts": "{\"WalkTime\":7.596864990813897,\"Kilometers\":0.6330947320796887}",
+                            "CumulativeMeters": 633.0947320796887,
+                            "CumulativeMinutes": 7.596864990813897,
+                            "CurbApproach": 0,
+                            "DepartureCurbApproach": 1,
+                            "DepartureTime": 1742303287812,
+                            "DepartureUTCOffset": 60,
+                            "LateMinutes": 0,
+                            "LocationType": null,
+                            "Name": "Tussenstop",
+                            "RouteName": null,
+                            "Sequence": 2,
+                            "ServiceCosts": "{\"WalkTime\":0,\"Kilometers\":0}",
+                            "ServiceMeters": 0,
+                            "ServiceMinutes": 0,
+                            "Status": 0,
+                            "TimeWindowEnd": null,
+                            "TimeWindowEndUTCOffset": 60,
+                            "TimeWindowStart": null,
+                            "TimeWindowStartUTCOffset": 60,
+                            "WaitMinutes": 0
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 614731.121100001,
+                            "y": 6728014.815200001
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                51,
+                                51,
+                                51,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 12,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 3,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    },
+                    {
+                        "attributes": {
+                            "ObjectID": 3,
+                            "ArrivalCurbApproach": null,
+                            "ArrivalTime": 1742303603441,
+                            "ArrivalUTCOffset": 60,
+                            "CumulativeCosts": "{\"WalkTime\":12.857348157255576,\"Kilometers\":1.071453094226889}",
+                            "CumulativeMeters": 1071.4530942268889,
+                            "CumulativeMinutes": 12.857348157255576,
+                            "CurbApproach": 0,
+                            "DepartureCurbApproach": null,
+                            "DepartureTime": 1742303603441,
+                            "DepartureUTCOffset": 60,
+                            "LateMinutes": 0,
+                            "LocationType": null,
+                            "Name": "eindpunt",
+                            "RouteName": null,
+                            "Sequence": 3,
+                            "ServiceCosts": "{\"WalkTime\":0,\"Kilometers\":0}",
+                            "ServiceMeters": 0,
+                            "ServiceMinutes": 0,
+                            "Status": 0,
+                            "TimeWindowEnd": null,
+                            "TimeWindowEndUTCOffset": 60,
+                            "TimeWindowStart": null,
+                            "TimeWindowStartUTCOffset": 60,
+                            "WaitMinutes": 0
+                        },
+                        "geometry": {
+                            "spatialReference": {
+                                "latestWkid": 3857,
+                                "wkid": 102100
+                            },
+                            "x": 615110.9178999998,
+                            "y": 6728551.646899998
+                        },
+                        "popupInfo": null,
+                        "symbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                255,
+                                0,
+                                0,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 20,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    255,
+                                    255,
+                                    255,
+                                    255
+                                ],
+                                "width": 4,
+                                "style": "esriSLSSolid"
+                            }
+                        }
+                    }
+                ],
+                "geometryType": "esriGeometryPoint",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                }
+            },
+            "layerDefinition": {
+                "capabilities": "Query,Update,Editing",
+                "drawingInfo": {
+                    "renderer": {
+                        "type": "uniqueValue",
+                        "field1": "Sequence",
+                        "defaultSymbol": {
+                            "type": "esriSMS",
+                            "color": [
+                                51,
+                                51,
+                                51,
+                                255
+                            ],
+                            "angle": 0,
+                            "xoffset": 0,
+                            "yoffset": 0,
+                            "size": 12,
+                            "style": "esriSMSCircle",
+                            "outline": {
+                                "type": "esriSLS",
+                                "color": [
+                                    0,
+                                    122,
+                                    194,
+                                    255
+                                ],
+                                "width": 3,
+                                "style": "esriSLSSolid"
+                            }
+                        },
+                        "uniqueValueInfos": [
+                            {
+                                "value": "1",
+                                "symbol": {
+                                    "type": "esriSMS",
+                                    "color": [
+                                        0,
+                                        255,
+                                        0,
+                                        255
+                                    ],
+                                    "angle": 0,
+                                    "xoffset": 0,
+                                    "yoffset": 0,
+                                    "size": 20,
+                                    "style": "esriSMSCircle",
+                                    "outline": {
+                                        "type": "esriSLS",
+                                        "color": [
+                                            255,
+                                            255,
+                                            255,
+                                            255
+                                        ],
+                                        "width": 4,
+                                        "style": "esriSLSSolid"
+                                    }
+                                },
+                                "label": "First Stop"
+                            },
+                            {
+                                "value": "3",
+                                "symbol": {
+                                    "type": "esriSMS",
+                                    "color": [
+                                        255,
+                                        0,
+                                        0,
+                                        255
+                                    ],
+                                    "angle": 0,
+                                    "xoffset": 0,
+                                    "yoffset": 0,
+                                    "size": 20,
+                                    "style": "esriSMSCircle",
+                                    "outline": {
+                                        "type": "esriSLS",
+                                        "color": [
+                                            255,
+                                            255,
+                                            255,
+                                            255
+                                        ],
+                                        "width": 4,
+                                        "style": "esriSLSSolid"
+                                    }
+                                },
+                                "label": "Last Stop"
+                            }
+                        ]
+                    }
+                },
+                "extent": {
+                    "spatialReference": {
+                        "latestWkid": 3857,
+                        "wkid": 102100
+                    },
+                    "xmin": 614711.3266000003,
+                    "ymin": 6727584.162900001,
+                    "xmax": 615451.4206000008,
+                    "ymax": 6728542.5940999985
+                },
+                "fields": [
+                    {
+                        "name": "ObjectID",
+                        "alias": "ObjectID",
+                        "type": "esriFieldTypeOID"
+                    },
+                    {
+                        "name": "ArrivalCurbApproach",
+                        "alias": "Arrival Curb Approach",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "ArrivalTime",
+                        "alias": "Arrival Time",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "ArrivalUTCOffset",
+                        "alias": "Arrival Time",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "CumulativeCosts",
+                        "alias": "Cumulative Costs",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "CumulativeMeters",
+                        "alias": "Cumulative Meters",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "CumulativeMinutes",
+                        "alias": "Cumulative Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "CurbApproach",
+                        "alias": "Curb Approach",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "DepartureCurbApproach",
+                        "alias": "Departure Curb Approach",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "DepartureTime",
+                        "alias": "Departure Time",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "DepartureUTCOffset",
+                        "alias": "Departure Time",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "LateMinutes",
+                        "alias": "Minutes Late",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "LocationType",
+                        "alias": "Location Type",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "Name",
+                        "alias": "Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "RouteName",
+                        "alias": "Route Name",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "Sequence",
+                        "alias": "Sequence",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "ServiceCosts",
+                        "alias": "Service Costs",
+                        "type": "esriFieldTypeString"
+                    },
+                    {
+                        "name": "ServiceMeters",
+                        "alias": "Service Meters",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "ServiceMinutes",
+                        "alias": "Service Minutes",
+                        "type": "esriFieldTypeDouble"
+                    },
+                    {
+                        "name": "Status",
+                        "alias": "Status",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "TimeWindowEnd",
+                        "alias": "Time Window End",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "TimeWindowEndUTCOffset",
+                        "alias": "Time Window End Offset",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "TimeWindowStart",
+                        "alias": "Time Window Start",
+                        "type": "esriFieldTypeDate"
+                    },
+                    {
+                        "name": "TimeWindowStartUTCOffset",
+                        "alias": "Time Window Start Offset",
+                        "type": "esriFieldTypeInteger"
+                    },
+                    {
+                        "name": "WaitMinutes",
+                        "alias": "Minutes Wait",
+                        "type": "esriFieldTypeDouble"
+                    }
+                ],
+                "geometryType": "esriGeometryPoint",
+                "hasM": false,
+                "hasZ": false,
+                "maxScale": 0,
+                "minScale": 0,
+                "name": "Stops",
+                "objectIdField": "ObjectID",
+                "spatialReference": {
+                    "latestWkid": 3857,
+                    "wkid": 102100
+                },
+                "title": "Stops",
+                "type": "Feature Layer",
+                "typeIdField": ""
+            }
+        }
+    ],
+    "visibleLayers": [
+        0,
+        1,
+        2,
+        3
+    ]
+}

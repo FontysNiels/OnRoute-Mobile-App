@@ -24,4 +24,4 @@ flutter:
   assets:
     - .env
     - assets/temp.png
-    - assets/kut.json
+    - assets/gisdata.json
