@@ -90,9 +90,9 @@ class _DirectionsCardState extends State<DirectionsCard> {
             final closestEntry = closeto.reduce((a, b) => a[0] < b[0] ? a : b);
             print(closestEntry);
             closestPoint = closestEntry;
-            setState(() {
-              metersToCurrentDirection = closestEntry[0].toInt();
-            });
+            // setState(() {
+            //   metersToCurrentDirection = closestEntry[0].toInt();
+            // });
           }
 
           for (int i = 0; i < lines.length - 1; i++) {
@@ -126,36 +126,38 @@ class _DirectionsCardState extends State<DirectionsCard> {
               }
               // print("Distance to line segment: ${distanceInMeters} meters");
               break;
-            } else if (closestPoint[0] < 40) {
-              for (var element
-                  in widget._routeInfo.layers[2].featureSet.features) {
-                if (element.attributes['ObjectID'] == closestPoint[1]) {
-                  print(element.attributes['DisplayText']);
-                  var testIndex = directionList.indexWhere(
-                    (direct) =>
-                        direct.description == element.attributes['DisplayText'],
-                  );
-                  // print(directionList[testIndex]);
-                  descriptionNum = testIndex;
+            } else if (closestPoint.length != 0) {
+              if (closestPoint[0] < 40) {
+                for (var element
+                    in widget._routeInfo.layers[2].featureSet.features) {
+                  if (element.attributes['ObjectID'] == closestPoint[1]) {
+                    print(element.attributes['DisplayText']);
+                    var testIndex = directionList.indexWhere(
+                      (direct) =>
+                          direct.description ==
+                          element.attributes['DisplayText'],
+                    );
+                    // print(directionList[testIndex]);
+                    descriptionNum = testIndex + 1;
+                  }
                 }
+
+                if (userAwayFromRoute) {
+                  userAwayFromRoute = !userAwayFromRoute;
+                }
+                // print("Distance to line segment: ${distanceInMeters} meters");
+                break;
               }
-              if (userAwayFromRoute) {
-                userAwayFromRoute = !userAwayFromRoute;
-              }
-              // print("Distance to line segment: ${distanceInMeters} meters");
-              break;
             } else if (i == lines.length - 2) {
               if (!userAwayFromRoute) {
-                userAwayFromRoute = !userAwayFromRoute;
+                setState(() {
+                  userAwayFromRoute = !userAwayFromRoute;
+                });
+
                 print("nergens");
               }
             }
           }
-
-          // if (!userAwayFromRoute) {
-          //   userAwayFromRoute = !userAwayFromRoute;
-          //   print("nergens");
-          // }
         }
       });
     }
@@ -285,10 +287,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
         // }
 
         // Update distance to nect direction
-        // setState(() {
-        //   metersToCurrentDirection = distanceInMeters.toInt();
-        //   descriptionDistanceList = descriptionDistanceListTemp;
-        // });
+        setState(() {
+          metersToCurrentDirection = distanceInMeters.toInt();
+          descriptionDistanceList = descriptionDistanceListTemp;
+        });
       }
     });
   }
@@ -318,7 +320,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
                   child: Text(
                     directionList.isNotEmpty
                         ? userAwayFromRoute
-                            ? "Van route af"
+                            ? "Ga terug naar de route"
                             : directionList[descriptionNum].description
                         : "NIKS",
                   ),
