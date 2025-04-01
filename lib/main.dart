@@ -104,38 +104,14 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
-        // bottomNavigationBar: NavigationBar(
-        //   onDestinationSelected: (int index) {
-        //     setState(() {
-        //       currentPageIndex = index;
-        //     });
-        //   },
-        //   indicatorColor: const Color.fromARGB(255, 235, 138, 138),
-        //   selectedIndex: currentPageIndex,
-        //   destinations: const <Widget>[
-        //     NavigationDestination(
-        //       selectedIcon: Icon(Icons.map),
-        //       icon: Icon(Icons.map),
-        //       label: 'Kaart',
-        //     ),
-        //     NavigationDestination(
-        //       icon: Badge(child: Icon(Icons.explore)),
-        //       label: 'Routes',
-        //     ),
-        //     NavigationDestination(
-        //       icon: Badge(label: Text('2'), child: Icon(Icons.question_mark)),
-        //       label: 't.b.d.',
-        //     ),
-        //   ],
-        // ),
         body: IndexedStack(
           index: currentPageIndex, // Controls which child is displayed
           children: [
             // AsyncMapPage(),
             MapWidget(),
-            RoutesList(),
+            // RoutesList(),
             // TempMapPage(), // This ensures the map remains loaded in memory
-            BottomSheetWidget(),
+            // BottomSheetWidget(),
           ],
         ),
       ),

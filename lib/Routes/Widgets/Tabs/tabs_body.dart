@@ -13,12 +13,15 @@ class TabsBody extends StatelessWidget {
       DescriptionBlock(),
       // POIs
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
-      // deze exporten naar Widgets/Tabs/Content
+      // ^ deze exporten naar Widgets/Tabs/Content
       POICard(),
+      
       // Routes
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
-      // deze exporten naar Widgets/Tabs/Content
-      RouteCard(),
+      // ^ deze exporten naar Widgets/Tabs/Content
+      
+      // deze vullen routeID, based op de routes in the package
+      // RouteCard(startRoute: () {}, routeID: ''),
     ];
     return Expanded(
       child: SingleChildScrollView(child: textWidgets[selectedIndex]),

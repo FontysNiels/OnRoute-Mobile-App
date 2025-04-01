@@ -118,7 +118,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
                         direct.description == element.attributes['DisplayText'],
                   );
                   // print(directionList[testIndex]);
-                  descriptionNum = testIndex;
+                  descriptionNum = testIndex + 1;
                 }
               }
               if (userAwayFromRoute) {
@@ -131,14 +131,17 @@ class _DirectionsCardState extends State<DirectionsCard> {
                 for (var element
                     in widget._routeInfo.layers[2].featureSet.features) {
                   if (element.attributes['ObjectID'] == closestPoint[1]) {
-                    print(element.attributes['DisplayText']);
+                    // print(element.attributes['DisplayText']);
                     var testIndex = directionList.indexWhere(
                       (direct) =>
                           direct.description ==
                           element.attributes['DisplayText'],
                     );
+
                     // print(directionList[testIndex]);
-                    descriptionNum = testIndex + 1;
+                    if (descriptionNum != testIndex + 1) {
+                      descriptionNum = testIndex + 1;
+                    }
                   }
                 }
 

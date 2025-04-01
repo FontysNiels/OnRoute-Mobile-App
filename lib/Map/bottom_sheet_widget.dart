@@ -2,28 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Map/BottomSheet/routes_list_view.dart';
 
 class BottomSheetWidget extends StatelessWidget {
-  const BottomSheetWidget({super.key});
+  final Function setRouteGraphics;
 
-  Future<List> fetchItems() async {
-    // make this the get routes from ArcGIS and get routes from local storage
-    // {storedLocaly: [route1, route2, route3], fromArcGIS: [route4, route5, route6]}
-    // of
-    List test = [
-      {"...": "....", "locally": true},
-      {"...": "....", "locally": true},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-      {"...": "....", "locally": false},
-    ];
-
-    return test;
-  }
+  const BottomSheetWidget({super.key, required this.setRouteGraphics});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +30,10 @@ class BottomSheetWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: RoutesListView(scrollController: scrollController),
+              child: RoutesListView(
+                scrollController: scrollController,
+                setRouteGraphics: setRouteGraphics,
+              ),
             );
           },
         ),

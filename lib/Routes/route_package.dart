@@ -16,6 +16,12 @@ int _selectedIndex = 0;
 
 class _RoutePackageState extends State<RoutePackage> {
   @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     void setIndex(int index) {
       setState(() {
@@ -43,9 +49,9 @@ class _RoutePackageState extends State<RoutePackage> {
           PackageDownloadButton(),
           // Tabs
           // Make one for Routes, or make it dynamic?
-          PackageTabs(setIndex: setIndex),
+          PackageTabs(setIndex: setIndex, isPackage: true),
           // Body of tabs
-          TabsBody(selectedIndex: _selectedIndex,),
+          TabsBody(selectedIndex: _selectedIndex),
         ],
       ),
     );

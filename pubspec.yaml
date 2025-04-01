@@ -7,11 +7,11 @@ environment:
   sdk: ^3.7.0
 
 dependencies:
-
   arcgis_maps: ^200.6.0+4426
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1 
+  path_provider: ^2.1.5
 
 dev_dependencies:
   flutter_test:

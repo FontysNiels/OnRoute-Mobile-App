@@ -1,17 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/available_routes.dart';
+import 'package:onroute_app/Routes/single_route.dart';
 
 class RouteCard extends StatelessWidget {
-  const RouteCard({super.key});
+  // final Function startRoute;
+  final AvailableRoutes routeID;
+  const RouteCard({super.key,
+  //  required this.startRoute, 
+  required this.routeID});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
         // Navigate to ROUTE
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => RoutePackage()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder:
+                (context) =>
+                    SingleRoute(fileLocation: routeID, 
+                    // startRoute: startRoute
+                    ),
+          ),
+        );
       },
       child: Card(
         elevation: 0,
@@ -44,7 +56,8 @@ class RouteCard extends StatelessWidget {
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
                             // 2 lines van maken? Titels zijn vrij lang
-                            "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+                            // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+                            routeID.routeData.title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
@@ -53,7 +66,7 @@ class RouteCard extends StatelessWidget {
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
                           Text(
-                            "Download status",
+                            routeID.locally ? "Gedownload" : "Niet Gedownload",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
@@ -67,18 +80,18 @@ class RouteCard extends StatelessWidget {
                   //   showPopover(context: context, bodyBuilder: (context)=> PopupMenuItem(child: Text('Download'), value: Text('yes'),));
                   //   },
                   // ),
-                  PopupMenuButton(
-                    itemBuilder:
-                        (BuildContext context) => <PopupMenuEntry>[
-                          const PopupMenuItem(
-                            // value: SampleItem.itemOne,
-                            child: Padding(
-                              padding: EdgeInsets.all(0),
-                              child: Text('Download'),
-                            ),
-                          ),
-                        ],
-                  ),
+                  // PopupMenuButton(
+                  //   itemBuilder:
+                  //       (BuildContext context) => <PopupMenuEntry>[
+                  //         const PopupMenuItem(
+                  //           // value: SampleItem.itemOne,
+                  //           child: Padding(
+                  //             padding: EdgeInsets.all(0),
+                  //             child: Text('Download'),
+                  //           ),
+                  //         ),
+                  //       ],
+                  // ),
                 ],
               ),
             ),

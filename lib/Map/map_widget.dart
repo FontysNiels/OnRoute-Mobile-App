@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
@@ -72,7 +70,7 @@ class _MapWidgetState extends State<MapWidget> {
                 ),
               ],
             ),
-
+            // navigate button
             Align(
               alignment: Alignment.centerRight,
               child: FloatingActionButton(
@@ -84,7 +82,7 @@ class _MapWidgetState extends State<MapWidget> {
                 child: Icon(Icons.gps_fixed),
               ),
             ),
-
+            // Direction card
             _directionsList.isNotEmpty
                 ? DirectionsCard(
                   directionsList: _directionsList,
@@ -92,6 +90,7 @@ class _MapWidgetState extends State<MapWidget> {
                   mapViewController: _mapViewController,
                 )
                 : Container(),
+            // route buttons
             Align(
               alignment: Alignment.centerLeft,
               child: Row(
@@ -116,8 +115,8 @@ class _MapWidgetState extends State<MapWidget> {
                 ],
               ),
             ),
-
-            BottomSheetWidget(),
+            // Bottomsheet
+            BottomSheetWidget(setRouteGraphics: test),
 
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
@@ -168,9 +167,6 @@ class _MapWidgetState extends State<MapWidget> {
 
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
-
-      // Configure some initial graphics.
-      // _graphicsOverlay.graphics.addAll(await initialGraphics());
 
       // Set an initial viewpoint over the graphics.
       _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
@@ -237,12 +233,15 @@ class _MapWidgetState extends State<MapWidget> {
       print("Error in onMapViewReady: $e");
     }
   }
+  void test() async{
+    await initialGraphics();
+  }
 
   Future<List<Graphic>> initialGraphics() async {
-    // Create symbol for line.
-
     // Get data from route <IN ONMAPVIEW ZETTEN>
-    var response = await getRouteData();
+    var response = await getRouteData('4f4cea7adeb0463c9ccb4a92d2c62dbf');
+
+    print(jsonDecode(response.body));
 
     var lastding =
         (jsonDecode(response.body)['layers'][2]['featureSet']['features']
