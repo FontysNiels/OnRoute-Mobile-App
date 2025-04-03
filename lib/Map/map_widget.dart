@@ -8,15 +8,20 @@ import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Map/bottom_sheet_widget.dart';
 import 'package:onroute_app/Map/directions_card.dart';
+import 'package:onroute_app/Routes/test.dart';
 
 class MapWidget extends StatefulWidget {
-  const MapWidget({super.key});
+  final ArcGISMapViewController mapViewController;
+  const MapWidget({super.key, required this.mapViewController});
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
 }
 
 class _MapWidgetState extends State<MapWidget> {
+  // Create a GlobalKey for the ArcGISMapView to persist its state.
+  final GlobalKey _mapViewKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -24,9 +29,6 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   void dispose() {
-    _locationDataSource.stop();
-    _statusSubscription?.cancel();
-    _autoPanModeSubscription?.cancel();
     super.dispose();
   }
 
@@ -64,6 +66,7 @@ class _MapWidgetState extends State<MapWidget> {
                 Expanded(
                   // Add a map view to the widget tree and set a controller.
                   child: ArcGISMapView(
+                    key: _mapViewKey, // Use the GlobalKey here
                     controllerProvider: () => _mapViewController,
                     onMapViewReady: onMapViewReady,
                   ),
@@ -74,6 +77,7 @@ class _MapWidgetState extends State<MapWidget> {
             Align(
               alignment: Alignment.centerRight,
               child: FloatingActionButton(
+                heroTag: 'uniqueTagForFAB3',
                 onPressed:
                     () => {
                       _mapViewController.locationDisplay.autoPanMode =
@@ -115,8 +119,10 @@ class _MapWidgetState extends State<MapWidget> {
                 ],
               ),
             ),
+
+            
             // Bottomsheet
-            BottomSheetWidget(setRouteGraphics: test),
+            // BottomSheetWidget(setRouteGraphics: test),
 
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
@@ -233,7 +239,8 @@ class _MapWidgetState extends State<MapWidget> {
       print("Error in onMapViewReady: $e");
     }
   }
-  void test() async{
+
+  void test() async {
     await initialGraphics();
   }
 

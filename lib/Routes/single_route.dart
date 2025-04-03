@@ -29,7 +29,7 @@ int _selectedIndex = 0;
 class _SingleRouteState extends State<SingleRoute> {
   @override
   void dispose() {
-    // TODO: implement dispose
+    
     super.dispose();
   }
 
@@ -52,6 +52,7 @@ class _SingleRouteState extends State<SingleRoute> {
         ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 26,
           children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
         ),
       ),
@@ -59,8 +60,8 @@ class _SingleRouteState extends State<SingleRoute> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
-          RouteTitle(title: widget.routeContent.routeData.title),
-          // Images (PACKAGE)
+          RouteTitle(title: widget.routeContent.routeLayer.title),
+          // Images (PACKAGE ONLY)
           PackegImagePreview(),
 
           // geef routeId(s) mee aan download button

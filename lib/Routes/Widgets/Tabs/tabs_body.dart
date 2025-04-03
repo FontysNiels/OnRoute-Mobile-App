@@ -15,6 +15,7 @@ class TabsBody extends StatelessWidget {
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
       // ^ deze exporten naar Widgets/Tabs/Content
       POICard(),
+      POICard(),
       
       // Routes
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting

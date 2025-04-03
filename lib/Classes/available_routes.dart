@@ -1,12 +1,14 @@
+import 'package:onroute_app/Classes/route_layer_data.dart';
+
 class AvailableRoutes {
   final String routeID;
-  final RouteData routeData;
   final bool locally;
+  final RouteLayerData routeLayer;
 
   AvailableRoutes({
     required this.routeID,
-    required this.routeData,
     required this.locally,
+    required this.routeLayer,
   });
 }
 

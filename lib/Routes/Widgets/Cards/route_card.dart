@@ -4,7 +4,7 @@ import 'package:onroute_app/Routes/single_route.dart';
 
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;
-  final VoidCallback onRouteUpdated; // New callback function
+  final VoidCallback onRouteUpdated; // New callback functionF
 
   const RouteCard({
     super.key,
@@ -20,9 +20,9 @@ class RouteCard extends StatelessWidget {
         final result = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SingleRoute(
-              routeContent: routeContent,
-            ),
+            builder:
+                (context) =>
+                    SingleRoute(key: UniqueKey(), routeContent: routeContent),
           ),
         );
 
@@ -62,16 +62,18 @@ class RouteCard extends StatelessWidget {
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
                             // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
-                            routeContent.routeData.title,
+                            routeContent.routeLayer.title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "2nd text",
+                            "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
                           Text(
-                            routeContent.locally ? "Gedownload" : "Niet Gedownload",
+                            routeContent.locally
+                                ? "Gedownload"
+                                : "Niet Gedownload",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),

@@ -4,11 +4,13 @@ import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
 import 'package:onroute_app/Map/bottom_sheet_widget.dart';
+import 'package:onroute_app/Routes/test.dart';
+import 'package:onroute_app/test2.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
-    // print(details);
+    // print("COOLE SHIT: ${details}");
     // Log or handle the error details
   };
   runApp(const MainApp());
@@ -48,7 +50,7 @@ class _MainAppState extends State<MainApp> {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     print('Screen width: $screenWidth, Screen height: $screenHeight');
-
+    final _mapViewController = ArcGISMapView.createController();
     return MaterialApp(
       // theme: AppTheme,
       debugShowCheckedModeBanner: false,
@@ -92,9 +94,7 @@ class _MainAppState extends State<MainApp> {
           unselectedLabelColor: primaryTextColor,
         ),
 
-        dividerTheme: DividerThemeData(
-          color: primaryAppColor
-        ),
+        dividerTheme: DividerThemeData(color: primaryAppColor),
 
         //Text Theme's
         textTheme: TextTheme(
@@ -104,14 +104,20 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
-        body: IndexedStack(
-          index: currentPageIndex, // Controls which child is displayed
+        // body: IndexedStack(
+        //   index: currentPageIndex, // Controls which child is displayed
+        //   children: [
+        //     // AsyncMapPage(),
+        //     // MapWidget(),
+        //     // RoutesList(),
+        //     // TempMapPage(), // This ensures the map remains loaded in memory
+        //     BottomSheetWidget(setRouteGraphics: (){}),
+        //   ],
+        // ),
+        body: Stack(
           children: [
-            // AsyncMapPage(),
-            // MapWidget(),
-            // RoutesList(),
-            // TempMapPage(), // This ensures the map remains loaded in memory
-            BottomSheetWidget(setRouteGraphics: (){}),
+            MapWidget(mapViewController: _mapViewController),
+            BottomSheetWidget(setRouteGraphics: () {}),
           ],
         ),
       ),

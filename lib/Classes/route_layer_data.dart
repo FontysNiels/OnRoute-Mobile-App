@@ -3,12 +3,16 @@ class RouteLayerData {
   // final bool visibility;
   final List<Layer> layers;
   final List<int> visibleLayers;
+  final String title;
+  final String description;
 
   RouteLayerData({
     // required this.opacity,
     // required this.visibility,
     required this.layers,
     required this.visibleLayers,
+    required this.title,
+    required this.description
   });
 
   factory RouteLayerData.fromJson(Map<String, dynamic> json) {
@@ -20,6 +24,8 @@ class RouteLayerData {
               .map((layer) => Layer.fromJson(layer))
               .toList(),
       visibleLayers: List<int>.from(json['visibleLayers']),
+      title: json['title'],
+      description: json['description'],
     );
   }
 }

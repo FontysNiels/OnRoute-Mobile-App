@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Map/BottomSheet/bottom_sheet_handle.dart';
@@ -22,9 +23,9 @@ class RoutesListView extends StatefulWidget {
   @override
   State<RoutesListView> createState() => _RoutesListViewState();
 }
-
+late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
 class _RoutesListViewState extends State<RoutesListView> {
-  late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
+  
 
   @override
   void initState() {
@@ -41,12 +42,14 @@ class _RoutesListViewState extends State<RoutesListView> {
   Future<List<AvailableRoutes>> fetchItems() async {
     // List of all files on device
     List<File> localFiles = await getRouteFiles();
-    print(localFiles);
+
+    // Remove localFiles.filename from routeIDs, instead of if = container()
 
     // TEMP list of routeIDs
     List routeIDs = [
       '4f4cea7adeb0463c9ccb4a92d2c62dbf',
       'd7c2638c697d415584c84166e04565b5',
+      'c79d6d7746d145deaf842bd7602f70b4',
     ];
 
     // List of available routes
@@ -58,14 +61,18 @@ class _RoutesListViewState extends State<RoutesListView> {
       var response = await getRouteInfo(routeIDs[i]);
       var layerInfo = jsonDecode(response.body);
 
+      var routeResponse = await getRouteData(layerInfo['id']);
+      var modifiedResponse = jsonDecode(routeResponse.body);
+      modifiedResponse['title'] = layerInfo['title'];
+      modifiedResponse['description'] = layerInfo['description'];
+
+      RouteLayerData routeInfo = RouteLayerData.fromJson(modifiedResponse);
+
       // Add info of online route to list
       AvailableRoutes onlineRoute = AvailableRoutes(
         routeID: layerInfo['id'],
-        routeData: RouteData(
-          title: layerInfo['title'],
-          description: layerInfo['description'],
-        ),
         locally: false,
+        routeLayer: routeInfo,
       );
       allAvailableRoutes.add(onlineRoute);
     }
@@ -73,15 +80,13 @@ class _RoutesListViewState extends State<RoutesListView> {
     // Add all the local files to the list
     for (var file in localFiles) {
       var storedFile = jsonDecode(await readRouteFile(file));
+      RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
 
       allAvailableRoutes.add(
         AvailableRoutes(
           routeID: file.path,
-          routeData: RouteData(
-            title: storedFile['title'],
-            description: storedFile['description'],
-          ),
           locally: true,
+          routeLayer: routeInfo,
         ),
       );
     }
@@ -120,7 +125,7 @@ class _RoutesListViewState extends State<RoutesListView> {
           if (localItems.isNotEmpty) {
             listItems.addAll(
               localItems.map((item) {
-                return RouteCard(
+                return RouteCard(key: UniqueKey(),
                   routeContent: item,
                   onRouteUpdated: _refreshRoutes, // Pass the callback
                 );
@@ -150,14 +155,13 @@ class _RoutesListViewState extends State<RoutesListView> {
           if (onlineItems.isNotEmpty) {
             listItems.addAll(
               onlineItems.map((item) {
-                // print(item);
                 if (localItems.any(
                   (localItem) =>
                       localItem.routeID.toString().contains(item.routeID),
                 )) {
                   return Container();
                 } else {
-                  return RouteCard(
+                  return RouteCard(key: UniqueKey(),
                     routeContent: item,
                     onRouteUpdated: _refreshRoutes, // Pass the callback
                   );

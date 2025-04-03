@@ -17,8 +17,8 @@ class RouteDownloadButton extends StatelessWidget {
         onPressed: () async {
           var response = await getRouteData(routeID.routeID);
           var modifiedResponse = jsonDecode(response.body);
-          modifiedResponse['title'] = routeID.routeData.title;
-          modifiedResponse['description'] = routeID.routeData.description;
+          modifiedResponse['title'] = routeID.routeLayer.title;
+          modifiedResponse['description'] = routeID.routeLayer.description;
           var encodedResponse = jsonEncode(modifiedResponse);
 
           var writtenfile = await writeFile(
@@ -30,7 +30,7 @@ class RouteDownloadButton extends StatelessWidget {
         },
         icon: const Icon(Icons.download),
         label: Text(
-          'Downlaod route',
+          'Download route',
           style: Theme.of(context).textTheme.labelLarge,
         ),
         iconAlignment: IconAlignment.start,
