@@ -108,10 +108,10 @@ class _MainAppState extends State<MainApp> {
           index: currentPageIndex, // Controls which child is displayed
           children: [
             // AsyncMapPage(),
-            MapWidget(),
+            // MapWidget(),
             // RoutesList(),
             // TempMapPage(), // This ensures the map remains loaded in memory
-            // BottomSheetWidget(),
+            BottomSheetWidget(setRouteGraphics: (){}),
           ],
         ),
       ),

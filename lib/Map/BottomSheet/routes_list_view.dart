@@ -9,7 +9,7 @@ import 'package:onroute_app/Map/BottomSheet/list_divider.dart';
 import 'package:onroute_app/Routes/Widgets/Cards/package_card.dart';
 import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
 
-class RoutesListView extends StatelessWidget {
+class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
   final Function setRouteGraphics;
 
@@ -18,6 +18,25 @@ class RoutesListView extends StatelessWidget {
     required this.scrollController,
     required this.setRouteGraphics,
   });
+
+  @override
+  State<RoutesListView> createState() => _RoutesListViewState();
+}
+
+class _RoutesListViewState extends State<RoutesListView> {
+  late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
+
+  @override
+  void initState() {
+    super.initState();
+    _futureRoutes = fetchItems(); // Initialize the future
+  }
+
+  void _refreshRoutes() {
+    setState(() {
+      _futureRoutes = fetchItems(); // Refresh the future
+    });
+  }
 
   Future<List<AvailableRoutes>> fetchItems() async {
     // List of all files on device
@@ -53,12 +72,14 @@ class RoutesListView extends StatelessWidget {
 
     // Add all the local files to the list
     for (var file in localFiles) {
+      var storedFile = jsonDecode(await readRouteFile(file));
+
       allAvailableRoutes.add(
         AvailableRoutes(
           routeID: file.path,
           routeData: RouteData(
-            title: 'NOG ERGENS DE TITEL OPSLAAN',
-            description: 'NOG ERGENS DE DESCRIPTION OPSLAAN',
+            title: storedFile['title'],
+            description: storedFile['description'],
           ),
           locally: true,
         ),
@@ -71,7 +92,7 @@ class RoutesListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<AvailableRoutes>>(
-      future: fetchItems(),
+      future: _futureRoutes, // Use the stored future
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
@@ -99,10 +120,9 @@ class RoutesListView extends StatelessWidget {
           if (localItems.isNotEmpty) {
             listItems.addAll(
               localItems.map((item) {
-                // return const PackageCard();
                 return RouteCard(
-                  routeID: item,
-                  // startRoute: setRouteGraphics,
+                  routeContent: item,
+                  onRouteUpdated: _refreshRoutes, // Pass the callback
                 );
               }).toList(),
             );
@@ -127,14 +147,6 @@ class RoutesListView extends StatelessWidget {
           // Add the online items section
           listItems.add(const ListDivider(text: 'Niet Gedownloade Routes'));
 
-          // listItems.add(
-          //   // return const PackageCard();
-          //   RouteCard(
-          //     startRoute: setRouteGraphics,
-          //     routeID: '',
-          //   ),
-          // );
-
           if (onlineItems.isNotEmpty) {
             listItems.addAll(
               onlineItems.map((item) {
@@ -146,8 +158,8 @@ class RoutesListView extends StatelessWidget {
                   return Container();
                 } else {
                   return RouteCard(
-                    routeID: item,
-                    // startRoute: () {},
+                    routeContent: item,
+                    onRouteUpdated: _refreshRoutes, // Pass the callback
                   );
                   // return const PackageCard();
                 }
@@ -172,7 +184,7 @@ class RoutesListView extends StatelessWidget {
 
           return ListView(
             padding: const EdgeInsets.all(5),
-            controller: scrollController,
+            controller: widget.scrollController,
             children: listItems,
           );
         }

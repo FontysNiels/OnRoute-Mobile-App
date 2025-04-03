@@ -108,11 +108,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
                 (userPosition.x <= start[1] && userPosition.x >= end[1]);
 
             if (isBetweenLat && isBetweenLng) {
-              print("User is between coordinates: $start and $end");
+              // print("User is between coordinates: $start and $end");
               for (var element
                   in widget._routeInfo.layers[2].featureSet.features) {
                 if (element.attributes['ObjectID'] == start[2]) {
-                  print(element.attributes['DisplayText']);
+                  // print(element.attributes['DisplayText']);
                   var testIndex = directionList.indexWhere(
                     (direct) =>
                         direct.description == element.attributes['DisplayText'],

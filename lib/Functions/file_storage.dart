@@ -19,7 +19,7 @@ Future<File> writeFile(String content, String name) async {
   }
 
   final file = File('${directory.path}/$name');
-
+  
   // Write the file
   return file.writeAsString('$content');
 }

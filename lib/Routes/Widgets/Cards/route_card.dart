@@ -3,27 +3,33 @@ import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Routes/single_route.dart';
 
 class RouteCard extends StatelessWidget {
-  // final Function startRoute;
-  final AvailableRoutes routeID;
-  const RouteCard({super.key,
-  //  required this.startRoute, 
-  required this.routeID});
+  final AvailableRoutes routeContent;
+  final VoidCallback onRouteUpdated; // New callback function
+
+  const RouteCard({
+    super.key,
+    required this.routeContent,
+    required this.onRouteUpdated, // Pass the callback
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         // Navigate to ROUTE
-        Navigator.push(
+        final result = await Navigator.push(
           context,
           MaterialPageRoute(
-            builder:
-                (context) =>
-                    SingleRoute(fileLocation: routeID, 
-                    // startRoute: startRoute
-                    ),
+            builder: (context) => SingleRoute(
+              routeContent: routeContent,
+            ),
           ),
         );
+
+        // Trigger the callback if result is true
+        if (result == true) {
+          onRouteUpdated();
+        }
       },
       child: Card(
         elevation: 0,
@@ -55,9 +61,8 @@ class RouteCard extends StatelessWidget {
                         children: [
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
-                            // 2 lines van maken? Titels zijn vrij lang
                             // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
-                            routeID.routeData.title,
+                            routeContent.routeData.title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
@@ -66,7 +71,7 @@ class RouteCard extends StatelessWidget {
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
                           Text(
-                            routeID.locally ? "Gedownload" : "Niet Gedownload",
+                            routeContent.locally ? "Gedownload" : "Niet Gedownload",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),

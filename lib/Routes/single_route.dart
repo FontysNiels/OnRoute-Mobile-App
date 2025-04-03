@@ -13,10 +13,10 @@ import 'package:onroute_app/Routes/Widgets/Tabs/tabs_body.dart';
 
 class SingleRoute extends StatefulWidget {
   // final Function startRoute;
-  final AvailableRoutes fileLocation;
+  final AvailableRoutes routeContent;
   const SingleRoute({
     super.key,
-    required this.fileLocation,
+    required this.routeContent,
     // required this.startRoute,
   });
 
@@ -41,33 +41,17 @@ class _SingleRouteState extends State<SingleRoute> {
       });
     }
 
-    // void _readAndPrintFile() async {
-    //   // print(widget.fileLoscation);
-    //   if (widget.fileLocation != '') {
-    //     File test = File(widget.fileLocation);
-    //     // print(await readRouteFile(test));
-    //     var test2 = jsonDecode(await readRouteFile(test));
-    //     // print(jsonDecode(test2));
-    //     RouteLayerData routeInfo = RouteLayerData.fromJson(test2);
-    //   }
-
-    //   //niet voor titel gebruiken, maar voor starten van route
-    // }
-
-    // _readAndPrintFile();
-
-    bool isfile = false;
-
-    if (widget.fileLocation.routeID.endsWith('.json')) {
-      isfile = true;
-    }
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        ),
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          spacing: 26,
           children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
         ),
       ),
@@ -75,13 +59,15 @@ class _SingleRouteState extends State<SingleRoute> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
-          RouteTitle(title: widget.fileLocation.routeData.title),
+          RouteTitle(title: widget.routeContent.routeData.title),
           // Images (PACKAGE)
           PackegImagePreview(),
 
           // geef routeId(s) mee aan download button
           // Download Button
-          !isfile ? RouteDownloadButton(routeID: widget.fileLocation.routeID,) : Text('data'),
+          !widget.routeContent.locally
+              ? RouteDownloadButton(routeID: widget.routeContent)
+              : Text('data'),
           // Tabs
           // Make one for Routes, or make it dynamic?
           PackageTabs(setIndex: setIndex, isPackage: false),
