@@ -12,21 +12,21 @@ import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
 
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
-  final Function setRouteGraphics;
+  // final Function setRouteGraphics;
 
   const RoutesListView({
     super.key,
     required this.scrollController,
-    required this.setRouteGraphics,
+    // required this.setRouteGraphics,
   });
 
   @override
   State<RoutesListView> createState() => _RoutesListViewState();
 }
-late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
-class _RoutesListViewState extends State<RoutesListView> {
-  
 
+late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
+
+class _RoutesListViewState extends State<RoutesListView> {
   @override
   void initState() {
     super.initState();
@@ -60,13 +60,26 @@ class _RoutesListViewState extends State<RoutesListView> {
       // Get route info (title, description) based on routeID
       var response = await getRouteInfo(routeIDs[i]);
       var layerInfo = jsonDecode(response.body);
-
       var routeResponse = await getRouteData(layerInfo['id']);
+
+      var lastding =
+          (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
+                  as List)
+              .last;
+
       var modifiedResponse = jsonDecode(routeResponse.body);
       modifiedResponse['title'] = layerInfo['title'];
       modifiedResponse['description'] = layerInfo['description'];
 
-      RouteLayerData routeInfo = RouteLayerData.fromJson(modifiedResponse);
+      RouteLayerData routeInfo = RouteLayerData.fromJson(
+        (modifiedResponse
+            ..['layers'][2]['featureSet']['features'] =
+                (modifiedResponse['layers'][2]['featureSet']['features']
+                        as List)
+                    .where((feature) => feature['attributes']['Azimuth'] != 0.0)
+                    .toList())
+          ..['layers'][2]['featureSet']['features'].add(lastding),
+      );
 
       // Add info of online route to list
       AvailableRoutes onlineRoute = AvailableRoutes(
@@ -99,11 +112,28 @@ class _RoutesListViewState extends State<RoutesListView> {
     return FutureBuilder<List<AvailableRoutes>>(
       future: _futureRoutes, // Use the stored future
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
+        // List of widgets that will be displayed
+        List<Widget> listItems = [];
+        // Add the "Start een route" section
+        listItems.add(BottomSheetHandle(context: context));
+        listItems.add(
+          SizedBox(
+            height: MediaQuery.of(context).size.width / 7,
+            child: Image.asset('assets/bragis_onroute.png'),
+          ),
+        );
+
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No items available'));
+          listItems.add(const Center(child: Text('No items available')));
+          return ListView(
+            padding: const EdgeInsets.all(5),
+            controller: widget.scrollController,
+            children: listItems,
+          );
         } else {
+          listItems.remove(const Center(child: Text('No items available')));
           // Sets snashot.data as a list of AvailableRoutes
           List<AvailableRoutes> allItems =
               snapshot.data! as List<AvailableRoutes>;
@@ -114,20 +144,16 @@ class _RoutesListViewState extends State<RoutesListView> {
           List onlineItems =
               allItems.where((item) => item.locally == false).toList();
 
-          // List of widgets that will be displayed
-          List<Widget> listItems = [];
-
-          // Add the "Start een route" section
-          listItems.add(BottomSheetHandle(context: context));
-
           // Add the local items section
           listItems.add(const ListDivider(text: 'Gedownloade Routes'));
           if (localItems.isNotEmpty) {
             listItems.addAll(
               localItems.map((item) {
-                return RouteCard(key: UniqueKey(),
+                return RouteCard(
+                  key: UniqueKey(),
                   routeContent: item,
                   onRouteUpdated: _refreshRoutes, // Pass the callback
+                  // setRouteGraphics: widget.setRouteGraphics,
                 );
               }).toList(),
             );
@@ -161,9 +187,11 @@ class _RoutesListViewState extends State<RoutesListView> {
                 )) {
                   return Container();
                 } else {
-                  return RouteCard(key: UniqueKey(),
+                  return RouteCard(
+                    key: UniqueKey(),
                     routeContent: item,
                     onRouteUpdated: _refreshRoutes, // Pass the callback
+                    // setRouteGraphics: widget.setRouteGraphics,
                   );
                   // return const PackageCard();
                 }
@@ -185,7 +213,6 @@ class _RoutesListViewState extends State<RoutesListView> {
               ),
             );
           }
-
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,

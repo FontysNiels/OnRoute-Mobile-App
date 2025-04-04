@@ -5,11 +5,13 @@ import 'package:onroute_app/Routes/single_route.dart';
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;
   final VoidCallback onRouteUpdated; // New callback functionF
+  // final Function setRouteGraphics;
 
   const RouteCard({
     super.key,
     required this.routeContent,
     required this.onRouteUpdated, // Pass the callback
+    // required this.setRouteGraphics,
   });
 
   @override
@@ -19,10 +21,19 @@ class RouteCard extends StatelessWidget {
         // Navigate to ROUTE
         final result = await Navigator.push(
           context,
+
+          // PageRouteBuilder(
+          //   pageBuilder:
+          //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
+          //   transitionDuration: Duration.zero, // No transition effect
+          // ),
           MaterialPageRoute(
             builder:
-                (context) =>
-                    SingleRoute(key: UniqueKey(), routeContent: routeContent),
+                (context) => SingleRoute(
+                  key: UniqueKey(),
+                  routeContent: routeContent,
+                  // setRouteGraphics: setRouteGraphics,
+                ),
           ),
         );
 

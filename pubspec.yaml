@@ -13,6 +13,7 @@ dependencies:
   flutter_dotenv: ^5.2.1 
   path_provider: ^2.1.5
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -25,3 +26,4 @@ flutter:
     - .env
     - assets/temp.png
     - assets/gisdata.json
+    - assets/bragis_onroute.png

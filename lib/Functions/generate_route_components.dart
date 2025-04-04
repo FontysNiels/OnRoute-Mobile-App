@@ -28,3 +28,33 @@ List<Graphic> generatePointGraphics(RouteLayerData routeInfo) {
   }
   return graphics;
 }
+
+Future<List<Graphic>> generateLinesAndPoints(RouteLayerData routeID) async {
+  // Generate Lines
+  List<Graphic> graphics = [];
+  for (var element in routeID.layers[1].featureSet.features) {
+    late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
+      style: SimpleLineSymbolStyle.solid,
+      color: Color(
+        (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000)).toInt(),
+      ).withOpacity(1.0),
+      width: 4,
+    );
+
+    final polylineJson = '''
+            {"paths": ${element.geometry.paths},
+            "spatialReference":${element.geometry.spatialReference.toString()}}''';
+
+    final routePart = Geometry.fromJsonString(polylineJson);
+    graphics.add(Graphic(geometry: routePart, symbol: polylineSymbol));
+  }
+
+  // Generate Points
+  List<Graphic> pointGraphics = generatePointGraphics(routeID);
+  for (var i = 0; i < pointGraphics.length; i++) {
+    graphics.addAll([pointGraphics[i]]);
+  }
+
+  // Return a list of graphics for each geometry type.
+  return graphics;
+}

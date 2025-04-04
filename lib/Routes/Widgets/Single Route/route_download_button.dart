@@ -25,8 +25,8 @@ class RouteDownloadButton extends StatelessWidget {
             encodedResponse,
             '${routeID.routeID}.json',
           );
-          // var contentoffile = jsonDecode(await readRouteFile(writtenfile));
-          // print(contentoffile);
+          //LOADING INDICATOR
+          Navigator.pop(context, true);
         },
         icon: const Icon(Icons.download),
         label: Text(

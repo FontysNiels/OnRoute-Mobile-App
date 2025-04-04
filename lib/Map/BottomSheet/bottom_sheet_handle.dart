@@ -24,7 +24,7 @@ class BottomSheetHandle extends StatelessWidget {
             ),
           ),
         ),
-        Text("Start een route", style: Theme.of(context).textTheme.bodyLarge),
+        // Text("Start een route", style: Theme.of(context).textTheme.bodyLarge),
       ],
     );
   }

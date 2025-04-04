@@ -1,5 +1,7 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
@@ -31,6 +33,13 @@ Future<void> initialize() async {
   ArcGISEnvironment.apiKey = apiKey;
 }
 
+final _mapViewController = ArcGISMapView.createController();
+final _graphicsOverlay = GraphicsOverlay();
+
+Future<void> addGraphics(RouteLayerData route) async {
+  _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
+}
+
 class _MainAppState extends State<MainApp> {
   @override
   void initState() {
@@ -49,8 +58,9 @@ class _MainAppState extends State<MainApp> {
 
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
+
     print('Screen width: $screenWidth, Screen height: $screenHeight');
-    final _mapViewController = ArcGISMapView.createController();
+
     return MaterialApp(
       // theme: AppTheme,
       debugShowCheckedModeBanner: false,
@@ -116,8 +126,11 @@ class _MainAppState extends State<MainApp> {
         // ),
         body: Stack(
           children: [
-            MapWidget(mapViewController: _mapViewController),
-            BottomSheetWidget(setRouteGraphics: () {}),
+            MapWidget(
+              mapViewController: _mapViewController,
+              graphicsOverlay: _graphicsOverlay,
+            ),
+            BottomSheetWidget(setRouteGraphics: addGraphics),
           ],
         ),
       ),

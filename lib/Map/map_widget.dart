@@ -12,7 +12,12 @@ import 'package:onroute_app/Routes/test.dart';
 
 class MapWidget extends StatefulWidget {
   final ArcGISMapViewController mapViewController;
-  const MapWidget({super.key, required this.mapViewController});
+  final GraphicsOverlay graphicsOverlay;
+  const MapWidget({
+    super.key,
+    required this.mapViewController,
+    required this.graphicsOverlay,
+  });
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -33,8 +38,11 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   // create a controller for the map view
-  final _mapViewController = ArcGISMapView.createController();
+  late final _mapViewController = widget.mapViewController;
   late ArcGISMap _webMap;
+  // Create a graphics overlay.
+  late final _graphicsOverlay = widget.graphicsOverlay;
+
   // A flag for when the settings bottom sheet is visible.
   var _settingsVisible = false;
   // Create the system location data source.
@@ -48,8 +56,7 @@ class _MapWidgetState extends State<MapWidget> {
   // A flag for when the map view is ready and controls can be used.
   var _ready = false;
   final _directionsGraphicsOverlay = GraphicsOverlay();
-  // Create a graphics overlay.
-  final _graphicsOverlay = GraphicsOverlay();
+
   // Create symbols which will be used for each geometry type.
   List<DescriptionPoint> _directionsList = [];
   late RouteLayerData _routeInfo;
@@ -120,7 +127,6 @@ class _MapWidgetState extends State<MapWidget> {
               ),
             ),
 
-            
             // Bottomsheet
             // BottomSheetWidget(setRouteGraphics: test),
 
@@ -175,7 +181,7 @@ class _MapWidgetState extends State<MapWidget> {
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
 
       // Set an initial viewpoint over the graphics.
-      _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
+      // _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
 
       _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
@@ -248,18 +254,20 @@ class _MapWidgetState extends State<MapWidget> {
     // Get data from route <IN ONMAPVIEW ZETTEN>
     var response = await getRouteData('4f4cea7adeb0463c9ccb4a92d2c62dbf');
 
-    print(jsonDecode(response.body));
+    var modifiedResponse = jsonDecode(response.body);
+    modifiedResponse['title'] = "title";
+    modifiedResponse['description'] = 'description';
+    var encoddeshit = jsonEncode(modifiedResponse);
 
     var lastding =
-        (jsonDecode(response.body)['layers'][2]['featureSet']['features']
-                as List)
+        (jsonDecode(encoddeshit)['layers'][2]['featureSet']['features'] as List)
             .last;
     // print(lastding);
 
     RouteLayerData routeInfo = RouteLayerData.fromJson(
-      (jsonDecode(response.body)
+      (jsonDecode(encoddeshit)
           ..['layers'][2]['featureSet']['features'] =
-              (jsonDecode(response.body)['layers'][2]['featureSet']['features']
+              (jsonDecode(encoddeshit)['layers'][2]['featureSet']['features']
                       as List)
                   .where((feature) => feature['attributes']['Azimuth'] != 0.0)
                   .toList())
@@ -276,15 +284,16 @@ class _MapWidgetState extends State<MapWidget> {
 
     // Route Directtions (Move to separate function)
     getRouteDirections(routeInfo);
-
+    List<Graphic> graphics = [];
     // Generate Points
     List<Graphic> pointGraphics = generatePointGraphics(routeInfo);
     for (var i = 0; i < pointGraphics.length; i++) {
-      _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
+      // _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
+      graphics.add(pointGraphics[i]);
     }
 
     // Generate Lines
-    List<Graphic> graphics = [];
+
     for (var element in routeInfo.layers[1].featureSet.features) {
       late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
         style: SimpleLineSymbolStyle.solid,
@@ -317,40 +326,6 @@ class _MapWidgetState extends State<MapWidget> {
       }
       final parsedX = element.geometry.x;
       final parsedY = element.geometry.y;
-
-      // Works, but when it repeats like "vertrek bij Location 1" it doesnt work....
-      // if (element.attributes['DisplayText'].contains(
-      //   element.attributes['Name'].toString(),
-      // )) {
-
-      //   final yes = routeInfo.layers[3].featureSet.features;
-
-      //   int test = element.attributes['ObjectID'];
-
-      //   if (test != null) {
-      //     try {
-      //       print(
-      //         yes.firstWhere(
-      //           (feature) => feature.attributes['ObjectID'] == test,
-      //         ),
-      //       );
-      //       element.attributes['DisplayText'] = element
-      //           .attributes['DisplayText']
-      //           .replaceAll(
-      //             element.attributes['Name'].toString(),
-      //             yes
-      //                 .firstWhere(
-      //                   (feature) => feature.attributes['ObjectID'] == test,
-      //                 )
-      //                 ?.attributes['Name'],
-      //           );
-
-      //           print( element.attributes['DisplayText']);
-      //     } catch (e) {
-      //       print("NOT IN THERE");
-      //     }
-      //   }
-      // }
 
       routeDirections.add(
         DescriptionPoint(

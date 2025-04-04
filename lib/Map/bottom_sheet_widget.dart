@@ -12,10 +12,10 @@ class BottomSheetWidget extends StatelessWidget {
       children: [
         // Persistent bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.1,
+          initialChildSize: 0.4,
           snap: true,
-          snapSizes: [0.1, 0.4, 0.6, 0.9],
-          minChildSize: 0.1,
+          snapSizes: [0.2, 0.4, 0.6, 0.9],
+          minChildSize: 0.2,
           maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
@@ -32,7 +32,7 @@ class BottomSheetWidget extends StatelessWidget {
               ),
               child: RoutesListView(
                 scrollController: scrollController,
-                setRouteGraphics: setRouteGraphics,
+                // setRouteGraphics: setRouteGraphics,
               ),
             );
           },
