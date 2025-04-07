@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
-import 'package:onroute_app/Routes/single_route.dart';
+import 'package:onroute_app/Routes/Single%20Route/single_route.dart';
 
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;
   final VoidCallback onRouteUpdated; // New callback functionF
-  // final Function setRouteGraphics;
+  final Function startRoute;
 
   const RouteCard({
     super.key,
     required this.routeContent,
     required this.onRouteUpdated, // Pass the callback
-    // required this.setRouteGraphics,
+    required this.startRoute,
   });
 
   @override
@@ -32,7 +32,7 @@ class RouteCard extends StatelessWidget {
                 (context) => SingleRoute(
                   key: UniqueKey(),
                   routeContent: routeContent,
-                  // setRouteGraphics: setRouteGraphics,
+                  startRoute: startRoute,
                 ),
           ),
         );

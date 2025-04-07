@@ -3,7 +3,7 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/math.dart';
+import 'package:onroute_app/Functions/conversions.dart';
 
 class DirectionsCard extends StatefulWidget {
   const DirectionsCard({
@@ -36,7 +36,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
   @override
   void initState() {
-    // TODO: implement initState
     amountOfDirections = widget._directionsList.length;
     directionList = [];
 
@@ -190,49 +189,49 @@ class _DirectionsCardState extends State<DirectionsCard> {
         const thresholdDistance = 0.0001;
         const metersPerDegree = 111320; // Approximation for latitude
         final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-        List<Map<String, dynamic>> descriptionDistanceListTemp = [];
-        for (int index = 0; index < directionList.length; index++) {
-          final point = directionList[index];
-          final pointXY = convertToLatLng(point.x, point.y);
-          final pointX = pointXY[1];
-          final pointY = pointXY[0];
+        // List<Map<String, dynamic>> descriptionDistanceListTemp = [];
+        // for (int index = 0; index < directionList.length; index++) {
+        //   final point = directionList[index];
+        //   final pointXY = convertToLatLng(point.x, point.y);
+        //   final pointX = pointXY[1];
+        //   final pointY = pointXY[0];
 
-          final distanceToPoint = sqrt(
-            pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
-          );
+        //   final distanceToPoint = sqrt(
+        //     pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
+        //   );
 
-          final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
+        //   final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
 
-          int distanceBetweenPoints = 0;
-          // Get distance between points
+        //   int distanceBetweenPoints = 0;
+        //   // Get distance between points
 
-          final matchingFeatures = widget
-              ._routeInfo
-              .layers[1]
-              .featureSet
-              .features
-              .where(
-                (feature) =>
-                    feature.attributes['DirectionPointID'] ==
-                    (widget
-                        ._routeInfo
-                        .layers[2]
-                        .featureSet
-                        .features[index]
-                        .attributes["ObjectID"]),
-              );
+        //   final matchingFeatures = widget
+        //       ._routeInfo
+        //       .layers[1]
+        //       .featureSet
+        //       .features
+        //       .where(
+        //         (feature) =>
+        //             feature.attributes['DirectionPointID'] ==
+        //             (widget
+        //                 ._routeInfo
+        //                 .layers[2]
+        //                 .featureSet
+        //                 .features[index]
+        //                 .attributes["ObjectID"]),
+        //       );
 
-          // Set distance between points
-          if (matchingFeatures.isNotEmpty) {
-            distanceBetweenPoints =
-                matchingFeatures.first.attributes['Meters'].toInt();
-          }
-          descriptionDistanceListTemp.add({
-            'desc': point.description,
-            'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
-            'distanceBetweenPoints': distanceBetweenPoints,
-          });
-        }
+        //   // Set distance between points
+        //   if (matchingFeatures.isNotEmpty) {
+        //     distanceBetweenPoints =
+        //         matchingFeatures.first.attributes['Meters'].toInt();
+        //   }
+        //   descriptionDistanceListTemp.add({
+        //     'desc': point.description,
+        //     'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
+        //     'distanceBetweenPoints': distanceBetweenPoints,
+        //   });
+        // }
 
         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
         // print(descriptionDistanceList);
@@ -292,7 +291,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
         // Update distance to nect direction
         setState(() {
           metersToCurrentDirection = distanceInMeters.toInt();
-          descriptionDistanceList = descriptionDistanceListTemp;
+          // descriptionDistanceList = descriptionDistanceListTemp;
         });
       }
     });

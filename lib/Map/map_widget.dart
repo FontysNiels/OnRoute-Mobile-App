@@ -1,22 +1,17 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
-import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/api_calls.dart';
-import 'package:onroute_app/Functions/generate_route_components.dart';
-import 'package:onroute_app/Map/bottom_sheet_widget.dart';
-import 'package:onroute_app/Map/directions_card.dart';
-import 'package:onroute_app/Routes/test.dart';
 
 class MapWidget extends StatefulWidget {
   final ArcGISMapViewController mapViewController;
   final GraphicsOverlay graphicsOverlay;
+    final List<DescriptionPoint> directionsList;
   const MapWidget({
     super.key,
     required this.mapViewController,
     required this.graphicsOverlay,
+    required this.directionsList, 
   });
 
   @override
@@ -42,7 +37,8 @@ class _MapWidgetState extends State<MapWidget> {
   late ArcGISMap _webMap;
   // Create a graphics overlay.
   late final _graphicsOverlay = widget.graphicsOverlay;
-
+  // A flag for when the map view is ready and controls can be used.
+  var _ready = false;
   // A flag for when the settings bottom sheet is visible.
   var _settingsVisible = false;
   // Create the system location data source.
@@ -53,13 +49,7 @@ class _MapWidgetState extends State<MapWidget> {
   // A subscription to receive changes to the auto-pan mode.
   StreamSubscription? _autoPanModeSubscription;
   var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
-  // A flag for when the map view is ready and controls can be used.
-  var _ready = false;
-  final _directionsGraphicsOverlay = GraphicsOverlay();
 
-  // Create symbols which will be used for each geometry type.
-  List<DescriptionPoint> _directionsList = [];
-  late RouteLayerData _routeInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -94,38 +84,38 @@ class _MapWidgetState extends State<MapWidget> {
               ),
             ),
             // Direction card
-            _directionsList.isNotEmpty
-                ? DirectionsCard(
-                  directionsList: _directionsList,
-                  routeInfo: _routeInfo,
-                  mapViewController: _mapViewController,
-                )
-                : Container(),
+            // _directionsList.isNotEmpty
+            //     ? DirectionsCard(
+            //       directionsList: _directionsList,
+            //       routeInfo: _routeInfo,
+            //       mapViewController: _mapViewController,
+            //     )
+            //     : Container(),
             // route buttons
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: Text("Route Toevoegen"),
-                    onPressed: () async {
-                      _graphicsOverlay.graphics.addAll(await initialGraphics());
-                    },
-                  ),
-                  TextButton(
-                    child: Text("Route Verwijderen"),
-                    onPressed: () async {
-                      setState(() {
-                        _directionsList.clear();
-                        _graphicsOverlay.graphics.clear();
-                        _directionsGraphicsOverlay.graphics.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.centerLeft,
+            //   child: Row(
+            //     crossAxisAlignment: CrossAxisAlignment.end,
+            //     children: [
+            //       TextButton(
+            //         child: Text("Route Toevoegen"),
+            //         onPressed: () async {
+            //           _graphicsOverlay.graphics.addAll(await initialGraphics());
+            //         },
+            //       ),
+            //       TextButton(
+            //         child: Text("Route Verwijderen"),
+            //         onPressed: () async {
+            //           setState(() {
+            //             _directionsList.clear();
+            //             _graphicsOverlay.graphics.clear();
+            //             _directionsGraphicsOverlay.graphics.clear();
+            //           });
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // Bottomsheet
             // BottomSheetWidget(setRouteGraphics: test),
@@ -246,100 +236,6 @@ class _MapWidgetState extends State<MapWidget> {
     }
   }
 
-  void test() async {
-    await initialGraphics();
-  }
-
-  Future<List<Graphic>> initialGraphics() async {
-    // Get data from route <IN ONMAPVIEW ZETTEN>
-    var response = await getRouteData('4f4cea7adeb0463c9ccb4a92d2c62dbf');
-
-    var modifiedResponse = jsonDecode(response.body);
-    modifiedResponse['title'] = "title";
-    modifiedResponse['description'] = 'description';
-    var encoddeshit = jsonEncode(modifiedResponse);
-
-    var lastding =
-        (jsonDecode(encoddeshit)['layers'][2]['featureSet']['features'] as List)
-            .last;
-    // print(lastding);
-
-    RouteLayerData routeInfo = RouteLayerData.fromJson(
-      (jsonDecode(encoddeshit)
-          ..['layers'][2]['featureSet']['features'] =
-              (jsonDecode(encoddeshit)['layers'][2]['featureSet']['features']
-                      as List)
-                  .where((feature) => feature['attributes']['Azimuth'] != 0.0)
-                  .toList())
-        ..['layers'][2]['featureSet']['features'].add(lastding),
-      // jsonDecode(response.body)
-    );
-
-    // String jsonString = await rootBundle.loadString('assets/kut.json');
-    // RouteLayerData routeInfo = RouteLayerData.fromJson(jsonDecode(jsonString));
-
-    setState(() {
-      _routeInfo = routeInfo;
-    });
-
-    // Route Directtions (Move to separate function)
-    getRouteDirections(routeInfo);
-    List<Graphic> graphics = [];
-    // Generate Points
-    List<Graphic> pointGraphics = generatePointGraphics(routeInfo);
-    for (var i = 0; i < pointGraphics.length; i++) {
-      // _directionsGraphicsOverlay.graphics.addAll([pointGraphics[i]]);
-      graphics.add(pointGraphics[i]);
-    }
-
-    // Generate Lines
-
-    for (var element in routeInfo.layers[1].featureSet.features) {
-      late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
-        style: SimpleLineSymbolStyle.solid,
-        color: Color(
-          (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000))
-              .toInt(),
-        ).withOpacity(1.0),
-        width: 4,
-      );
-      // print(routeInfo.layers[2].featureSet.features.where((item)=> item.attributes['ObjectID'] == ));
-
-      final polylineJson = '''
-            {"paths": ${element.geometry.paths},
-            "spatialReference":${element.geometry.spatialReference.toString()}}''';
-
-      final routePart = Geometry.fromJsonString(polylineJson);
-      graphics.add(Graphic(geometry: routePart, symbol: polylineSymbol));
-    }
-
-    // Return a list of graphics for each geometry type.
-    return graphics;
-  }
-
-  void getRouteDirections(RouteLayerData routeInfo) {
-    List<DescriptionPoint> routeDirections = [];
-
-    for (var element in routeInfo.layers[2].featureSet.features) {
-      if (element.geometry.x == null) {
-        continue;
-      }
-      final parsedX = element.geometry.x;
-      final parsedY = element.geometry.y;
-
-      routeDirections.add(
-        DescriptionPoint(
-          description: element.attributes['DisplayText'],
-          x: parsedX!,
-          y: parsedY!,
-          angle: element.attributes['Azimuth'].toDouble(),
-        ),
-      );
-    }
-    setState(() {
-      _directionsList = routeDirections;
-    });
-  }
 }
 
 class locationsettings extends StatelessWidget {

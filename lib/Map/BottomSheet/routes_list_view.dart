@@ -1,23 +1,20 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
-import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
+import 'package:onroute_app/Functions/route_functions.dart';
 import 'package:onroute_app/Map/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Map/BottomSheet/list_divider.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/package_card.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
+import 'package:onroute_app/Routes/Single%20Route/route_card.dart';
 
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
-  // final Function setRouteGraphics;
+  final Function startRoute;
 
   const RoutesListView({
     super.key,
     required this.scrollController,
-    // required this.setRouteGraphics,
+    required this.startRoute,
   });
 
   @override
@@ -30,82 +27,27 @@ class _RoutesListViewState extends State<RoutesListView> {
   @override
   void initState() {
     super.initState();
-    _futureRoutes = fetchItems(); // Initialize the future
+    _futureRoutes = fetchItems();
   }
 
   void _refreshRoutes() {
     setState(() {
-      _futureRoutes = fetchItems(); // Refresh the future
+      _futureRoutes = fetchItems();
     });
   }
 
   Future<List<AvailableRoutes>> fetchItems() async {
-    // List of all files on device
-    List<File> localFiles = await getRouteFiles();
-
-    // Remove localFiles.filename from routeIDs, instead of if = container()
-
-    // TEMP list of routeIDs
-    List routeIDs = [
-      '4f4cea7adeb0463c9ccb4a92d2c62dbf',
-      'd7c2638c697d415584c84166e04565b5',
-      'c79d6d7746d145deaf842bd7602f70b4',
-    ];
-
     // List of available routes
+    List<File> localFiles = await getRouteFiles();
     List<AvailableRoutes> allAvailableRoutes = [];
 
-    // Insert all online routes into the list
-    for (var i = 0; i < routeIDs.length; i++) {
-      // Get route info (title, description) based on routeID
-      var response = await getRouteInfo(routeIDs[i]);
-      var layerInfo = jsonDecode(response.body);
-      var routeResponse = await getRouteData(layerInfo['id']);
-
-      var lastding =
-          (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
-                  as List)
-              .last;
-
-      var modifiedResponse = jsonDecode(routeResponse.body);
-      modifiedResponse['title'] = layerInfo['title'];
-      modifiedResponse['description'] = layerInfo['description'];
-
-      RouteLayerData routeInfo = RouteLayerData.fromJson(
-        (modifiedResponse
-            ..['layers'][2]['featureSet']['features'] =
-                (modifiedResponse['layers'][2]['featureSet']['features']
-                        as List)
-                    .where((feature) => feature['attributes']['Azimuth'] != 0.0)
-                    .toList())
-          ..['layers'][2]['featureSet']['features'].add(lastding),
-      );
-
-      // Add info of online route to list
-      AvailableRoutes onlineRoute = AvailableRoutes(
-        routeID: layerInfo['id'],
-        locally: false,
-        routeLayer: routeInfo,
-      );
-      allAvailableRoutes.add(onlineRoute);
-    }
-
-    // Add all the local files to the list
-    for (var file in localFiles) {
-      var storedFile = jsonDecode(await readRouteFile(file));
-      RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
-
-      allAvailableRoutes.add(
-        AvailableRoutes(
-          routeID: file.path,
-          locally: true,
-          routeLayer: routeInfo,
-        ),
-      );
-    }
+    allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
+    allAvailableRoutes.addAll(await fetchOnlineItems(localFiles));
 
     return allAvailableRoutes;
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -153,7 +95,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                   key: UniqueKey(),
                   routeContent: item,
                   onRouteUpdated: _refreshRoutes, // Pass the callback
-                  // setRouteGraphics: widget.setRouteGraphics,
+                  startRoute: widget.startRoute,
                 );
               }).toList(),
             );
@@ -191,7 +133,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                     key: UniqueKey(),
                     routeContent: item,
                     onRouteUpdated: _refreshRoutes, // Pass the callback
-                    // setRouteGraphics: widget.setRouteGraphics,
+                    startRoute: widget.startRoute,
                   );
                   // return const PackageCard();
                 }

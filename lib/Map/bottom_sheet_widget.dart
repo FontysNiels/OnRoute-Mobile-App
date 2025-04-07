@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Map/BottomSheet/routes_list_view.dart';
 
 class BottomSheetWidget extends StatelessWidget {
-  final Function setRouteGraphics;
+  final Function startRoute;
 
-  const BottomSheetWidget({super.key, required this.setRouteGraphics});
+  const BottomSheetWidget({super.key, required this.startRoute});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class BottomSheetWidget extends StatelessWidget {
               ),
               child: RoutesListView(
                 scrollController: scrollController,
-                // setRouteGraphics: setRouteGraphics,
+                startRoute: startRoute,
               ),
             );
           },

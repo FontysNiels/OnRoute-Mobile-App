@@ -8,22 +8,29 @@ import 'package:onroute_app/main.dart';
 
 class RouteStartButton extends StatelessWidget {
   final AvailableRoutes routeContent;
-  const RouteStartButton({super.key, required this.routeContent});
-
+  final Function startRoute;
+  const RouteStartButton({
+    super.key,
+    required this.routeContent,
+    required this.startRoute,
+  });
+ 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FilledButton.icon(
         onPressed: () async {
-          await addGraphics(routeContent.routeLayer);
+            startRoute(routeContent.routeLayer);
+          // await addGraphics(routeContent.routeLayer);
+        
         },
         icon: const Icon(Icons.directions),
         label: Text(
           'Start Route',
-          style: Theme.of(context).textTheme.labelLarge!.copyWith(
-            color: Colors.white,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.labelLarge!.copyWith(color: Colors.white),
         ),
         iconAlignment: IconAlignment.start,
       ),

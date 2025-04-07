@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/Widgets/Cards/poi_card.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
+import 'package:onroute_app/Routes/Single%20Route/route_card.dart';
 import 'package:onroute_app/Routes/Widgets/Tabs/Content/tabs_description_block.dart';
 
 class TabsBody extends StatelessWidget {

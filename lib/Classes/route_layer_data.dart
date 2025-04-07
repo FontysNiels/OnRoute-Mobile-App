@@ -12,7 +12,7 @@ class RouteLayerData {
     required this.layers,
     required this.visibleLayers,
     required this.title,
-    required this.description
+    required this.description,
   });
 
   factory RouteLayerData.fromJson(Map<String, dynamic> json) {
@@ -28,6 +28,13 @@ class RouteLayerData {
       description: json['description'],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'layers': layers.map((layer) => layer.toJson()).toList(),
+    'visibleLayers': visibleLayers,
+    'title': title,
+    'description': description,
+  };
 }
 
 class Layer {
@@ -43,6 +50,7 @@ class Layer {
       // layerDefinition: LayerDefinition.fromJson(json['layerDefinition']),
     );
   }
+  Map<String, dynamic> toJson() => {'featureSet': featureSet.toJson()};
 }
 
 class FeatureSet {
@@ -68,6 +76,11 @@ class FeatureSet {
       ),
     );
   }
+  Map<String, dynamic> toJson() => {
+    'features': features.map((f) => f.toJson()).toList(),
+    'geometryType': geometryType,
+    'spatialReference': spatialReference.toJson(),
+  };
 }
 
 class RouteFeature {
@@ -91,6 +104,11 @@ class RouteFeature {
       // displayText: json['displayText'],
     );
   }
+  Map<String, dynamic> toJson() => {
+    'attributes': attributes,
+    'geometry': geometry.toJson(),
+    if (symbol != null) 'symbol': symbol!.toJson(),
+  };
 }
 
 class RouteGeometry {
@@ -111,6 +129,12 @@ class RouteGeometry {
       y: json['y'],
     );
   }
+  Map<String, dynamic> toJson() => {
+    'spatialReference': spatialReference.toJson(),
+    if (paths != null) 'paths': paths,
+    if (x != null) 'x': x,
+    if (y != null) 'y': y,
+  };
 }
 
 class RouteSpatialReference {
@@ -129,6 +153,7 @@ class RouteSpatialReference {
       wkid: json['wkid'],
     );
   }
+  Map<String, dynamic> toJson() => {'latestWkid': latestWkid, 'wkid': wkid};
 }
 
 class Symbol {
@@ -149,6 +174,13 @@ class Symbol {
       style: json['style'],
     );
   }
+  Map<String, dynamic> toJson() => {
+    'type': type,
+    if (color != null) 'color': color,
+    if (size != null) 'size': size,
+    if (width != null) 'width': width,
+    if (style != null) 'style': style,
+  };
 }
 
 // class LayerDefinition {

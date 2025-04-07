@@ -1,13 +1,13 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
+import 'package:onroute_app/Map/directions_card.dart';
 import 'package:onroute_app/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Routes/route_list.dart';
 import 'package:onroute_app/Map/bottom_sheet_widget.dart';
-import 'package:onroute_app/Routes/test.dart';
-import 'package:onroute_app/test2.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
@@ -35,10 +35,13 @@ Future<void> initialize() async {
 
 final _mapViewController = ArcGISMapView.createController();
 final _graphicsOverlay = GraphicsOverlay();
+List<DescriptionPoint> _directionsList = [];
+late RouteLayerData _routeInfo;
+int change = 0;
 
-Future<void> addGraphics(RouteLayerData route) async {
-  _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
-}
+// Future<void> addGraphics(RouteLayerData route) async {
+//   _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
+// }
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -46,6 +49,36 @@ class _MainAppState extends State<MainApp> {
     initialize();
     super.initState();
   }
+
+  Future<void> _startRoute(RouteLayerData route) async {
+    _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
+
+    List<DescriptionPoint> routeDirections = [];
+
+    for (var element in route.layers[2].featureSet.features) {
+      if (element.geometry.x == null) {
+        continue;
+      }
+      final parsedX = element.geometry.x;
+      final parsedY = element.geometry.y;
+
+      routeDirections.add(
+        DescriptionPoint(
+          description: element.attributes['DisplayText'],
+          x: parsedX!,
+          y: parsedY!,
+          angle: element.attributes['Azimuth'].toDouble(),
+        ),
+      );
+    }
+
+    setState(() {
+      _routeInfo = route;
+      _directionsList = routeDirections;
+    });
+  }
+
+  void setRouteInfo(RouteLayerData route) {}
 
   // int currentPageIndex = 1;
   int currentPageIndex = 0;
@@ -129,8 +162,34 @@ class _MainAppState extends State<MainApp> {
             MapWidget(
               mapViewController: _mapViewController,
               graphicsOverlay: _graphicsOverlay,
+              directionsList: _directionsList,
             ),
-            BottomSheetWidget(setRouteGraphics: addGraphics),
+            _directionsList.isNotEmpty
+                ? DirectionsCard(
+                  directionsList: _directionsList,
+                  routeInfo: _routeInfo,
+                  mapViewController: _mapViewController,
+                )
+                : Container(),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text("Route Verwijderen"),
+                    onPressed: () async {
+                      setState(() {
+                        _directionsList.clear();
+                        _graphicsOverlay.graphics.clear();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+            BottomSheetWidget(startRoute: _startRoute),
           ],
         ),
       ),
