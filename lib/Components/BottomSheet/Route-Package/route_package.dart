@@ -33,7 +33,7 @@ class _RoutePackageState extends State<RoutePackage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Row(
+        title: const Row(
           mainAxisAlignment: MainAxisAlignment.end,
           spacing: 26,
           children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
@@ -43,11 +43,11 @@ class _RoutePackageState extends State<RoutePackage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Title
-          PackageTitle(),
+          const PackageTitle(),
           // Images
-          PackegImagePreview(),
+          const PackegImagePreview(),
           // Download Button
-          PackageDownloadButton(),
+          const PackageDownloadButton(),
           // Tabs
           // Make one for Routes, or make it dynamic?
           PackageTabs(setIndex: setIndex, isPackage: true),
