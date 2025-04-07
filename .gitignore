@@ -46,3 +46,7 @@ app.*.map.json
 /android/app/release
 
 
+test.json
+assets/kut.json
+lib/test2.dart
+lib/Routes/test.dart

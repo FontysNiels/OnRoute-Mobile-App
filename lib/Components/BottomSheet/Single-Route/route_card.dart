@@ -1,17 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/route_package.dart';
+import 'package:onroute_app/Classes/available_routes.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 
-class PackageCard extends StatelessWidget {
-  const PackageCard({super.key});
+
+class RouteCard extends StatelessWidget {
+  final AvailableRoutes routeContent;
+  final VoidCallback onRouteUpdated; // New callback functionF
+  final Function startRoute;
+
+  const RouteCard({
+    super.key,
+    required this.routeContent,
+    required this.onRouteUpdated, // Pass the callback
+    required this.startRoute,
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
+      onTap: () async {
+        // Navigate to ROUTE
+        final result = await Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoutePackage()),
+
+          // PageRouteBuilder(
+          //   pageBuilder:
+          //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
+          //   transitionDuration: Duration.zero, // No transition effect
+          // ),
+          MaterialPageRoute(
+            builder:
+                (context) => SingleRoute(
+                  key: UniqueKey(),
+                  routeContent: routeContent,
+                  startRoute: startRoute,
+                ),
+          ),
         );
+
+        // Trigger the callback if result is true
+        if (result == true) {
+          onRouteUpdated();
+        }
       },
       child: Card(
         elevation: 0,
@@ -43,17 +73,19 @@ class PackageCard extends StatelessWidget {
                         children: [
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
-                            // 2 lines van maken? Titels zijn vrij lang
-                            "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+                            // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+                            routeContent.routeLayer.title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "2nd text",
+                            "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
                           Text(
-                            "Download status",
+                            routeContent.locally
+                                ? "Gedownload"
+                                : "Niet Gedownload",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
@@ -67,18 +99,18 @@ class PackageCard extends StatelessWidget {
                   //   showPopover(context: context, bodyBuilder: (context)=> PopupMenuItem(child: Text('Download'), value: Text('yes'),));
                   //   },
                   // ),
-                  PopupMenuButton(
-                    itemBuilder:
-                        (BuildContext context) => <PopupMenuEntry>[
-                          const PopupMenuItem(
-                            // value: SampleItem.itemOne,
-                            child: Padding(
-                              padding: EdgeInsets.all(0),
-                              child: Text('Download'),
-                            ),
-                          ),
-                        ],
-                  ),
+                  // PopupMenuButton(
+                  //   itemBuilder:
+                  //       (BuildContext context) => <PopupMenuEntry>[
+                  //         const PopupMenuItem(
+                  //           // value: SampleItem.itemOne,
+                  //           child: Padding(
+                  //             padding: EdgeInsets.all(0),
+                  //             child: Text('Download'),
+                  //           ),
+                  //         ),
+                  //       ],
+                  // ),
                 ],
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/poi_card.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/route_card.dart';
-import 'package:onroute_app/Routes/Widgets/Tabs/Content/tabs_description_block.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/poi_card.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description_block.dart';
 
 class TabsBody extends StatelessWidget {
   const TabsBody({super.key, required this.selectedIndex});
@@ -13,12 +12,16 @@ class TabsBody extends StatelessWidget {
       DescriptionBlock(),
       // POIs
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
-      // deze exporten naar Widgets/Tabs/Content
+      // ^ deze exporten naar Widgets/Tabs/Content
       POICard(),
+      POICard(),
+      
       // Routes
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
-      // deze exporten naar Widgets/Tabs/Content
-      RouteCard(),
+      // ^ deze exporten naar Widgets/Tabs/Content
+      
+      // deze vullen routeID, based op de routes in the package
+      // RouteCard(startRoute: () {}, routeID: ''),
     ];
     return Expanded(
       child: SingleChildScrollView(child: textWidgets[selectedIndex]),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/route_package.dart';
 
-class RouteCard extends StatelessWidget {
-  const RouteCard({super.key});
+class PackageCard extends StatelessWidget {
+  const PackageCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // Navigate to ROUTE
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => RoutePackage()),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => RoutePackage()),
+        );
       },
       child: Card(
         elevation: 0,
@@ -42,9 +42,12 @@ class RouteCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyLarge!.copyWith(),
                             // 2 lines van maken? Titels zijn vrij lang
                             "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
+
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(

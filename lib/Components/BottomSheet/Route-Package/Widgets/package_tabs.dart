@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../../material_design_indicator.dart';
+import '../../Tabs/material_design_indicator.dart';
 
 class PackageTabs extends StatefulWidget {
   final Function setIndex;
-  const PackageTabs({super.key, required this.setIndex});
+  final bool isPackage;
+  const PackageTabs({
+    super.key,
+    required this.setIndex,
+    required this.isPackage,
+  });
 
   @override
   State<PackageTabs> createState() => _PackageTabsState();
@@ -18,11 +23,16 @@ class _PackageTabsState extends State<PackageTabs>
     widget.setIndex(_tabController.index);
   }
 
-  final _tabs = [
-    Tab(text: 'Beschrijving'),
-    Tab(text: 'POIs'),
-    Tab(text: 'Routes'),
-  ];
+  late final List<Tab> _tabs = widget.isPackage
+      ? [
+          Tab(text: 'Beschrijving'),
+          Tab(text: 'POIs'),
+          Tab(text: 'Routes'),
+        ]
+      : [
+          Tab(text: 'Beschrijving'),
+          Tab(text: 'POIs'),
+        ];
 
   @override
   void initState() {
@@ -44,11 +54,9 @@ class _PackageTabsState extends State<PackageTabs>
         Theme.of(context).colorScheme.primary; // Get primaryAccent from theme
 
     return DecoratedBox(
-      decoration: BoxDecoration(   
+      decoration: BoxDecoration(
         //This is for bottom border that is needed
-        border: Border(
-          bottom: BorderSide(color: Colors.black, width: 1.6),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.black, width: 1.6)),
       ),
       child: TabBar(
         controller: _tabController,
