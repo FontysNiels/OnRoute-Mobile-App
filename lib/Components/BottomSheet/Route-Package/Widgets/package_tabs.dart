@@ -25,13 +25,13 @@ class _PackageTabsState extends State<PackageTabs>
 
   late final List<Tab> _tabs = widget.isPackage
       ? [
-          Tab(text: 'Beschrijving'),
-          Tab(text: 'POIs'),
-          Tab(text: 'Routes'),
+          const Tab(text: 'Beschrijving'),
+          const Tab(text: 'POIs'),
+          const Tab(text: 'Routes'),
         ]
       : [
-          Tab(text: 'Beschrijving'),
-          Tab(text: 'POIs'),
+          const Tab(text: 'Beschrijving'),
+          const Tab(text: 'POIs'),
         ];
 
   @override
@@ -54,7 +54,7 @@ class _PackageTabsState extends State<PackageTabs>
         Theme.of(context).colorScheme.primary; // Get primaryAccent from theme
 
     return DecoratedBox(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         //This is for bottom border that is needed
         border: Border(bottom: BorderSide(color: Colors.black, width: 1.6)),
       ),

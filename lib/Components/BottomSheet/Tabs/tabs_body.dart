@@ -9,12 +9,12 @@ class TabsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> textWidgets = [
       //Bescrhijving
-      DescriptionBlock(),
+      const DescriptionBlock(),
       // POIs
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
       // ^ deze exporten naar Widgets/Tabs/Content
-      POICard(),
-      POICard(),
+      const POICard(),
+      const POICard(),
       
       // Routes
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting

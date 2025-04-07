@@ -10,7 +10,7 @@ class PackageCard extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RoutePackage()),
+          MaterialPageRoute(builder: (context) => const RoutePackage()),
         );
       },
       child: Card(

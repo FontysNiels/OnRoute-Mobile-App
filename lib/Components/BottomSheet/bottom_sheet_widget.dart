@@ -19,7 +19,7 @@ class BottomSheetWidget extends StatelessWidget {
           maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
                 boxShadow: [

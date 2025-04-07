@@ -40,12 +40,12 @@ class _SingleRouteState extends State<SingleRoute> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context, true);
           },
         ),
-        title: Row(
+        title: const Row(
           mainAxisAlignment: MainAxisAlignment.end,
           spacing: 26,
           children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
@@ -57,7 +57,7 @@ class _SingleRouteState extends State<SingleRoute> {
           // Title
           RouteTitle(title: widget.routeContent.routeLayer.title),
           // Images (PACKAGE ONLY)
-          PackegImagePreview(),
+          const PackegImagePreview(),
 
           // Download Button
           !widget.routeContent.locally

@@ -8,12 +8,12 @@ class ListDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Divider(thickness: 1),
+        const Divider(thickness: 1),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           child: Row(
             children: [
-              Expanded(child: Divider(thickness: 1)),
+              const Expanded(child: Divider(thickness: 1)),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
@@ -21,11 +21,11 @@ class ListDivider extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
-              Expanded(child: Divider(thickness: 1)),
+              const Expanded(child: Divider(thickness: 1)),
             ],
           ),
         ),
-        Divider(thickness: 1),
+        const Divider(thickness: 1),
       ],
     );
   }

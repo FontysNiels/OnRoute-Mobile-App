@@ -104,7 +104,7 @@ class _MainAppState extends State<MainApp> {
         ),
 
         // Appbar Theme
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: primaryAppColor,
           // scrolledUnderElevation: 0
           scrolledUnderElevation: 1,
@@ -120,23 +120,23 @@ class _MainAppState extends State<MainApp> {
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: primaryAppColor,
           iconTheme: WidgetStateProperty.all(
-            IconThemeData(color: navigationIcons),
+            const IconThemeData(color: navigationIcons),
           ),
         ),
 
         // Card Theme
-        cardTheme: CardTheme(
+        cardTheme: const CardTheme(
           color: primaryAppColor,
           // elevation: 0,
         ),
 
         // TabBar Theme
-        tabBarTheme: TabBarTheme(
+        tabBarTheme: const TabBarTheme(
           labelColor: primaryAccent,
           unselectedLabelColor: primaryTextColor,
         ),
 
-        dividerTheme: DividerThemeData(color: primaryAppColor),
+        dividerTheme: const DividerThemeData(color: primaryAppColor),
 
         //Text Theme's
         textTheme: TextTheme(
