@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/Widgets/Cards/poi_card.dart';
-import 'package:onroute_app/Routes/Single%20Route/route_card.dart';
-import 'package:onroute_app/Routes/Widgets/Tabs/Content/tabs_description_block.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/poi_card.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description_block.dart';
 
 class TabsBody extends StatelessWidget {
   const TabsBody({super.key, required this.selectedIndex});

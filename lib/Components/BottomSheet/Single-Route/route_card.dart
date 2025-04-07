@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
-import 'package:onroute_app/Routes/Single%20Route/single_route.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
+
 
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;

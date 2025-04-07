@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/Bottomsheet/list_divider.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/route_functions.dart';
-import 'package:onroute_app/Map/BottomSheet/bottom_sheet_handle.dart';
-import 'package:onroute_app/Map/BottomSheet/list_divider.dart';
-import 'package:onroute_app/Routes/Single%20Route/route_card.dart';
 
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
@@ -46,8 +46,6 @@ class _RoutesListViewState extends State<RoutesListView> {
 
     return allAvailableRoutes;
   }
-
-  
 
   @override
   Widget build(BuildContext context) {

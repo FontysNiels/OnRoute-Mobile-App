@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_image_preview.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_tabs.dart';
-import 'package:onroute_app/Routes/Single%20Route/Widgets/route_download_button.dart';
-import 'package:onroute_app/Routes/Single%20Route/Widgets/route_start_button.dart';
-import 'package:onroute_app/Routes/Single%20Route/Widgets/route_title.dart';
-import 'package:onroute_app/Routes/Widgets/Tabs/tabs_body.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_download_button.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_start_button.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_title.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
 
 class SingleRoute extends StatefulWidget {
   final AvailableRoutes routeContent;

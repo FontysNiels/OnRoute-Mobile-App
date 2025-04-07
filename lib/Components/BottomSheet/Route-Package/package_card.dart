@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/Route%20Package/route_package.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/route_package.dart';
 
 class PackageCard extends StatelessWidget {
   const PackageCard({super.key});

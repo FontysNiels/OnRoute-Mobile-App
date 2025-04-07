@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_download_button.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_tabs.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_title.dart';
-import 'package:onroute_app/Routes/Route%20Package/Widgets/package_image_preview.dart';
-import 'package:onroute_app/Routes/Widgets/Tabs/tabs_body.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_download_button.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
+import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_title.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
+
 
 class RoutePackage extends StatefulWidget {
   const RoutePackage({super.key});

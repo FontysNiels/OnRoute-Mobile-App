@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../Widgets/material_design_indicator.dart';
+import '../../Tabs/material_design_indicator.dart';
 
 class PackageTabs extends StatefulWidget {
   final Function setIndex;

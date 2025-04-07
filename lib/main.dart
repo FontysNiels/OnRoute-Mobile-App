@@ -3,11 +3,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
-import 'package:onroute_app/Map/directions_card.dart';
-import 'package:onroute_app/Map/map_widget.dart';
+import 'package:onroute_app/Components/Map/directions_card.dart';
+import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Routes/route_list.dart';
-import 'package:onroute_app/Map/bottom_sheet_widget.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
