@@ -7,6 +7,7 @@ import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
+import 'package:onroute_app/tesmap.dart';
 import 'package:onroute_app/theme.dart';
 
 void main() {
@@ -158,37 +159,38 @@ class _MainAppState extends State<MainApp> {
         // ),
         body: Stack(
           children: [
-            MapWidget(
-              mapViewController: _mapViewController,
-              graphicsOverlay: _graphicsOverlay,
-              directionsList: _directionsList,
-            ),
-            _directionsList.isNotEmpty
-                ? DirectionsCard(
-                  directionsList: _directionsList,
-                  routeInfo: _routeInfo,
-                  mapViewController: _mapViewController,
-                )
-                : Container(),
+            // MapWidget(
+            //   mapViewController: _mapViewController,
+            //   graphicsOverlay: _graphicsOverlay,
+            //   directionsList: _directionsList,
+            // ),
+            // _directionsList.isNotEmpty
+            //     ? DirectionsCard(
+            //       directionsList: _directionsList,
+            //       routeInfo: _routeInfo,
+            //       mapViewController: _mapViewController,
+            //     )
+            //     : Container(),
 
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: Text("Route Verwijderen"),
-                    onPressed: () async {
-                      setState(() {
-                        _directionsList.clear();
-                        _graphicsOverlay.graphics.clear();
-                      });
-                    },
-                  ),
-                ],
-              ),
-            ),
+            // Align(
+            //   alignment: Alignment.centerLeft,
+            //   child: Row(
+            //     crossAxisAlignment: CrossAxisAlignment.end,
+            //     children: [
+            //       TextButton(
+            //         child: Text("Route Verwijderen"),
+            //         onPressed: () async {
+            //           setState(() {
+            //             _directionsList.clear();
+            //             _graphicsOverlay.graphics.clear();
+            //           });
+            //         },
+            //       ),
+            //     ],
+            //   ),
+            // ),
             BottomSheetWidget(startRoute: _startRoute),
+          // OfflineMapDownloadExample(),
           ],
         ),
       ),

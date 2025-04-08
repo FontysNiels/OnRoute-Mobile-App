@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
@@ -31,6 +32,7 @@ class _RoutesListViewState extends State<RoutesListView> {
   }
 
   void _refreshRoutes() {
+    // TODO: make this refresh the list of which ones local (and remove the online ones, no need to make more API calls)
     setState(() {
       _futureRoutes = fetchItems();
     });
@@ -42,7 +44,14 @@ class _RoutesListViewState extends State<RoutesListView> {
     List<AvailableRoutes> allAvailableRoutes = [];
 
     allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
-    allAvailableRoutes.addAll(await fetchOnlineItems(localFiles));
+
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
+
+    if (connectivityResult.contains(ConnectivityResult.mobile) ||
+        connectivityResult.contains(ConnectivityResult.wifi)) {
+      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles));
+    }
 
     return allAvailableRoutes;
   }
@@ -63,17 +72,30 @@ class _RoutesListViewState extends State<RoutesListView> {
           ),
         );
 
+        Widget startupText = Column(
+          spacing: 8,
+          children: [
+            Text(
+              "Uw routes worden opgehaald!",
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+
+            CircularProgressIndicator(),
+          ],
+        );
+
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          listItems.add(const Center(child: Text('No items available')));
+          listItems.add(startupText);
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,
             children: listItems,
           );
         } else {
-          listItems.remove(const Center(child: Text('No items available')));
+          listItems.remove(startupText);
           // Sets snashot.data as a list of AvailableRoutes
           List<AvailableRoutes> allItems =
               snapshot.data! as List<AvailableRoutes>;
@@ -94,6 +116,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                   routeContent: item,
                   onRouteUpdated: _refreshRoutes, // Pass the callback
                   startRoute: widget.startRoute,
+                  scrollController: widget.scrollController,
                 );
               }).toList(),
             );
@@ -132,6 +155,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                     routeContent: item,
                     onRouteUpdated: _refreshRoutes, // Pass the callback
                     startRoute: widget.startRoute,
+                    scrollController: widget.scrollController,
                   );
                   // return const PackageCard();
                 }

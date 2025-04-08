@@ -30,9 +30,16 @@ class BottomSheetWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: RoutesListView(
-                scrollController: scrollController,
-                startRoute: startRoute,
+              child: Navigator(
+                onGenerateRoute: (settings) {
+                  return MaterialPageRoute(
+                    builder:
+                        (_) => RoutesListView(
+                          scrollController: scrollController,
+                          startRoute: startRoute,
+                        ),
+                  );
+                },
               ),
             );
           },

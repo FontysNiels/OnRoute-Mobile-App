@@ -23,8 +23,6 @@ class TabsBody extends StatelessWidget {
       // deze vullen routeID, based op de routes in the package
       // RouteCard(startRoute: () {}, routeID: ''),
     ];
-    return Expanded(
-      child: SingleChildScrollView(child: textWidgets[selectedIndex]),
-    );
+    return textWidgets[selectedIndex];
   }
 }

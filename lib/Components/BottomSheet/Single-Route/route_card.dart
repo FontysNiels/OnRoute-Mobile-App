@@ -1,18 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
-
 
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;
   final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
+  final ScrollController scrollController;
 
   const RouteCard({
     super.key,
     required this.routeContent,
     required this.onRouteUpdated, // Pass the callback
     required this.startRoute,
+    required this.scrollController,
   });
 
   @override
@@ -20,26 +22,42 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
-        final result = await Navigator.push(
-          context,
+        // final result = await Navigator.push(
+        //   context,
 
-          // PageRouteBuilder(
-          //   pageBuilder:
-          //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
-          //   transitionDuration: Duration.zero, // No transition effect
-          // ),
+        //   // PageRouteBuilder(
+        //   //   pageBuilder:
+        //   //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
+        //   //   transitionDuration: Duration.zero, // No transition effect
+        //   // ),
+        //   MaterialPageRoute(
+        //     builder:
+        //         (context) => SingleRoute(
+        //           key: UniqueKey(),
+        //           routeContent: routeContent,
+        //           startRoute: startRoute,
+        //         ),
+        //   ),
+        // );
+        final result = Navigator.of(context).push(
           MaterialPageRoute(
             builder:
-                (context) => SingleRoute(
-                  key: UniqueKey(),
-                  routeContent: routeContent,
-                  startRoute: startRoute,
+                (_) => ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(16.0),
+                  ),
+                  child: SingleRoute(
+                    key: UniqueKey(),
+                    routeContent: routeContent,
+                    startRoute: startRoute,
+                    scroller: scrollController,
+                  ),
                 ),
           ),
         );
 
         // Trigger the callback if result is true
-        if (result == true) {
+        if (await result == true) {
           onRouteUpdated();
         }
       },
@@ -57,11 +75,14 @@ class RouteCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/temp.png',
+                    child: CachedNetworkImage(
                       height: 56,
                       width: 56,
-                      fit: BoxFit.cover,
+                      imageUrl:
+                          "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                      // placeholder:
+                      //     (context, url) => CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
                   ),
                   Expanded(
