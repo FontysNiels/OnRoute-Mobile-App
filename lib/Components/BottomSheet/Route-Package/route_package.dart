@@ -52,7 +52,7 @@ class _RoutePackageState extends State<RoutePackage> {
           // Make one for Routes, or make it dynamic?
           PackageTabs(setIndex: setIndex, isPackage: true),
           // Body of tabs
-          TabsBody(selectedIndex: _selectedIndex),
+          // TabsBody(selectedIndex: _selectedIndex),
         ],
       ),
     );

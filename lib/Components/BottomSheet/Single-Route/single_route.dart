@@ -6,6 +6,7 @@ import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_do
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_start_button.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_title.dart';
 import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 
 class SingleRoute extends StatefulWidget {
   final AvailableRoutes routeContent;
@@ -43,43 +44,114 @@ class _SingleRouteState extends State<SingleRoute> {
       removeTop: true,
 
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context, true);
-            },
-          ),
-          title: const Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            spacing: 26,
-            children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
-          ),
-        ),
-        body: SingleChildScrollView(
-          controller: widget.scroller,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              RouteTitle(title: widget.routeContent.routeLayer.title),
-              // Images (PACKAGE ONLY)
-              const PackegImagePreview(),
+        // appBar: AppBar(
+        //   backgroundColor: Colors.white,
+        //   automaticallyImplyLeading: false,
+        //   // leading: RouteTitle(title: widget.routeContent.routeLayer.title),
+        //   // leading: IconButton(
+        //   //   icon: const Icon(Icons.assist_walker),
+        //   //   onPressed: () {
+        //   //     Navigator.pop(context, true);
+        //   //   },
+        //   // ),
+        //   title: SingleChildScrollView(
+        //     controller: widget.scroller,
 
-              // Download Button
-              !widget.routeContent.locally
-                  ? RouteDownloadButton(routeID: widget.routeContent)
-                  : RouteStartButton(
-                    routeContent: widget.routeContent,
-                    startRoute: widget.startRoute,
-                  ),
-              // Tabs
-              // Make one for Routes, or make it dynamic?
-              PackageTabs(setIndex: setIndex, isPackage: false),
-              // // Body of tabs
-              TabsBody(selectedIndex: _selectedIndex),
-            ],
+        //     // child: const Row(
+        //     //   mainAxisAlignment: MainAxisAlignment.end,
+        //     //   spacing: 26,
+        //     //   children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
+        //     // ),
+        //     child: Row(
+        //       mainAxisAlignment: MainAxisAlignment.start,
+        //       // spacing: 6,
+        //       children: [
+        //         Text(widget.routeContent.routeLayer.title + "sssssdds d sdsdsd", overflow: textove,),
+        //         IconButton.filled(
+        //           icon: Icon(Icons.close),
+        //           onPressed: () {
+        //             Navigator.pop(context, true);
+        //           },
+        //           style: ButtonStyle(
+        //             backgroundColor: WidgetStateProperty.all(
+        //               Theme.of(context).primaryColor.withValues(alpha: 0.5),
+        //             ),
+        //             // foregroundColor: WidgetStateProperty.all(
+        //             //   Colors.white,
+        //             // ), // Adjust the icon color if needed
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            controller: widget.scroller,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                BottomSheetHandle(context: context),
+                // Title
+                Row(
+                  spacing: 6,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        child: RouteTitle(
+                          title: widget.routeContent.routeLayer.title,
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        top: 6,
+                      ),
+                      child: IconButton.filled(
+                        icon: Icon(Icons.close),
+                        onPressed: () {
+                          Navigator.pop(context, true);
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                            Theme.of(
+                              context,
+                            ).primaryColor.withValues(alpha: 0.5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // Images (PACKAGE ONLY)
+                const PackegImagePreview(),
+
+                // Download Button
+                !widget.routeContent.locally
+                    ? RouteDownloadButton(routeID: widget.routeContent)
+                    : RouteStartButton(
+                      routeContent: widget.routeContent,
+                      startRoute: widget.startRoute,
+                    ),
+                // Tabs
+                // Make one for Routes, or make it dynamic?
+                PackageTabs(setIndex: setIndex, isPackage: false),
+                // // Body of tabs
+                TabsBody(
+                  selectedIndex: _selectedIndex,
+                  routeInfo: widget.routeContent.routeLayer,
+                ),
+              ],
+            ),
           ),
         ),
       ),

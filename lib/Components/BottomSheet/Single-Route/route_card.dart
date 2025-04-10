@@ -42,16 +42,11 @@ class RouteCard extends StatelessWidget {
         final result = Navigator.of(context).push(
           MaterialPageRoute(
             builder:
-                (_) => ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(16.0),
-                  ),
-                  child: SingleRoute(
-                    key: UniqueKey(),
-                    routeContent: routeContent,
-                    startRoute: startRoute,
-                    scroller: scrollController,
-                  ),
+                (_) => SingleRoute(
+                  key: UniqueKey(),
+                  routeContent: routeContent,
+                  startRoute: startRoute,
+                  scroller: scrollController,
                 ),
           ),
         );
