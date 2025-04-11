@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
@@ -147,48 +150,38 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
-        // body: IndexedStack(
-        //   index: currentPageIndex, // Controls which child is displayed
-        //   children: [
-        //     // AsyncMapPage(),
-        //     // MapWidget(),
-        //     // RoutesList(),
-        //     // TempMapPage(), // This ensures the map remains loaded in memory
-        //     BottomSheetWidget(setRouteGraphics: (){}),
-        //   ],
-        // ),
         body: Stack(
           children: [
-            // MapWidget(
-            //   mapViewController: _mapViewController,
-            //   graphicsOverlay: _graphicsOverlay,
-            //   directionsList: _directionsList,
-            // ),
-            // _directionsList.isNotEmpty
-            //     ? DirectionsCard(
-            //       directionsList: _directionsList,
-            //       routeInfo: _routeInfo,
-            //       mapViewController: _mapViewController,
-            //     )
-            //     : Container(),
+            MapWidget(
+              mapViewController: _mapViewController,
+              graphicsOverlay: _graphicsOverlay,
+              directionsList: _directionsList,
+            ),
+            _directionsList.isNotEmpty
+                ? DirectionsCard(
+                  directionsList: _directionsList,
+                  routeInfo: _routeInfo,
+                  mapViewController: _mapViewController,
+                )
+                : Container(),
 
-            // Align(
-            //   alignment: Alignment.centerLeft,
-            //   child: Row(
-            //     crossAxisAlignment: CrossAxisAlignment.end,
-            //     children: [
-            //       TextButton(
-            //         child: Text("Route Verwijderen"),
-            //         onPressed: () async {
-            //           setState(() {
-            //             _directionsList.clear();
-            //             _graphicsOverlay.graphics.clear();
-            //           });
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  TextButton(
+                    child: Text("Route Verwijderen"),
+                    onPressed: () async {
+                      setState(() {
+                        _directionsList.clear();
+                        _graphicsOverlay.graphics.clear();
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
             BottomSheetWidget(startRoute: _startRoute),
             // OfflineMapDownloadExample(),
           ],

@@ -1,10 +1,24 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class PackegImagePreview extends StatelessWidget {
-  const PackegImagePreview({super.key});
+  final String description;
+  const PackegImagePreview({super.key, required this.description});
 
   @override
   Widget build(BuildContext context) {
+    String getImageSource() {
+      List<String> listOfItems = description.split(' ');
+      final String sourceString =
+          listOfItems
+              .firstWhere((word) => word.contains('src'), orElse: () => '')
+              .replaceAll('src=', '')
+              .replaceAll("'", '')
+              .trim();
+
+      return sourceString;
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
@@ -18,10 +32,21 @@ class PackegImagePreview extends StatelessWidget {
                 flex: 6,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(28),
-                  child: Image.asset(
+                  child: CachedNetworkImage(
+                    height: MediaQuery.of(context).size.height * 0.2,
+                    fit: BoxFit.cover,
+                    imageUrl: getImageSource(),
+                    // placeholder:
+                    //     (context, url) => Image.asset(
+                    //       'assets/temp.png',
+                    //       height: MediaQuery.of(context).size.height * 0.2,
+                    //       fit: BoxFit.cover,
+                    //     ),
+                    errorWidget: (context, url, error) =>  Image.asset(
                     'assets/temp.png',
                     height: MediaQuery.of(context).size.height * 0.2,
                     fit: BoxFit.cover,
+                  ),
                   ),
                 ),
               ),

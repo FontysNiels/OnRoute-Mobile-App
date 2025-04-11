@@ -172,6 +172,11 @@ class _RoutesListViewState extends State<RoutesListView> {
                       "Verbind met het internet om alle routes te zien",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
+                    // TODO: add a loading modal
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: IconButton.filled(onPressed: _refreshRoutes, icon: Icon(Icons.refresh)),
+                    )
                   ],
                 ),
               ),

@@ -42,102 +42,26 @@ class _SingleRouteState extends State<SingleRoute> {
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
-
       child: Scaffold(
-        // appBar: AppBar(
-        //   backgroundColor: Colors.white,
-        //   automaticallyImplyLeading: false,
-        //   // leading: RouteTitle(title: widget.routeContent.routeLayer.title),
-        //   // leading: IconButton(
-        //   //   icon: const Icon(Icons.assist_walker),
-        //   //   onPressed: () {
-        //   //     Navigator.pop(context, true);
-        //   //   },
-        //   // ),
-        //   title: SingleChildScrollView(
-        //     controller: widget.scroller,
-
-        //     // child: const Row(
-        //     //   mainAxisAlignment: MainAxisAlignment.end,
-        //     //   spacing: 26,
-        //     //   children: [Icon(Icons.info_outline), Icon(Icons.more_vert)],
-        //     // ),
-        //     child: Row(
-        //       mainAxisAlignment: MainAxisAlignment.start,
-        //       // spacing: 6,
-        //       children: [
-        //         Text(widget.routeContent.routeLayer.title + "sssssdds d sdsdsd", overflow: textove,),
-        //         IconButton.filled(
-        //           icon: Icon(Icons.close),
-        //           onPressed: () {
-        //             Navigator.pop(context, true);
-        //           },
-        //           style: ButtonStyle(
-        //             backgroundColor: WidgetStateProperty.all(
-        //               Theme.of(context).primaryColor.withValues(alpha: 0.5),
-        //             ),
-        //             // foregroundColor: WidgetStateProperty.all(
-        //             //   Colors.white,
-        //             // ), // Adjust the icon color if needed
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
         body: SafeArea(
           child: SingleChildScrollView(
             controller: widget.scroller,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                BottomSheetHandle(context: context),
-                // Title
-                Row(
-                  spacing: 6,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        child: RouteTitle(
-                          title: widget.routeContent.routeLayer.title,
-                        ),
-                      ),
-                    ),
-
-                    Padding(
-                      padding: const EdgeInsets.only(
-                        left: 16,
-                        right: 16,
-                        top: 6,
-                      ),
-                      child: IconButton.filled(
-                        icon: Icon(Icons.close),
-                        onPressed: () {
-                          Navigator.pop(context, true);
-                        },
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(
-                            Theme.of(
-                              context,
-                            ).primaryColor.withValues(alpha: 0.5),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: BottomSheetHandle(context: context),
                 ),
+                // Title
+                RouteTitle(title: widget.routeContent.title),
+
                 // Images (PACKAGE ONLY)
-                const PackegImagePreview(),
+                PackegImagePreview(description: widget.routeContent.description,),
 
                 // Download Button
                 !widget.routeContent.locally
-                    ? RouteDownloadButton(routeID: widget.routeContent)
+                    ? RouteDownloadButton(currentRoute: widget.routeContent)
                     : RouteStartButton(
                       routeContent: widget.routeContent,
                       startRoute: widget.startRoute,
@@ -148,7 +72,7 @@ class _SingleRouteState extends State<SingleRoute> {
                 // // Body of tabs
                 TabsBody(
                   selectedIndex: _selectedIndex,
-                  routeInfo: widget.routeContent.routeLayer,
+                  routeDescription: widget.routeContent.description,
                 ),
               ],
             ),

@@ -39,8 +39,6 @@ class DescriptionBlock extends StatelessWidget {
       return decoded.trim();
     }
 
-    getImageSource();
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Column(
@@ -62,14 +60,5 @@ class DescriptionBlock extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  void getImageSource() {
-    List<String> listOfItems = description.split(' ');
-    final String sourceString =
-        listOfItems
-            .firstWhere((word) => word.contains('src'), orElse: () => '')
-            .replaceAll('src=', '')
-            .trim();
   }
 }

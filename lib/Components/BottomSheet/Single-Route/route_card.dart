@@ -22,23 +22,6 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
-        // final result = await Navigator.push(
-        //   context,
-
-        //   // PageRouteBuilder(
-        //   //   pageBuilder:
-        //   //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
-        //   //   transitionDuration: Duration.zero, // No transition effect
-        //   // ),
-        //   MaterialPageRoute(
-        //     builder:
-        //         (context) => SingleRoute(
-        //           key: UniqueKey(),
-        //           routeContent: routeContent,
-        //           startRoute: startRoute,
-        //         ),
-        //   ),
-        // );
         final result = Navigator.of(context).push(
           MaterialPageRoute(
             builder:
@@ -90,11 +73,12 @@ class RouteCard extends StatelessWidget {
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
                             // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
-                            routeContent.routeLayer.title,
+                            routeContent.title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
+                            // "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
+                            "GEEN KM MEER",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
@@ -109,24 +93,6 @@ class RouteCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.more_vert),
-                  //   onPressed: () {
-                  //   showPopover(context: context, bodyBuilder: (context)=> PopupMenuItem(child: Text('Download'), value: Text('yes'),));
-                  //   },
-                  // ),
-                  // PopupMenuButton(
-                  //   itemBuilder:
-                  //       (BuildContext context) => <PopupMenuEntry>[
-                  //         const PopupMenuItem(
-                  //           // value: SampleItem.itemOne,
-                  //           child: Padding(
-                  //             padding: EdgeInsets.all(0),
-                  //             child: Text('Download'),
-                  //           ),
-                  //         ),
-                  //       ],
-                  // ),
                 ],
               ),
             ),

@@ -7,15 +7,15 @@ class TabsBody extends StatelessWidget {
   const TabsBody({
     super.key,
     required this.selectedIndex,
-    required this.routeInfo,
+    required this.routeDescription,
   });
   final int selectedIndex;
-  final RouteLayerData routeInfo;
+  final String routeDescription;
   @override
   Widget build(BuildContext context) {
     List<Widget> textWidgets = [
       //Bescrhijving
-      DescriptionBlock(description: routeInfo.description),
+      DescriptionBlock(description: routeDescription),
       // POIs
       // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
       // ^ deze exporten naar Widgets/Tabs/Content

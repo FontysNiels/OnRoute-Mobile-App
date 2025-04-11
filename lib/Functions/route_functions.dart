@@ -7,15 +7,15 @@ import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 // Filters the route-JSON so that only the necessary data is returned
-RouteLayerData filterRouteInfo(Response routeResponse, layerInfo) {
+RouteLayerData filterRouteInfo(Response routeResponse, AvailableRoutes layerInfo) {
   var lastding =
       (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
               as List)
           .last;
 
   var modifiedResponse = jsonDecode(routeResponse.body);
-  modifiedResponse['title'] = layerInfo['title'];
-  modifiedResponse['description'] = layerInfo['description'];
+  modifiedResponse['title'] = layerInfo.title;
+  modifiedResponse['description'] = layerInfo.description;
 
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
@@ -38,7 +38,13 @@ Future<List<AvailableRoutes>> fetchLocalItems(List<File> localFiles) async {
     RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
 
     availableLocalRoutes.add(
-      AvailableRoutes(routeID: file.path, locally: true, routeLayer: routeInfo),
+      AvailableRoutes(
+        routeID: file.path,
+        title: routeInfo.title,
+        description: routeInfo.description,
+        locally: true,
+        // routeLayer: routeInfo
+      ),
     );
   }
 
@@ -47,13 +53,9 @@ Future<List<AvailableRoutes>> fetchLocalItems(List<File> localFiles) async {
 
 // Fetches online routes that are not already downloaded
 Future<List<AvailableRoutes>> fetchOnlineItems(List<File> localFiles) async {
-  // List of all files on device
-  // TEMP list of routeIDs
-  List routeIDs = [
-    '4f4cea7adeb0463c9ccb4a92d2c62dbf',
-    'd7c2638c697d415584c84166e04565b5',
-    'c79d6d7746d145deaf842bd7602f70b4',
-  ];
+  var responseAll = await getAll();
+  var content = jsonDecode(responseAll.body);
+  List routeIDs = content['items'];
 
   // Extract file names from files
   final existingIDs =
@@ -64,31 +66,29 @@ Future<List<AvailableRoutes>> fetchOnlineItems(List<File> localFiles) async {
 
   // Filter routeIDs that are not in existingIDs
   final filteredRouteIDs =
-      routeIDs.where((id) => !existingIDs.contains(id)).toList();
+      routeIDs.where((id) => !existingIDs.contains(id['id'])).toList();
 
   List<AvailableRoutes> availableOnlineRoutes = [];
 
   for (var i = 0; i < filteredRouteIDs.length; i++) {
     // Get route info (title, description) based on routeID
-    var response = await getRouteInfo(filteredRouteIDs[i]);
-    var layerInfo = jsonDecode(response.body);
-    var routeResponse = await getRouteData(layerInfo['id']);
+    // var routeResponse = await getRouteData(filteredRouteIDs[i]['id']);
 
-    RouteLayerData routeInfo = filterRouteInfo(routeResponse, layerInfo);
+    // RouteLayerData routeInfo = filterRouteInfo(
+    //   routeResponse,
+    //   filteredRouteIDs[i],
+    // );
 
     // Add info of online route to list
     AvailableRoutes onlineRoute = AvailableRoutes(
-      routeID: layerInfo['id'],
+      routeID: filteredRouteIDs[i]['id'],
+      title: filteredRouteIDs[i]['title'],
+      description: filteredRouteIDs[i]['description'] ?? '...',
       locally: false,
-      routeLayer: routeInfo,
+      // routeLayer: routeInfo,
     );
     availableOnlineRoutes.add(onlineRoute);
   }
-
-  // var routes = await fetchLocalItems(localFiles);
-  // if (routes.isNotEmpty) {
-  //   allAvailableRoutes.addAll(routes);
-  // }
 
   return availableOnlineRoutes;
 }

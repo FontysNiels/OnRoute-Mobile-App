@@ -45,7 +45,7 @@ class _RoutePackageState extends State<RoutePackage> {
           // Title
           const PackageTitle(),
           // Images
-          const PackegImagePreview(),
+          const PackegImagePreview(description: '',),
           // Download Button
           const PackageDownloadButton(),
           // Tabs
