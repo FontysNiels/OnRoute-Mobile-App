@@ -6,28 +6,6 @@ import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
-// Filters the route-JSON so that only the necessary data is returned
-RouteLayerData filterRouteInfo(Response routeResponse, AvailableRoutes layerInfo) {
-  var lastding =
-      (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
-              as List)
-          .last;
-
-  var modifiedResponse = jsonDecode(routeResponse.body);
-  modifiedResponse['title'] = layerInfo.title;
-  modifiedResponse['description'] = layerInfo.description;
-
-  RouteLayerData routeInfo = RouteLayerData.fromJson(
-    (modifiedResponse
-        ..['layers'][2]['featureSet']['features'] =
-            (modifiedResponse['layers'][2]['featureSet']['features'] as List)
-                .where((feature) => feature['attributes']['Azimuth'] != 0.0)
-                .toList())
-      ..['layers'][2]['featureSet']['features'].add(lastding),
-  );
-  return routeInfo;
-}
-
 // Fetches local routes that are already downloaded
 Future<List<AvailableRoutes>> fetchLocalItems(List<File> localFiles) async {
   List<AvailableRoutes> availableLocalRoutes = [];
@@ -43,7 +21,6 @@ Future<List<AvailableRoutes>> fetchLocalItems(List<File> localFiles) async {
         title: routeInfo.title,
         description: routeInfo.description,
         locally: true,
-        // routeLayer: routeInfo
       ),
     );
   }
@@ -71,24 +48,40 @@ Future<List<AvailableRoutes>> fetchOnlineItems(List<File> localFiles) async {
   List<AvailableRoutes> availableOnlineRoutes = [];
 
   for (var i = 0; i < filteredRouteIDs.length; i++) {
-    // Get route info (title, description) based on routeID
-    // var routeResponse = await getRouteData(filteredRouteIDs[i]['id']);
-
-    // RouteLayerData routeInfo = filterRouteInfo(
-    //   routeResponse,
-    //   filteredRouteIDs[i],
-    // );
-
     // Add info of online route to list
     AvailableRoutes onlineRoute = AvailableRoutes(
       routeID: filteredRouteIDs[i]['id'],
       title: filteredRouteIDs[i]['title'],
       description: filteredRouteIDs[i]['description'] ?? '...',
       locally: false,
-      // routeLayer: routeInfo,
     );
     availableOnlineRoutes.add(onlineRoute);
   }
 
   return availableOnlineRoutes;
+}
+
+// Filters the route-JSON so that only the necessary data is returned
+RouteLayerData filterRouteInfo(
+  Response routeResponse,
+  AvailableRoutes layerInfo,
+) {
+  var lastding =
+      (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
+              as List)
+          .last;
+
+  var modifiedResponse = jsonDecode(routeResponse.body);
+  modifiedResponse['title'] = layerInfo.title;
+  modifiedResponse['description'] = layerInfo.description;
+
+  RouteLayerData routeInfo = RouteLayerData.fromJson(
+    (modifiedResponse
+        ..['layers'][2]['featureSet']['features'] =
+            (modifiedResponse['layers'][2]['featureSet']['features'] as List)
+                .where((feature) => feature['attributes']['Azimuth'] != 0.0)
+                .toList())
+      ..['layers'][2]['featureSet']['features'].add(lastding),
+  );
+  return routeInfo;
 }

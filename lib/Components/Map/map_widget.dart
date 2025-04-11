@@ -48,7 +48,7 @@ class _MapWidgetState extends State<MapWidget> {
   var _status = LocationDataSourceStatus.stopped;
   // A subscription to receive changes to the auto-pan mode.
   StreamSubscription? _autoPanModeSubscription;
-  var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
+  // var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
 
 
   @override
@@ -71,54 +71,36 @@ class _MapWidgetState extends State<MapWidget> {
               ],
             ),
             // navigate button
-            Align(
-              alignment: Alignment.centerRight,
-              child: FloatingActionButton(
-                heroTag: 'uniqueTagForFAB3',
-                onPressed:
-                    () => {
-                      _mapViewController.locationDisplay.autoPanMode =
-                          LocationDisplayAutoPanMode.recenter,
-                    },
-                child: Icon(Icons.gps_fixed),
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: FloatingActionButton(
+                    heroTag: UniqueKey(),
+                    onPressed:
+                        () => {
+                          _mapViewController.locationDisplay.autoPanMode =
+                              LocationDisplayAutoPanMode.recenter,
+                        },
+                    child: Icon(Icons.gps_fixed),
+                  ),
+                ),
+                 Align(
+                  alignment: Alignment.centerRight,
+                  child: FloatingActionButton(
+                    heroTag: UniqueKey(),
+                    onPressed:
+                        () => {
+                          _mapViewController.locationDisplay.autoPanMode =
+                              // LocationDisplayAutoPanMode.compassNavigation,
+                              LocationDisplayAutoPanMode.navigation,
+                        },
+                    child: Icon(Icons.compass_calibration),
+                  ),
+                ),
+              ],
             ),
-            // Direction card
-            // _directionsList.isNotEmpty
-            //     ? DirectionsCard(
-            //       directionsList: _directionsList,
-            //       routeInfo: _routeInfo,
-            //       mapViewController: _mapViewController,
-            //     )
-            //     : Container(),
-            // route buttons
-            // Align(
-            //   alignment: Alignment.centerLeft,
-            //   child: Row(
-            //     crossAxisAlignment: CrossAxisAlignment.end,
-            //     children: [
-            //       TextButton(
-            //         child: Text("Route Toevoegen"),
-            //         onPressed: () async {
-            //           _graphicsOverlay.graphics.addAll(await initialGraphics());
-            //         },
-            //       ),
-            //       TextButton(
-            //         child: Text("Route Verwijderen"),
-            //         onPressed: () async {
-            //           setState(() {
-            //             _directionsList.clear();
-            //             _graphicsOverlay.graphics.clear();
-            //             _directionsGraphicsOverlay.graphics.clear();
-            //           });
-            //         },
-            //       ),
-            //     ],
-            //   ),
-            // ),
-
-            // Bottomsheet
-            // BottomSheetWidget(setRouteGraphics: test),
 
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
@@ -133,8 +115,6 @@ class _MapWidgetState extends State<MapWidget> {
           ],
         ),
       ),
-      // The Settings bottom sheet.
-      // bottomSheet: _settingsVisible ? buildSettings(context) : null,
     );
   }
 
@@ -170,46 +150,43 @@ class _MapWidgetState extends State<MapWidget> {
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
 
-      // Set an initial viewpoint over the graphics.
-      // _mapViewController.graphicsOverlays.add(_directionsGraphicsOverlay);
-
       _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
       _mapViewController.locationDisplay.autoPanMode =
           LocationDisplayAutoPanMode.navigation;
-      _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
-        if (mounted) {
-          setState(() => _autoPanMode = mode);
-        }
-      });
+      // _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
+      //   if (mounted) {
+      //     setState(() => _autoPanMode = mode);
+      //   }
+      // });
 
       // Setting the location type, probably don't need this later on
       //////////////////////////////////////////////////////////////////////////////////////////
       // Subscribe to status changes and changes to the auto-pan mode.
-      _statusSubscription = _locationDataSource.onStatusChanged.listen((
-        status,
-      ) {
-        if (mounted) {
-          setState(() => _status = status);
-        }
-      });
-      if (mounted) {
-        setState(() => _status = _locationDataSource.status);
-        _autoPanModeSubscription = _mapViewController
-            .locationDisplay
-            .onAutoPanModeChanged
-            .listen((mode) {
-              if (mounted) {
-                setState(() => _autoPanMode = mode);
-              }
-            });
-      }
-      if (mounted) {
-        setState(
-          () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
-        );
-      }
+      // _statusSubscription = _locationDataSource.onStatusChanged.listen((
+      //   status,
+      // ) {
+      //   if (mounted) {
+      //     setState(() => _status = status);
+      //   }
+      // });
+      // if (mounted) {
+      //   setState(() => _status = _locationDataSource.status);
+      //   _autoPanModeSubscription = _mapViewController
+      //       .locationDisplay
+      //       .onAutoPanModeChanged
+      //       .listen((mode) {
+      //         if (mounted) {
+      //           setState(() => _autoPanMode = mode);
+      //         }
+      //       });
+      // }
+      // if (mounted) {
+      //   setState(
+      //     () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
+      //   );
+      // }
       //////////////////////////////////////////////////////////////////////////////////////////
 
       // Attempt to start the location data source (this will prompt the user for permission).

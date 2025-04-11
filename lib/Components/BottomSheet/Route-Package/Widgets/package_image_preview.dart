@@ -15,7 +15,6 @@ class PackegImagePreview extends StatelessWidget {
               .replaceAll('src=', '')
               .replaceAll("'", '')
               .trim();
-
       return sourceString;
     }
 

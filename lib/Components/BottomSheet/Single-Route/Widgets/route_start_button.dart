@@ -4,9 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
-import 'package:onroute_app/main.dart';
 
 class RouteStartButton extends StatelessWidget {
   final AvailableRoutes routeContent;

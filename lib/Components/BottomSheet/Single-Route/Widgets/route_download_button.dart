@@ -4,7 +4,7 @@ import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
-import 'package:onroute_app/Functions/route_functions.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
 
 class RouteDownloadButton extends StatelessWidget {
   final AvailableRoutes currentRoute;
