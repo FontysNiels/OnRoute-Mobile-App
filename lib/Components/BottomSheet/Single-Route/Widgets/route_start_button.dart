@@ -25,6 +25,7 @@ class RouteStartButton extends StatelessWidget {
           RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
           startRoute(routeInfo);
           // await addGraphics(routeContent.routeLayer);
+          Navigator.pop(context, false);
         },
         icon: const Icon(Icons.directions),
         label: Text(

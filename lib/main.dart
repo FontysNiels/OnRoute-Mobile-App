@@ -1,10 +1,7 @@
-import 'dart:convert';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
@@ -41,6 +38,18 @@ final _graphicsOverlay = GraphicsOverlay();
 List<DescriptionPoint> _directionsList = [];
 late RouteLayerData _routeInfo;
 int change = 0;
+
+List<DescriptionPoint> getDirectionList() {
+  return _directionsList;
+}
+
+RouteLayerData getRouteInfo() {
+  return _routeInfo;
+}
+
+ArcGISMapViewController getMapViewController() {
+  return _mapViewController;
+}
 
 // Future<void> addGraphics(RouteLayerData route) async {
 //   _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));

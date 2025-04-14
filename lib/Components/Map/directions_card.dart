@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,13 @@ class _DirectionsCardState extends State<DirectionsCard> {
   // Create a list of descriptions and distances
   List<Map<String, dynamic>> descriptionDistanceList = [];
   late final List<DescriptionPoint> directionList;
+  late StreamSubscription<ArcGISLocation> subscription;
+
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -60,9 +68,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
         }
       }
 
-      widget._mapViewController.locationDisplay.onLocationChanged.listen((
+      subscription = widget._mapViewController.locationDisplay.onLocationChanged.listen((
         mode,
       ) {
+        print('object');
         if (widget._directionsList.isNotEmpty) {
           final userPosition =
               widget._mapViewController.locationDisplay.location!.position;
@@ -161,140 +170,137 @@ class _DirectionsCardState extends State<DirectionsCard> {
             }
           }
         }
+        // check that checks if user is facing a point and moving towards it?
+
+        if (widget._directionsList.isNotEmpty) {
+          // Calculate the distance between the user's current position and the direction's coordinates
+          final userPosition =
+              widget._mapViewController.locationDisplay.location!.position;
+
+          final directionPointXY = convertToLatLng(
+            directionList[descriptionNum].x,
+            directionList[descriptionNum].y,
+          );
+          final directionPointX = directionPointXY[1];
+          final directionPointY = directionPointXY[0];
+
+          final distanceToDirectionPoint = sqrt(
+            pow(userPosition.y - directionPointY, 2) +
+                pow(userPosition.x - directionPointX, 2),
+          );
+
+          // Define a threshold distance (e.g., 10 meters)
+          // Approx. 10 meters in lat/long degrees
+          const thresholdDistance = 0.0001;
+          const metersPerDegree = 111320; // Approximation for latitude
+          final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
+          // List<Map<String, dynamic>> descriptionDistanceListTemp = [];
+          // for (int index = 0; index < directionList.length; index++) {
+          //   final point = directionList[index];
+          //   final pointXY = convertToLatLng(point.x, point.y);
+          //   final pointX = pointXY[1];
+          //   final pointY = pointXY[0];
+
+          //   final distanceToPoint = sqrt(
+          //     pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
+          //   );
+
+          //   final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
+
+          //   int distanceBetweenPoints = 0;
+          //   // Get distance between points
+
+          //   final matchingFeatures = widget
+          //       ._routeInfo
+          //       .layers[1]
+          //       .featureSet
+          //       .features
+          //       .where(
+          //         (feature) =>
+          //             feature.attributes['DirectionPointID'] ==
+          //             (widget
+          //                 ._routeInfo
+          //                 .layers[2]
+          //                 .featureSet
+          //                 .features[index]
+          //                 .attributes["ObjectID"]),
+          //       );
+
+          //   // Set distance between points
+          //   if (matchingFeatures.isNotEmpty) {
+          //     distanceBetweenPoints =
+          //         matchingFeatures.first.attributes['Meters'].toInt();
+          //   }
+          //   descriptionDistanceListTemp.add({
+          //     'desc': point.description,
+          //     'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
+          //     'distanceBetweenPoints': distanceBetweenPoints,
+          //   });
+          // }
+
+          // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
+          // print(descriptionDistanceList);
+          // if (distanceToDirectionPoint < thresholdDistance) {
+          //   if (descriptionNum < amountOfDirections - 1) {
+          //     print("User has passed the current direction's coordinates.");
+          //     setState(() {
+          //       descriptionNum++;
+          //       skipNextCheck = true; // Skip the next check
+          //       // ^ uit setstate zetten?
+          //     });
+          //   }
+          // } else if (!skipNextCheck) {
+          //   // Check if the distance to current direction is increasing
+          //   if (metersToCurrentDirection < distanceInMeters.toInt() &&
+          //       metersToCurrentDirection != 0) {
+          //     // If so, check if user is getting closer to a different point
+          //     for (
+          //       var iLoop = 0;
+          //       iLoop < descriptionDistanceList.length;
+          //       iLoop++
+          //     ) {
+          //       // Can't check the one after the last
+          //       if (iLoop != descriptionDistanceList.length - 1) {
+          //         // print('tempdistance ${descriptionDistanceListTemp[1]['userDistanceFromPoint']}');
+          //         // print('main distance ${descriptionDistanceList[1]['userDistanceFromPoint']}');
+          //         // print('0--------0');
+
+          //         // Check if user is closer than the set distance to it
+
+          //         // if (descriptionDistanceList[iLoop +
+          //         //         1]['userDistanceFromPoint'] <
+          //         //     descriptionDistanceList[iLoop]['distanceBetweenPoints']) {
+          //         if (descriptionDistanceListTemp[iLoop]['userDistanceFromPoint'] >
+          //                 descriptionDistanceList[iLoop]['userDistanceFromPoint'] &&
+          //             descriptionDistanceListTemp[iLoop +
+          //                     1]['userDistanceFromPoint'] <
+          //                 descriptionDistanceList[iLoop +
+          //                     1]['userDistanceFromPoint']) {
+          //           // Skip if the user is getting closer to one that they already passed
+
+          //           if (descriptionNum > iLoop) {
+          //             continue;
+          //           }
+
+          //           // Change to the next description and stop the loop
+          //           descriptionNum++;
+          //           break;
+          //         }
+          //       }
+          //     }
+          //   }
+          // } else {
+          //   skipNextCheck = false; // Reset the flag after skipping
+          // }
+
+          // Update distance to nect direction
+          setState(() {
+            metersToCurrentDirection = distanceInMeters.toInt();
+            // descriptionDistanceList = descriptionDistanceListTemp;
+          });
+        }
       });
     }
-
-    widget._mapViewController.locationDisplay.onLocationChanged.listen((mode) {
-      // check that checks if user is facing a point and moving towards it?
-
-      if (widget._directionsList.isNotEmpty) {
-        // Calculate the distance between the user's current position and the direction's coordinates
-        final userPosition =
-            widget._mapViewController.locationDisplay.location!.position;
-
-        final directionPointXY = convertToLatLng(
-          directionList[descriptionNum].x,
-          directionList[descriptionNum].y,
-        );
-        final directionPointX = directionPointXY[1];
-        final directionPointY = directionPointXY[0];
-
-        final distanceToDirectionPoint = sqrt(
-          pow(userPosition.y - directionPointY, 2) +
-              pow(userPosition.x - directionPointX, 2),
-        );
-
-        // Define a threshold distance (e.g., 10 meters)
-        // Approx. 10 meters in lat/long degrees
-        const thresholdDistance = 0.0001;
-        const metersPerDegree = 111320; // Approximation for latitude
-        final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-        // List<Map<String, dynamic>> descriptionDistanceListTemp = [];
-        // for (int index = 0; index < directionList.length; index++) {
-        //   final point = directionList[index];
-        //   final pointXY = convertToLatLng(point.x, point.y);
-        //   final pointX = pointXY[1];
-        //   final pointY = pointXY[0];
-
-        //   final distanceToPoint = sqrt(
-        //     pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
-        //   );
-
-        //   final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
-
-        //   int distanceBetweenPoints = 0;
-        //   // Get distance between points
-
-        //   final matchingFeatures = widget
-        //       ._routeInfo
-        //       .layers[1]
-        //       .featureSet
-        //       .features
-        //       .where(
-        //         (feature) =>
-        //             feature.attributes['DirectionPointID'] ==
-        //             (widget
-        //                 ._routeInfo
-        //                 .layers[2]
-        //                 .featureSet
-        //                 .features[index]
-        //                 .attributes["ObjectID"]),
-        //       );
-
-        //   // Set distance between points
-        //   if (matchingFeatures.isNotEmpty) {
-        //     distanceBetweenPoints =
-        //         matchingFeatures.first.attributes['Meters'].toInt();
-        //   }
-        //   descriptionDistanceListTemp.add({
-        //     'desc': point.description,
-        //     'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
-        //     'distanceBetweenPoints': distanceBetweenPoints,
-        //   });
-        // }
-
-        // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
-        // print(descriptionDistanceList);
-        // if (distanceToDirectionPoint < thresholdDistance) {
-        //   if (descriptionNum < amountOfDirections - 1) {
-        //     print("User has passed the current direction's coordinates.");
-        //     setState(() {
-        //       descriptionNum++;
-        //       skipNextCheck = true; // Skip the next check
-        //       // ^ uit setstate zetten?
-        //     });
-        //   }
-        // } else if (!skipNextCheck) {
-        //   // Check if the distance to current direction is increasing
-        //   if (metersToCurrentDirection < distanceInMeters.toInt() &&
-        //       metersToCurrentDirection != 0) {
-        //     // If so, check if user is getting closer to a different point
-        //     for (
-        //       var iLoop = 0;
-        //       iLoop < descriptionDistanceList.length;
-        //       iLoop++
-        //     ) {
-        //       // Can't check the one after the last
-        //       if (iLoop != descriptionDistanceList.length - 1) {
-        //         // print('tempdistance ${descriptionDistanceListTemp[1]['userDistanceFromPoint']}');
-        //         // print('main distance ${descriptionDistanceList[1]['userDistanceFromPoint']}');
-        //         // print('0--------0');
-
-        //         // Check if user is closer than the set distance to it
-
-        //         // if (descriptionDistanceList[iLoop +
-        //         //         1]['userDistanceFromPoint'] <
-        //         //     descriptionDistanceList[iLoop]['distanceBetweenPoints']) {
-        //         if (descriptionDistanceListTemp[iLoop]['userDistanceFromPoint'] >
-        //                 descriptionDistanceList[iLoop]['userDistanceFromPoint'] &&
-        //             descriptionDistanceListTemp[iLoop +
-        //                     1]['userDistanceFromPoint'] <
-        //                 descriptionDistanceList[iLoop +
-        //                     1]['userDistanceFromPoint']) {
-        //           // Skip if the user is getting closer to one that they already passed
-
-        //           if (descriptionNum > iLoop) {
-        //             continue;
-        //           }
-
-        //           // Change to the next description and stop the loop
-        //           descriptionNum++;
-        //           break;
-        //         }
-        //       }
-        //     }
-        //   }
-        // } else {
-        //   skipNextCheck = false; // Reset the flag after skipping
-        // }
-
-        // Update distance to nect direction
-        setState(() {
-          metersToCurrentDirection = distanceInMeters.toInt();
-          // descriptionDistanceList = descriptionDistanceListTemp;
-        });
-      }
-    });
   }
 
   @override

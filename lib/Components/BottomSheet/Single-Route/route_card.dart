@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
+import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 
 class RouteCard extends StatelessWidget {
   final AvailableRoutes routeContent;
@@ -37,6 +38,16 @@ class RouteCard extends StatelessWidget {
         // Trigger the callback if result is true
         if (await result == true) {
           onRouteUpdated();
+        } else {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder:
+                  (_) => TripContent(
+                    key: UniqueKey(),
+                    scroller: scrollController,
+                  ),
+            ),
+          );
         }
       },
       child: Card(
