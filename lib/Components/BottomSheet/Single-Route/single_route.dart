@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
@@ -9,7 +10,7 @@ import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 
 class SingleRoute extends StatefulWidget {
-  final AvailableRoutes routeContent;
+  final WebMapCollection routeContent;
   final Function startRoute;
   final ScrollController scroller;
   const SingleRoute({
@@ -54,16 +55,21 @@ class _SingleRouteState extends State<SingleRoute> {
                   child: BottomSheetHandle(context: context),
                 ),
                 // Title
-                RouteTitle(title: widget.routeContent.title),
+                RouteTitle(title: widget.routeContent.availableRoute[0].title),
 
                 // Images (PACKAGE ONLY)
-                PackegImagePreview(description: widget.routeContent.description,),
+                PackegImagePreview(
+                  description:
+                      widget.routeContent.availableRoute[0].description,
+                ),
 
                 // Download Button
                 !widget.routeContent.locally
-                    ? RouteDownloadButton(currentRoute: widget.routeContent)
+                    ? RouteDownloadButton(
+                      currentRoute: widget.routeContent,
+                    )
                     : RouteStartButton(
-                      routeContent: widget.routeContent,
+                      routeContent: widget.routeContent.availableRoute[0],
                       startRoute: widget.startRoute,
                     ),
                 // Tabs
@@ -72,7 +78,7 @@ class _SingleRouteState extends State<SingleRoute> {
                 // // Body of tabs
                 TabsBody(
                   selectedIndex: _selectedIndex,
-                  routeDescription: widget.routeContent.description,
+                  routeDescription: widget.routeContent.availableRoute[0].description,
                 ),
               ],
             ),

@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 
 class RouteCard extends StatelessWidget {
-  final AvailableRoutes routeContent;
+  final WebMapCollection routeContent;
   final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
   final ScrollController scrollController;
@@ -84,7 +85,7 @@ class RouteCard extends StatelessWidget {
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
                             // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
-                            routeContent.title,
+                            routeContent.availableRoute[0].title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(

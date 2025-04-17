@@ -1,17 +1,20 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/Functions/file_storage.dart';
+import 'package:path_provider/path_provider.dart';
 
 class MapWidget extends StatefulWidget {
   final ArcGISMapViewController mapViewController;
   final GraphicsOverlay graphicsOverlay;
-    final List<DescriptionPoint> directionsList;
+  final List<DescriptionPoint> directionsList;
   const MapWidget({
     super.key,
     required this.mapViewController,
     required this.graphicsOverlay,
-    required this.directionsList, 
+    required this.directionsList,
   });
 
   @override
@@ -50,7 +53,6 @@ class _MapWidgetState extends State<MapWidget> {
   StreamSubscription? _autoPanModeSubscription;
   // var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,7 +88,7 @@ class _MapWidgetState extends State<MapWidget> {
                     child: Icon(Icons.gps_fixed),
                   ),
                 ),
-                 Align(
+                Align(
                   alignment: Alignment.centerRight,
                   child: FloatingActionButton(
                     heroTag: UniqueKey(),
@@ -142,6 +144,23 @@ class _MapWidgetState extends State<MapWidget> {
 
       _webMap = ArcGISMap.withItem(portalItem);
       _mapViewController.arcGISMap = _webMap;
+
+      // await downloadSampleData(['5f52e970830a4140bec9d69317d1399f']);
+      // // await downloadSampleData(['b75f95c720204d78b1eed8f98ccbe0d9']);
+      // final appDir = await getApplicationDocumentsDirectory();
+
+      // // Load the local mobile map package.
+      // final mmpkFile = File('${appDir.absolute.path}/offlinemap.mmpk');
+      // // final mmpkFile = File('${appDir.absolute.path}/MMP.mmpk');
+      // final mmpk = MobileMapPackage.withFileUri(mmpkFile.uri);
+      // await mmpk.load();
+
+      // if (mmpk.maps.isNotEmpty) {
+      //   // Get the first map in the mobile map package and set to the map view.
+
+      //   _mapViewController.arcGISMap = mmpk.maps.first;
+      // }
+
       // _mapViewController.onScaleChanged.listen((scale) {
       //   _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
 
@@ -212,7 +231,6 @@ class _MapWidgetState extends State<MapWidget> {
       print("Error in onMapViewReady: $e");
     }
   }
-
 }
 
 class locationsettings extends StatelessWidget {

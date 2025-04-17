@@ -30,10 +30,16 @@ class _TripContentState extends State<TripContent> {
 
   @override
   void initState() {
+    calculateDistances();
+    super.initState();
+  }
+
+  void calculateDistances() {
     List<DescriptionPoint> directions = getDirectionList();
     if (directions.isEmpty) {
       Navigator.pop(context, false);
     } else if (directions.isNotEmpty) {
+      // TODO: Make this calculate (totaldistance - distance traveled (points length) & distance traveled to current point = bestemming)
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) {
@@ -53,13 +59,16 @@ class _TripContentState extends State<TripContent> {
 
         const metersPerDegree = 111320; // Approximation for latitude
         final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-
+        // print(distanceInMeters);
         setState(() {
-          distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
+          if (distanceInMeters >= 1000) {
+            distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
+          } else {
+            distanceToFinish = distanceInMeters.toStringAsFixed(0);
+          }
         });
       });
     }
-    super.initState();
   }
 
   @override
@@ -80,11 +89,166 @@ class _TripContentState extends State<TripContent> {
                 ),
 
                 TripInfoBar(distanceToFinish: distanceToFinish),
+
+                POI(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class POI extends StatelessWidget {
+  const POI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Image
+        ImagePOI(),
+        // Content
+        BodyPOI(),
+      ],
+    );
+  }
+}
+
+class ImagePOI extends StatelessWidget {
+  const ImagePOI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 197, 197, 197),
+          ),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Image.asset(
+              'assets/temp.png',
+              height: MediaQuery.of(context).size.height * 0.2,
+            ),
+          ),
+        ),
+        SizedBox(height: 20),
+        Container(
+          decoration: const BoxDecoration(
+            color: Color.fromARGB(255, 197, 197, 197),
+          ),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Image.asset(
+              'assets/temp-vertical.png',
+              height: MediaQuery.of(context).size.height * 0.2,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class BodyPOI extends StatelessWidget {
+  const BodyPOI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // title
+          TitlePOI(),
+
+          // FUNCTION TO SHOW BUTTONS OF AVAILABLE CONATCT TYPES
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () async {},
+                  icon: const Icon(Icons.language),
+                  label: Text(
+                    'Website',
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                      //TODO: set ElevatedButtonTheme so it works instantly
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ),
+                  iconAlignment: IconAlignment.start,
+                  style: ButtonStyle(
+                    // iconColor: WidgetStateProperty.all(const Color.fromARGB(255, 0, 0, 0)),
+           
+            
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // description
+          DescriptionPOI(),
+        ],
+      ),
+    );
+  }
+}
+
+class DescriptionPOI extends StatelessWidget {
+  const DescriptionPOI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Text(
+            'POI beschrijving',
+            style: Theme.of(context).textTheme.labelSmall,
+          ),
+        ),
+
+        // Beschrijving
+        Text(
+          "BeschrijvingBeschrijvingBeschrijvingBeschrijvingBeschrijvingBeschrijving BeschrijvingBeschrijvingBeschrijving Beschrijving",
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+      ],
+    );
+  }
+}
+
+class TitlePOI extends StatelessWidget {
+  const TitlePOI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+
+      children: [
+        Text(
+          "TITLE",
+          style: Theme.of(
+            context,
+          ).textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
+        ),
+        // type
+        Text(
+          "TYPE",
+          style: Theme.of(context).textTheme.bodySmall,
+          // style: Theme.of(context).textTheme.bodySmall!.copyWith(fontStyle: FontStyle.italic),
+        ),
+      ],
     );
   }
 }
@@ -154,7 +318,10 @@ class TripInfoBar extends StatelessWidget {
                     context,
                   ).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
                 ),
-                Text("km", style: Theme.of(context).textTheme.labelMedium),
+                Text(
+                  double.parse(distanceToFinish) > 999 ? "km" : "m",
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
               ],
             ),
           ],

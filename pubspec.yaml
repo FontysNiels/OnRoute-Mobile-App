@@ -15,6 +15,7 @@ dependencies:
   path_provider: ^2.1.5
   cached_network_image: ^3.4.1
   connectivity_plus: ^6.1.3
+  flutter_archive: ^6.0.0
 
 
 dev_dependencies:
@@ -28,5 +29,6 @@ flutter:
   assets:
     - .env
     - assets/temp.png
+    - assets/temp-vertical.png
     - assets/gisdata.json
     - assets/bragis_onroute.png

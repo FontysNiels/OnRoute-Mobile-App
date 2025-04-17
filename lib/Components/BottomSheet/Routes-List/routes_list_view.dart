@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
@@ -22,7 +23,7 @@ class RoutesListView extends StatefulWidget {
   State<RoutesListView> createState() => _RoutesListViewState();
 }
 
-late Future<List<AvailableRoutes>> _futureRoutes; // Store the future
+late Future<List<WebMapCollection>> _futureRoutes; // Store the future
 
 class _RoutesListViewState extends State<RoutesListView> {
   @override
@@ -38,10 +39,13 @@ class _RoutesListViewState extends State<RoutesListView> {
     });
   }
 
-  Future<List<AvailableRoutes>> fetchItems() async {
+  Future<List<WebMapCollection>> fetchItems() async {
     // List of available routes
     List<File> localFiles = await getRouteFiles();
-    List<AvailableRoutes> allAvailableRoutes = [];
+
+   
+
+    List<WebMapCollection> allAvailableRoutes = [];
 
     allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
 
@@ -58,7 +62,7 @@ class _RoutesListViewState extends State<RoutesListView> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<AvailableRoutes>>(
+    return FutureBuilder<List<WebMapCollection>>(
       future: _futureRoutes, // Use the stored future
       builder: (BuildContext context, AsyncSnapshot<List> snapshot) {
         // List of widgets that will be displayed
@@ -97,13 +101,13 @@ class _RoutesListViewState extends State<RoutesListView> {
         } else {
           listItems.remove(startupText);
           // Sets snashot.data as a list of AvailableRoutes
-          List<AvailableRoutes> allItems =
-              snapshot.data! as List<AvailableRoutes>;
+          List<WebMapCollection> allItems =
+              snapshot.data! as List<WebMapCollection>;
 
           // Sorts the items into locally saved and online ones
-          List localItems =
+          List<WebMapCollection> localItems =
               allItems.where((item) => item.locally == true).toList();
-          List onlineItems =
+          List<WebMapCollection> onlineItems =
               allItems.where((item) => item.locally == false).toList();
 
           // Add the local items section
@@ -140,24 +144,29 @@ class _RoutesListViewState extends State<RoutesListView> {
           //////////////////////////////////////////////////////////////////////////////////////////////////////////
           // Add the online items section
           listItems.add(const ListDivider(text: 'Niet Gedownloade Routes'));
-
+          // TODO: Not container, remove earlier
           if (onlineItems.isNotEmpty) {
             listItems.addAll(
               onlineItems.map((item) {
                 if (localItems.any(
                   (localItem) =>
-                      localItem.routeID.toString().contains(item.routeID),
+                      localItem.webmapId.toString().contains(item.webmapId),
                 )) {
                   return Container();
                 } else {
-                  return RouteCard(
-                    key: UniqueKey(),
-                    routeContent: item,
-                    onRouteUpdated: _refreshRoutes, // Pass the callback
-                    startRoute: widget.startRoute,
-                    scrollController: widget.scrollController,
-                  );
-                  // return const PackageCard();
+                  // Check if it is only 1 route, making it a route and not package
+                  if (item.availableRoute.length == 1) {
+                    return RouteCard(
+                      key: UniqueKey(),
+                      routeContent: item,
+                      onRouteUpdated: _refreshRoutes, // Pass the callback
+                      startRoute: widget.startRoute,
+                      scrollController: widget.scrollController,
+                    );
+                  } else {
+                    return Container();
+                    // return const PackageCard();
+                  }
                 }
               }).toList(),
             );
@@ -175,8 +184,11 @@ class _RoutesListViewState extends State<RoutesListView> {
                     // TODO: add a loading modal
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: IconButton.filled(onPressed: _refreshRoutes, icon: Icon(Icons.refresh)),
-                    )
+                      child: IconButton.filled(
+                        onPressed: _refreshRoutes,
+                        icon: Icon(Icons.refresh),
+                      ),
+                    ),
                   ],
                 ),
               ),

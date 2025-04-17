@@ -129,6 +129,17 @@ class _MainAppState extends State<MainApp> {
           elevation: WidgetStateProperty.all(0.0),
         ),
 
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 248, 248, 248),
+            // foregroundColor: Colors.white,
+            iconColor: primaryAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          ),
+        ),
         // NavigationBar Theme
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: primaryAppColor,
