@@ -31,7 +31,7 @@ class RouteTitle extends StatelessWidget {
             },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(
-                Theme.of(context).primaryColor.withValues(alpha: 0.5),
+                Theme.of(context).primaryColor.withValues(alpha: 1.0),
               ),
             ),
           ),

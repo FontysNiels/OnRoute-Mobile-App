@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
@@ -101,166 +102,12 @@ class _TripContentState extends State<TripContent> {
                 // TODO: get this out of the same thing as tripInfo, since it loops shit
                 // TODO: make it receive the current POI
                 // TODO: link POIs to map and how close user is to them
-                POI(routeContent: widget.routeContent),
+                POI(routeContent: widget.routeContent.pointsOfInterest[0]),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-}
-
-class POI extends StatelessWidget {
-  final WebMapCollection routeContent;
-  const POI({super.key, required this.routeContent});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Image
-        ImagePOI(poiList: routeContent.pointsOfInterest),
-        // Content
-        BodyPOI(poiList: routeContent.pointsOfInterest),
-      ],
-    );
-  }
-}
-
-class ImagePOI extends StatelessWidget {
-  final List<Poi> poiList;
-  const ImagePOI({super.key, required this.poiList});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 197, 197, 197),
-          ),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Image.asset(
-              'assets/temp.png',
-              height: MediaQuery.of(context).size.height * 0.2,
-            ),
-          ),
-        ),
-        SizedBox(height: 20),
-        Container(
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(255, 197, 197, 197),
-          ),
-          child: AspectRatio(
-            aspectRatio: 16 / 9,
-            child: Image.asset(
-              'assets/temp-vertical.png',
-              height: MediaQuery.of(context).size.height * 0.2,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class BodyPOI extends StatelessWidget {
-  final List<Poi> poiList;
-  const BodyPOI({super.key, required this.poiList});
-  @override
-  Widget build(BuildContext context) {
-
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // title
-          TitlePOI(),
-
-          // FUNCTION TO SHOW BUTTONS OF AVAILABLE CONATCT TYPES
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              children: [
-                ElevatedButton.icon(
-                  onPressed: () async {},
-                  icon: const Icon(Icons.language),
-                  label: Text(
-                    'Website',
-                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                      //TODO: set ElevatedButtonTheme so it works instantly
-                      color: const Color.fromARGB(255, 0, 0, 0),
-                    ),
-                  ),
-                  iconAlignment: IconAlignment.start,
-                  style: ButtonStyle(
-                    // iconColor: WidgetStateProperty.all(const Color.fromARGB(255, 0, 0, 0)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // description
-          DescriptionPOI(),
-        ],
-      ),
-    );
-  }
-}
-
-class DescriptionPOI extends StatelessWidget {
-  const DescriptionPOI({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: Text(
-            'POI beschrijving',
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ),
-
-        // Beschrijving
-        Text(
-          "BeschrijvingBeschrijvingBeschrijvingBeschrijvingBeschrijvingBeschrijving BeschrijvingBeschrijvingBeschrijving Beschrijving",
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
-      ],
-    );
-  }
-}
-
-class TitlePOI extends StatelessWidget {
-  const TitlePOI({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-
-      children: [
-        Text(
-          "TITLE",
-          style: Theme.of(
-            context,
-          ).textTheme.headlineMedium!.copyWith(fontWeight: FontWeight.bold),
-        ),
-        // type
-        Text(
-          "TYPE",
-          style: Theme.of(context).textTheme.bodySmall,
-          // style: Theme.of(context).textTheme.bodySmall!.copyWith(fontStyle: FontStyle.italic),
-        ),
-      ],
     );
   }
 }

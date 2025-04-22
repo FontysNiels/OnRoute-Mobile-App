@@ -72,6 +72,10 @@ Future<String> getServiceAssets(String url, int id) async {
   );
 
   var repsonseAttechments = jsonDecode(response.body);
+
+  if(repsonseAttechments['attachmentInfos'].isEmpty) {
+    return '';
+  }
   var attachments = repsonseAttechments['attachmentInfos'][0]['id'];
 
   String attechmentUrl = "$url/$id/attechments/$attachments";
