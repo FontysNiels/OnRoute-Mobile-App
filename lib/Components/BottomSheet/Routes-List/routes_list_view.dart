@@ -54,7 +54,7 @@ class _RoutesListViewState extends State<RoutesListView> {
 
     if (connectivityResult.contains(ConnectivityResult.mobile) ||
         connectivityResult.contains(ConnectivityResult.wifi)) {
-      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles));
+      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
     }
 
     return allAvailableRoutes;

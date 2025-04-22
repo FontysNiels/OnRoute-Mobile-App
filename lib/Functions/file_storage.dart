@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 // Gets the directory
 Future<String> get _localPath async {
@@ -85,10 +87,6 @@ Future<List> getRouteFolders() async {
 // Read content of one File
 Future<String> readFile(File name) async {
   try {
-    // final path = await _localPath;
-    // final directory = Directory('$path/routes');
-    // final file = File(name);
-
     // Read the file
     return await name.readAsString();
   } catch (e) {

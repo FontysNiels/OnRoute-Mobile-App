@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
@@ -64,7 +66,7 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
 
 // TODO: Rewrite this, so it gets WebMaps, goes trhough the layers and gets the routes and POIs seperatly (maybe make different functions for getting the actial route info, but idk yet)
 // Fetches online routes that are not already downloaded
-Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles) async {
+Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildContext context) async {
   var responseAll = await getAllFromFolder();
   var content = jsonDecode(responseAll.body);
   // List routeIDs = content['items'];
@@ -123,6 +125,11 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles) async {
               poi['attributes']['OBJECTID'],
             );
             poi['attributes']['asset'] = image;
+
+            if (image != '') {
+              final imageProvider = CachedNetworkImageProvider(image);
+              await precacheImage(imageProvider, context);
+            }
 
             Poi parsedPoi = Poi.fromJsonOnline(poi);
             featureLayerPois.add(parsedPoi);
