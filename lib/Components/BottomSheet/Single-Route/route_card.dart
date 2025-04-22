@@ -10,6 +10,7 @@ class RouteCard extends StatelessWidget {
   final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
   final ScrollController scrollController;
+  final Function changesheetsize;
 
   const RouteCard({
     super.key,
@@ -17,6 +18,7 @@ class RouteCard extends StatelessWidget {
     required this.onRouteUpdated, // Pass the callback
     required this.startRoute,
     required this.scrollController,
+    required this.changesheetsize,
   });
 
   @override
@@ -24,7 +26,10 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
-        final result = Navigator.of(context).push(
+        await changesheetsize(0.9);
+        //TODO: Do not make this a navigator push, but a swap of the screen or something....
+        final result = Navigator.push(
+          context,
           MaterialPageRoute(
             builder:
                 (_) => SingleRoute(
@@ -39,8 +44,10 @@ class RouteCard extends StatelessWidget {
         // Trigger the callback if result is true
         if (await result == true) {
           onRouteUpdated();
+          // await changesheetsize(0.4);
         } else {
-          Navigator.of(context).push(
+          Navigator.push(
+            context,
             MaterialPageRoute(
               builder:
                   (_) => TripContent(

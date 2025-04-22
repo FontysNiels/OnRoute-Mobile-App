@@ -1,10 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
 
-class BottomSheetWidget extends StatelessWidget {
+class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
-
   const BottomSheetWidget({super.key, required this.startRoute});
+
+  @override
+  State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
+}
+
+double sheetSize = 0.4;
+
+class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+  late final DraggableScrollableController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void moveSheetTo(double size) async {
+    while (!_controller.isAttached) {
+      await Future.delayed(Duration(milliseconds: 50));
+    }
+
+    _controller.animateTo(
+      size,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+    await Future.delayed(Duration(milliseconds: 300));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +45,8 @@ class BottomSheetWidget extends StatelessWidget {
       children: [
         // Persistent bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.4,
+          controller: _controller,
+          initialChildSize: sheetSize,
           snap: true,
           snapSizes: [0.2, 0.4, 0.6, 0.9],
           minChildSize: 0.2,
@@ -38,7 +72,8 @@ class BottomSheetWidget extends StatelessWidget {
                       builder:
                           (_) => RoutesListView(
                             scrollController: scrollController,
-                            startRoute: startRoute,
+                            startRoute: widget.startRoute,
+                            changesheetsize: moveSheetTo,
                           ),
                     );
                   },

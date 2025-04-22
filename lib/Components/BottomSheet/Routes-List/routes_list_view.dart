@@ -12,11 +12,13 @@ import 'package:onroute_app/Functions/fetch_routes.dart';
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
   final Function startRoute;
+  final Function changesheetsize;
 
   const RoutesListView({
     super.key,
     required this.scrollController,
     required this.startRoute,
+    required this.changesheetsize,
   });
 
   @override
@@ -42,8 +44,6 @@ class _RoutesListViewState extends State<RoutesListView> {
   Future<List<WebMapCollection>> fetchItems() async {
     // List of available routes
     List<File> localFiles = await getRouteFiles();
-
-   
 
     List<WebMapCollection> allAvailableRoutes = [];
 
@@ -92,23 +92,22 @@ class _RoutesListViewState extends State<RoutesListView> {
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } 
-        else if (snapshot.connectionState == ConnectionState.waiting) {
+        // else if (snapshot.connectionState == ConnectionState.none) {
+        //   listItems.add(startupText);
+        //   return ListView(
+        //     padding: const EdgeInsets.all(5),
+        //     controller: widget.scrollController,
+        //     children: listItems,
+        //   );
+        // } 
+        else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           listItems.add(startupText);
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,
             children: listItems,
           );
-        }
-        // else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          // listItems.add(startupText);
-          // return ListView(
-          //   padding: const EdgeInsets.all(5),
-          //   controller: widget.scrollController,
-          //   children: listItems,
-          // );
-        // }
-         else {
+        } else {
           listItems.remove(startupText);
           // Sets snashot.data as a list of AvailableRoutes
           List<WebMapCollection> allItems =
@@ -131,6 +130,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                   onRouteUpdated: _refreshRoutes, // Pass the callback
                   startRoute: widget.startRoute,
                   scrollController: widget.scrollController,
+                  changesheetsize: widget.changesheetsize,
                 );
               }).toList(),
             );
@@ -173,6 +173,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                       onRouteUpdated: _refreshRoutes, // Pass the callback
                       startRoute: widget.startRoute,
                       scrollController: widget.scrollController,
+                      changesheetsize: widget.changesheetsize,
                     );
                   } else {
                     return Container();
