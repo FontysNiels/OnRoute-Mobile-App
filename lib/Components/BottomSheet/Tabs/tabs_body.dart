@@ -5,11 +5,12 @@ import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description
 
 class TabsBody extends StatelessWidget {
   final WebMapCollection currentRoute;
+  final ScrollController scroller;
   const TabsBody({
     super.key,
     required this.selectedIndex,
     required this.routeDescription,
-    required this.currentRoute,
+    required this.currentRoute, required this.scroller,
   });
   final int selectedIndex;
   final String routeDescription;
@@ -25,7 +26,7 @@ class TabsBody extends StatelessWidget {
         physics: NeverScrollableScrollPhysics(),
         itemCount: currentRoute.pointsOfInterest.length,
         itemBuilder: (context, index) {
-          return POICard(currentPoi: currentRoute.pointsOfInterest[index]);
+          return POICard(currentPoi: currentRoute.pointsOfInterest[index], scroller: scroller,);
         },
       ),
 

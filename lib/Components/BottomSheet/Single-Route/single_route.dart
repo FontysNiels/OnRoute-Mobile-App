@@ -78,7 +78,7 @@ class _SingleRouteState extends State<SingleRoute> {
                   selectedIndex: _selectedIndex,
                   routeDescription:
                       widget.routeContent.availableRoute[0].description,
-                  currentRoute: widget.routeContent,
+                  currentRoute: widget.routeContent, scroller: widget.scroller,
                 ),
               ],
             ),

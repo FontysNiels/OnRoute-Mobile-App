@@ -5,7 +5,8 @@ import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 
 class POICard extends StatelessWidget {
   final Poi currentPoi;
-  const POICard({super.key, required this.currentPoi});
+  final ScrollController scroller;
+  const POICard({super.key, required this.currentPoi, required this.scroller});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +24,7 @@ class POICard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 5.0),
                           child: BottomSheetHandle(context: context),
                         ),
-                        POI(key: UniqueKey(), routeContent: currentPoi),
+                        POI(key: UniqueKey(), routeContent: currentPoi, scroller: scroller,),
                       ],
                     ),
                     Align(

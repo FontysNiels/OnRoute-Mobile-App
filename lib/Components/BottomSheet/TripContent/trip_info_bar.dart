@@ -102,7 +102,7 @@ class _TripContentState extends State<TripContent> {
                 // TODO: get this out of the same thing as tripInfo, since it loops shit
                 // TODO: make it receive the current POI
                 // TODO: link POIs to map and how close user is to them
-                POI(routeContent: widget.routeContent.pointsOfInterest[0]),
+                POI(routeContent: widget.routeContent.pointsOfInterest[0], scroller: widget.scroller,),
               ],
             ),
           ),
