@@ -91,14 +91,24 @@ class _RoutesListViewState extends State<RoutesListView> {
 
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        } 
+        else if (snapshot.connectionState == ConnectionState.waiting) {
           listItems.add(startupText);
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,
             children: listItems,
           );
-        } else {
+        }
+        // else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          // listItems.add(startupText);
+          // return ListView(
+          //   padding: const EdgeInsets.all(5),
+          //   controller: widget.scrollController,
+          //   children: listItems,
+          // );
+        // }
+         else {
           listItems.remove(startupText);
           // Sets snashot.data as a list of AvailableRoutes
           List<WebMapCollection> allItems =
