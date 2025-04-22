@@ -3,14 +3,21 @@ import 'dart:math';
 
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
 
 class TripContent extends StatefulWidget {
   final ScrollController scroller;
-  const TripContent({super.key, required this.scroller});
+  final WebMapCollection routeContent;
+  const TripContent({
+    super.key,
+    required this.scroller,
+    required this.routeContent,
+  });
 
   @override
   State<TripContent> createState() => _TripContentState();
@@ -90,7 +97,11 @@ class _TripContentState extends State<TripContent> {
 
                 TripInfoBar(distanceToFinish: distanceToFinish),
 
-                POI(),
+
+                // TODO: get this out of the same thing as tripInfo, since it loops shit
+                // TODO: make it receive the current POI
+                // TODO: link POIs to map and how close user is to them
+                POI(routeContent: widget.routeContent),
               ],
             ),
           ),
@@ -101,23 +112,25 @@ class _TripContentState extends State<TripContent> {
 }
 
 class POI extends StatelessWidget {
-  const POI({super.key});
+  final WebMapCollection routeContent;
+  const POI({super.key, required this.routeContent});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         // Image
-        ImagePOI(),
+        ImagePOI(poiList: routeContent.pointsOfInterest),
         // Content
-        BodyPOI(),
+        BodyPOI(poiList: routeContent.pointsOfInterest),
       ],
     );
   }
 }
 
 class ImagePOI extends StatelessWidget {
-  const ImagePOI({super.key});
+  final List<Poi> poiList;
+  const ImagePOI({super.key, required this.poiList});
 
   @override
   Widget build(BuildContext context) {
@@ -154,10 +167,11 @@ class ImagePOI extends StatelessWidget {
 }
 
 class BodyPOI extends StatelessWidget {
-  const BodyPOI({super.key});
-
+  final List<Poi> poiList;
+  const BodyPOI({super.key, required this.poiList});
   @override
   Widget build(BuildContext context) {
+
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Column(
@@ -184,8 +198,6 @@ class BodyPOI extends StatelessWidget {
                   iconAlignment: IconAlignment.start,
                   style: ButtonStyle(
                     // iconColor: WidgetStateProperty.all(const Color.fromARGB(255, 0, 0, 0)),
-           
-            
                   ),
                 ),
               ],

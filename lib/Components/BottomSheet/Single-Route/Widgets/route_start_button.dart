@@ -21,7 +21,7 @@ class RouteStartButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FilledButton.icon(
         onPressed: () async {
-          var storedFile = jsonDecode(await readRouteFile(File(routeContent.routeID)));
+          var storedFile = jsonDecode(await readFile(File(routeContent.routeID)));
           RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
           startRoute(routeInfo);
           // await addGraphics(routeContent.routeLayer);

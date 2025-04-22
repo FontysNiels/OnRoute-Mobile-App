@@ -83,7 +83,7 @@ Future<List> getRouteFolders() async {
 }
 
 // Read content of one File
-Future<String> readRouteFile(File name) async {
+Future<String> readFile(File name) async {
   try {
     // final path = await _localPath;
     // final directory = Directory('$path/routes');

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/poi.dart';
 
 class POICard extends StatelessWidget {
-  const POICard({super.key});
+  final Poi currentPoi;
+  const POICard({super.key, required this.currentPoi});
 
   @override
   Widget build(BuildContext context) {
@@ -11,10 +13,7 @@ class POICard extends StatelessWidget {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -37,7 +36,7 @@ class POICard extends StatelessWidget {
                         Text(
                           style: Theme.of(context).textTheme.bodyLarge,
                           // 2 lines van maken? Titels zijn vrij lang
-                          "POI Titel",
+                          currentPoi.title,
                           overflow: TextOverflow.ellipsis,
                         ),
                         Text(
@@ -48,25 +47,25 @@ class POICard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(right: 6.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      // Handle the tap event here
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(
-                      //     builder: (context) => POI(),
-                      //   ),
-                      // );
-                    },
-                    child: Text(
-                      "Bekijken",
-                      style: Theme.of(context).textTheme.labelLarge,
-                      textAlign: TextAlign.end,
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(right: 6.0),
+                //   child: GestureDetector(
+                //     onTap: () {
+                //       // Handle the tap event here
+                //       // Navigator.push(
+                //       //   context,
+                //       //   MaterialPageRoute(
+                //       //     builder: (context) => POI(),
+                //       //   ),
+                //       // );
+                //     },
+                //     child: Text(
+                //       "Bekijken",
+                //       style: Theme.of(context).textTheme.labelLarge,
+                //       textAlign: TextAlign.end,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),

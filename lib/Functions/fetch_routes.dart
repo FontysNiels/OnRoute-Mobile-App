@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 import 'package:http/http.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
@@ -9,32 +8,41 @@ import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
-// Fetches local routes that are already downloaded
+// Fetches local ROUTES ONLY, NO PACKAGES that are already downloaded
 Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
-  // WebMapCollection
-
   List<dynamic> localFilesWithFolders = await getRouteFolders();
 
-  List<File> localFiles =
+  // TODO: make it so when a package is downlaoded it doesnt show the package, but all the seperate routes.
+  // Possibly already doing so....
+
+  List<File> localRouteFiles =
       localFilesWithFolders
           .whereType<Map<String, dynamic>>()
           .expand((package) => package['package']['files'])
           .whereType<File>()
-          .where((file) => file.path.endsWith('.json'))
           .where((file) => file.path.contains('route-'))
+          .where((file) => file.path.endsWith('.json'))
           .toList();
-
-  // print(localFiles);
 
   List<WebMapCollection> webMapCollectionList = [];
   // Add all the local files to the list
-  for (var file in localFiles) {
-    var storedFile = jsonDecode(await readRouteFile(file));
+  for (var file in localRouteFiles) {
+    var storedFile = jsonDecode(await readFile(file));
     RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
     var webMapId = file.path.split('/')[file.path.split('/').length - 2];
+    var poiPath = file.path.replaceAll(
+      RegExp(r'route-[a-f0-9]{32}\.json$'),
+      'pois-$webMapId.json',
+    );
+
+    var poiJSON = jsonDecode(await readFile(File(poiPath)));
+    List<Poi> featureLayerPois = [];
+    for (var element in poiJSON['points']) {
+      featureLayerPois.add(Poi.fromJsonLocal(element));
+    }
 
     WebMapCollection webMapCollection = WebMapCollection(
-      pointsOfInterest: [],
+      pointsOfInterest: featureLayerPois,
       availableRoute: [
         AvailableRoutes(
           routeID: file.path,
@@ -116,7 +124,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles) async {
             );
             poi['attributes']['asset'] = image;
 
-            Poi parsedPoi = Poi.fromJson(poi);
+            Poi parsedPoi = Poi.fromJsonOnline(poi);
             featureLayerPois.add(parsedPoi);
           }
           webMapCollection.pointsOfInterest.addAll(featureLayerPois);

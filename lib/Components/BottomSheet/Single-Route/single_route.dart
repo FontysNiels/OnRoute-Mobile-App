@@ -65,9 +65,7 @@ class _SingleRouteState extends State<SingleRoute> {
 
                 // Download Button
                 !widget.routeContent.locally
-                    ? RouteDownloadButton(
-                      currentRoute: widget.routeContent,
-                    )
+                    ? RouteDownloadButton(currentRoute: widget.routeContent)
                     : RouteStartButton(
                       routeContent: widget.routeContent.availableRoute[0],
                       startRoute: widget.startRoute,
@@ -78,7 +76,9 @@ class _SingleRouteState extends State<SingleRoute> {
                 // // Body of tabs
                 TabsBody(
                   selectedIndex: _selectedIndex,
-                  routeDescription: widget.routeContent.availableRoute[0].description,
+                  routeDescription:
+                      widget.routeContent.availableRoute[0].description,
+                  currentRoute: widget.routeContent,
                 ),
               ],
             ),

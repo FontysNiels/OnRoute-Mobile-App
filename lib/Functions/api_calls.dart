@@ -34,12 +34,11 @@ Future<http.Response> getRouteInfo(String routeID) async {
 // Gets all files in a folder
 Future<http.Response> getAllFromFolder() async {
   var tokenResponse = await generateToken();
-  // var generatedToken = jsonDecode(tokenResponse.body)['token'];
+  var generatedToken = jsonDecode(tokenResponse.body)['token'];
   final response = await http.get(
     Uri.parse(
       // 'https://gisportal.bragis.nl/arcgis/sharing/rest/content/users/bragis_stagiair/c792879e301c4fdd94dcf6cbf4874bc5?f=pjson&token=$routeID',
-      // 'https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken',
-      'https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=mzFcMRqhxzPAoRJavp2MJlMrYq1jabTz5r9h3SQq0znTBAlU0eCdHmw5qrJ9SsjDCr4Ft0SzLNZvDH0ErfeLClF45YAxUUz9DmbxVdK_odC4HqQL1TS7X4GqiZgekw6ieCimAG-u-NGbfT9rFzA3l_uVcbYW1z-8gadjpo6mFKQ'
+      'https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken',
     ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',

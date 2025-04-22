@@ -145,6 +145,7 @@ class _RoutesListViewState extends State<RoutesListView> {
           // Add the online items section
           listItems.add(const ListDivider(text: 'Niet Gedownloade Routes'));
           // TODO: Not container, remove earlier
+          // TODO: Add something for when everything is downloaded
           if (onlineItems.isNotEmpty) {
             listItems.addAll(
               onlineItems.map((item) {

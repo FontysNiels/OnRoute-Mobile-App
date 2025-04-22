@@ -50,7 +50,7 @@ class _RoutePackageState extends State<RoutePackage> {
           const PackageDownloadButton(),
           // Tabs
           // Make one for Routes, or make it dynamic?
-          PackageTabs(setIndex: setIndex, isPackage: true),
+          // PackageTabs(setIndex: setIndex, isPackage: true),
           // Body of tabs
           // TabsBody(selectedIndex: _selectedIndex),
         ],

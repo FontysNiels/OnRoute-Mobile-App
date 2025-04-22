@@ -46,6 +46,7 @@ class RouteCard extends StatelessWidget {
                   (_) => TripContent(
                     key: UniqueKey(),
                     scroller: scrollController,
+                    routeContent: routeContent,
                   ),
             ),
           );
