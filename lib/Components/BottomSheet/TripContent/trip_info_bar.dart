@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
@@ -27,8 +26,56 @@ class TripContent extends StatefulWidget {
 String distanceToFinish = "0.0";
 
 class _TripContentState extends State<TripContent> {
+  @override
+  Widget build(BuildContext context) {
+    int currentPoiInt = getcurrentPOI();
+    var test = widget.routeContent.pointsOfInterest.where(
+      (element) => element.objectId == currentPoiInt,
+    );
+    Poi? currentPoi = test.isNotEmpty ? test.first : null;
+
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            controller: widget.scroller,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: BottomSheetHandle(context: context),
+                ),
+
+                TripInfoBar(distanceToFinish: distanceToFinish),
+
+                // TODO: link POIs to map and how close user is to them
+                currentPoi != null
+                    ? POI(routeContent: currentPoi, scroller: widget.scroller)
+                    : Container(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TripInfoBar extends StatefulWidget {
+  const TripInfoBar({super.key, required this.distanceToFinish});
+  final String distanceToFinish;
+
+  @override
+  State<TripInfoBar> createState() => _TripInfoBarState();
+}
+
+class _TripInfoBarState extends State<TripInfoBar> {
   ArcGISMapViewController controller = getMapViewController();
   late StreamSubscription<ArcGISLocation> subscription;
+
   @override
   void dispose() {
     // controller.locationDisplay.onLocationChanged.drain();
@@ -81,111 +128,83 @@ class _TripContentState extends State<TripContent> {
 
   @override
   Widget build(BuildContext context) {
-    return MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      child: Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            controller: widget.scroller,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: BottomSheetHandle(context: context),
-                ),
-
-                TripInfoBar(distanceToFinish: distanceToFinish),
-
-
-                // TODO: get this out of the same thing as tripInfo, since it loops shit
-                // TODO: make it receive the current POI
-                // TODO: link POIs to map and how close user is to them
-                POI(routeContent: widget.routeContent.pointsOfInterest[0], scroller: widget.scroller,),
-              ],
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 28,
+        children: [
+          // Next POI
+          Column(
+            spacing: 4,
+            children: [
+              Text(
+                "Volgende POI",
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "120",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text("m", style: Theme.of(context).textTheme.labelMedium),
+                ],
+              ),
+            ],
           ),
-        ),
+          // Tripteller
+          Column(
+            spacing: 4,
+            children: [
+              Text(
+                "Tripteller",
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "1,8",
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text("km", style: Theme.of(context).textTheme.labelMedium),
+                ],
+              ),
+            ],
+          ),
+          // Bestemming Distance
+          Column(
+            spacing: 4,
+            children: [
+              Text(
+                "Bestemming",
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.distanceToFinish,
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    double.parse(widget.distanceToFinish) > 999 ? "km" : "m",
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
-    );
-  }
-}
-
-class TripInfoBar extends StatelessWidget {
-  const TripInfoBar({super.key, required this.distanceToFinish});
-  final String distanceToFinish;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      spacing: 28,
-      children: [
-        // Next POI
-        Column(
-          spacing: 4,
-          children: [
-            Text(
-              "Volgende POI",
-              style: Theme.of(context).textTheme.labelMedium,
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "120",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text("m", style: Theme.of(context).textTheme.labelMedium),
-              ],
-            ),
-          ],
-        ),
-        // Tripteller
-        Column(
-          spacing: 4,
-          children: [
-            Text("Tripteller", style: Theme.of(context).textTheme.labelMedium),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "1,8",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text("km", style: Theme.of(context).textTheme.labelMedium),
-              ],
-            ),
-          ],
-        ),
-        // Bestemming Distance
-        Column(
-          spacing: 4,
-          children: [
-            Text("Bestemming", style: Theme.of(context).textTheme.labelMedium),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  distanceToFinish,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  double.parse(distanceToFinish) > 999 ? "km" : "m",
-                  style: Theme.of(context).textTheme.labelMedium,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

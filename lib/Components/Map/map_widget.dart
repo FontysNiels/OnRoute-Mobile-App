@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -10,11 +11,13 @@ class MapWidget extends StatefulWidget {
   final ArcGISMapViewController mapViewController;
   final GraphicsOverlay graphicsOverlay;
   final List<DescriptionPoint> directionsList;
+  final Function selectPoi;
   const MapWidget({
     super.key,
     required this.mapViewController,
     required this.graphicsOverlay,
     required this.directionsList,
+    required this.selectPoi,
   });
 
   @override
@@ -68,6 +71,21 @@ class _MapWidgetState extends State<MapWidget> {
                     key: _mapViewKey, // Use the GlobalKey here
                     controllerProvider: () => _mapViewController,
                     onMapViewReady: onMapViewReady,
+                    onTap: (Offset screenPoint) async {
+                      final result = await _mapViewController
+                          .identifyGraphicsOverlay(
+                            _graphicsOverlay,
+                            screenPoint: screenPoint,
+                            tolerance: 10.0, // tolerance in screen points
+                          );
+
+                      if (result.graphics.isNotEmpty) {
+                        final tappedGraphic = result.graphics.first;
+                        // print(tappedGraphic.attributes);
+                        widget.selectPoi(tappedGraphic.attributes['objectId'].toInt());
+                        // Maybe show a dialog or highlight it
+                      }
+                    },
                   ),
                 ),
               ],

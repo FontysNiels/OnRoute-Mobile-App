@@ -48,8 +48,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           controller: _controller,
           initialChildSize: sheetSize,
           snap: true,
-          snapSizes: [0.2, 0.4, 0.6, 0.9],
-          minChildSize: 0.2,
+          // snapSizes: [0.2, 0.4, 0.6, 0.9],
+          // minChildSize: 0.2,
+          // During route:
+          snapSizes: [0.15, 0.5, 0.9],
+          minChildSize: 0.15,
           maxChildSize: 0.9,
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(

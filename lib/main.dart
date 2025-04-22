@@ -1,6 +1,7 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
@@ -51,19 +52,30 @@ ArcGISMapViewController getMapViewController() {
   return _mapViewController;
 }
 
-// Future<void> addGraphics(RouteLayerData route) async {
-//   _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
-// }
+int currenPOI = 0;
+
+int getcurrentPOI() {
+  // print('Current POI: ${currenPOI.title}');
+  return currenPOI;
+}
 
 class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     initialize();
+
     super.initState();
   }
 
-  Future<void> _startRoute(RouteLayerData route) async {
+  void selectPoi(int selectedPoiObjectId) {
+    setState(() {
+      currenPOI = selectedPoiObjectId;
+    });
+  }
+
+  Future<void> _startRoute(RouteLayerData route, List<Poi> pois) async {
     _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
+    _graphicsOverlay.graphics.addAll(generatePoiGraphics(pois));
 
     List<DescriptionPoint> routeDirections = [];
 
@@ -105,7 +117,7 @@ class _MainAppState extends State<MainApp> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     print('Screen width: $screenWidth, Screen height: $screenHeight');
-
+  
     return MaterialApp(
       // theme: AppTheme,
       debugShowCheckedModeBanner: false,
@@ -175,7 +187,7 @@ class _MainAppState extends State<MainApp> {
             MapWidget(
               mapViewController: _mapViewController,
               graphicsOverlay: _graphicsOverlay,
-              directionsList: _directionsList,
+              directionsList: _directionsList, selectPoi: selectPoi,
             ),
             _directionsList.isNotEmpty
                 ? DirectionsCard(
@@ -196,6 +208,7 @@ class _MainAppState extends State<MainApp> {
                       setState(() {
                         _directionsList.clear();
                         _graphicsOverlay.graphics.clear();
+                        currenPOI = 0;
                       });
                     },
                   ),
