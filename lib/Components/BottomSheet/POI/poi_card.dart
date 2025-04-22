@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 
 class POICard extends StatelessWidget {
   final Poi currentPoi;
@@ -14,10 +15,37 @@ class POICard extends StatelessWidget {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder:
-                (_) => POI(
-                  key: UniqueKey(),
-                  routeContent: currentPoi,
-                
+                (_) => Stack(
+                  children: [
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: BottomSheetHandle(context: context),
+                        ),
+                        POI(key: UniqueKey(), routeContent: currentPoi),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 12, top: 22),
+                        child: IconButton.filled(
+                          icon: Icon(Icons.close),
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                              Theme.of(
+                                context,
+                              ).primaryColor.withValues(alpha: 1.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
           ),
         );

@@ -13,10 +13,7 @@ class POI extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: BottomSheetHandle(context: context),
-        ),
+        
 
         // Image
         ImagePOI(poiList: routeContent),
