@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 class RouteStartButton extends StatelessWidget {
@@ -32,6 +33,8 @@ class RouteStartButton extends StatelessWidget {
           RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
           startRoute(routeInfo, routeContent.pointsOfInterest);
           // await addGraphics(routeContent.routeLayer);
+          await moveSheetTo(0.15);
+
           setSheetWidget(
             TripContent(
               key: UniqueKey(),

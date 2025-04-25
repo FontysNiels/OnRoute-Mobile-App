@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class RouteTitle extends StatelessWidget {
   final String title;
@@ -31,7 +32,8 @@ class RouteTitle extends StatelessWidget {
           padding: const EdgeInsets.only(left: 16, right: 16, top: 6),
           child: IconButton.filled(
             icon: Icon(Icons.close),
-            onPressed: () {
+            onPressed: () async {
+              await moveSheetTo(0.5);
               setSheetWidget(null, false);
             },
             style: ButtonStyle(

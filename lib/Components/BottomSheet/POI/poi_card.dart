@@ -4,6 +4,7 @@ import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class POICard extends StatelessWidget {
   final Poi currentPoi;
@@ -23,6 +24,7 @@ class POICard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
+        await moveSheetTo(0.9);
         setSheetWidget(
           Stack(
             children: [
@@ -45,7 +47,7 @@ class POICard extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 12, top: 22),
                   child: IconButton.filled(
                     icon: Icon(Icons.close),
-                    onPressed: () {
+                    onPressed: () async {
                       setSheetWidget(null, false);
                     },
                     style: ButtonStyle(
@@ -58,7 +60,7 @@ class POICard extends StatelessWidget {
               ),
             ],
           ),
-          false
+          false,
         );
 
         // Trigger the callback if result is true

@@ -4,13 +4,13 @@ import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class RouteCard extends StatelessWidget {
   final WebMapCollection routeContent;
   // final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
   final ScrollController scrollController;
-  final Function changesheetsize;
   final Function setSheetWidget;
 
   const RouteCard({
@@ -19,7 +19,6 @@ class RouteCard extends StatelessWidget {
     // required this.onRouteUpdated, // Pass the callback
     required this.startRoute,
     required this.scrollController,
-    required this.changesheetsize,
     required this.setSheetWidget,
   });
 
@@ -28,7 +27,9 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
-        await changesheetsize(0.9);
+        // await changesheetsize(0.9);
+
+        await moveSheetTo(0.9);
         //TODO: Do not make this a navigator push, but a swap of the screen or something....
         setSheetWidget(
           SingleRoute(

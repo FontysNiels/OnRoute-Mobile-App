@@ -135,7 +135,6 @@ class _RoutesListViewState extends State<RoutesListView> {
                   // onRouteUpdated: _refreshRoutes, // Pass the callback
                   startRoute: widget.startRoute,
                   scrollController: widget.scrollController,
-                  changesheetsize: widget.changesheetsize,
                   setSheetWidget: widget.setSheetWidget,
                 );
               }).toList(),
@@ -179,7 +178,6 @@ class _RoutesListViewState extends State<RoutesListView> {
                       // onRouteUpdated: _refreshRoutes, // Pass the callback
                       startRoute: widget.startRoute,
                       scrollController: widget.scrollController,
-                      changesheetsize: widget.changesheetsize,
                       setSheetWidget: widget.setSheetWidget,
                     );
                   } else {

@@ -16,23 +16,44 @@ class BottomSheetWidget extends StatefulWidget {
   State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
 }
 
-double sheetSize = 0.4;
-
+// Current POI number
 int currentPOI = 0;
 int getcurrentPOI() {
-  // print('Current POI: ${currenPOI.title}');
   return currenPOI;
 }
 
+/// Scroll controller for the bottom sheet
 final ScrollController scrollController = ScrollController();
+
+// List of available routes
 late Future<List<WebMapCollection>> _futureRoutes;
 Future<List<WebMapCollection>> getRoutes() {
   return _futureRoutes;
 }
 
+// Sheet controller
+late final DraggableScrollableController _controller;
+// Sheet size
+double sheetSize = 0.4;
+// Sheet size animator
+// TODO: vaste maten maken, ipv variable double
+Future<void> moveSheetTo(double size) async {
+  while (!_controller.isAttached) {
+    await Future.delayed(Duration(milliseconds: 50));
+  }
+  _controller.animateTo(
+    size,
+    duration: Duration(milliseconds: 300),
+    curve: Curves.easeInOut,
+  );
+  await Future.delayed(Duration(milliseconds: 300));
+}
+
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
-  late final DraggableScrollableController _controller;
+  // List of all the widgets in the bottom sheet
   List<Widget> bottomSheetWidgets = [];
+
+  // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
     List<File> localFiles = await getRouteFiles();
     List<WebMapCollection> futureRoutes = await _futureRoutes;
@@ -88,19 +109,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void moveSheetTo(double size) async {
-    while (!_controller.isAttached) {
-      await Future.delayed(Duration(milliseconds: 50));
-    }
-
-    _controller.animateTo(
-      size,
-      duration: Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-    await Future.delayed(Duration(milliseconds: 300));
   }
 
   // TODO: refreshing this doesnt refresh widgets list (ofc), so the check for poi is broken
