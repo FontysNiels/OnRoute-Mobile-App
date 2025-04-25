@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
-import 'package:onroute_app/Classes/poi.dart';
-import 'package:onroute_app/Functions/file_storage.dart';
-import 'package:path_provider/path_provider.dart';
 
 class MapWidget extends StatefulWidget {
   final ArcGISMapViewController mapViewController;
@@ -46,14 +42,14 @@ class _MapWidgetState extends State<MapWidget> {
   // A flag for when the map view is ready and controls can be used.
   var _ready = false;
   // A flag for when the settings bottom sheet is visible.
-  var _settingsVisible = false;
+  // var _settingsVisible = false;
   // Create the system location data source.
   final _locationDataSource = SystemLocationDataSource();
   // A subscription to receive status changes of the location data source.
-  StreamSubscription? _statusSubscription;
-  var _status = LocationDataSourceStatus.stopped;
+  // StreamSubscription? _statusSubscription;
+  // var _status = LocationDataSourceStatus.stopped;
   // A subscription to receive changes to the auto-pan mode.
-  StreamSubscription? _autoPanModeSubscription;
+  // StreamSubscription? _autoPanModeSubscription;
   // var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
 
   @override
@@ -82,7 +78,9 @@ class _MapWidgetState extends State<MapWidget> {
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
                         // print(tappedGraphic.attributes);
-                        widget.selectPoi(tappedGraphic.attributes['objectId'].toInt());
+                        widget.selectPoi(
+                          tappedGraphic.attributes['objectId'].toInt(),
+                        );
                         // Maybe show a dialog or highlight it
                       }
                     },

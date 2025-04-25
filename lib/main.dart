@@ -1,21 +1,15 @@
-import 'dart:io';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
-import 'package:onroute_app/tesmap.dart';
-import 'package:onroute_app/theme.dart';
+// import 'package:onroute_app/theme.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -57,15 +51,9 @@ RouteLayerData getRouteInfo() {
   return _routeInfo;
 }
 
-
-
+// currentPOI is the current point of interest (POI) that is selected by the user
+// This is purely used for the POI that the user clicked on, so it can be passed from MapWidget to TripInfoBar
 int currenPOI = 0;
-// int getcurrentPOI() {
-//   // print('Current POI: ${currenPOI.title}');
-//   return currenPOI;
-// }
-
-
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -109,10 +97,6 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
-  void setRouteInfo(RouteLayerData route) {}
-
-  // int currentPageIndex = 1;
-  int currentPageIndex = 0;
   @override
   Widget build(BuildContext context) {
     const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
@@ -120,10 +104,10 @@ class _MainAppState extends State<MainApp> {
     const Color navigationIcons = Color.fromARGB(255, 48, 48, 48);
     const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
+    // final double screenWidth = MediaQuery.of(context).size.width;
+    // final double screenHeight = MediaQuery.of(context).size.height;
 
-    print('Screen width: $screenWidth, Screen height: $screenHeight');
+    // print('Screen width: $screenWidth, Screen height: $screenHeight');
 
     return MaterialApp(
       // theme: AppTheme,
@@ -227,7 +211,7 @@ class _MainAppState extends State<MainApp> {
             Padding(
               padding: const EdgeInsets.all(128.0),
               child: Align(
-                alignment: Alignment.centerLeft  ,
+                alignment: Alignment.centerLeft,
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [

@@ -3,12 +3,11 @@ import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/description_poi.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/image_poi.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/title_poi.dart';
-import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 
 class POI extends StatelessWidget {
   final Poi routeContent;
   final ScrollController scroller;
-  
+
   const POI({super.key, required this.routeContent, required this.scroller});
 
   @override

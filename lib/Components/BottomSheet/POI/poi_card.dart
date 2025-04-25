@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
-import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 

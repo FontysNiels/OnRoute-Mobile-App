@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
-import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
-import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class RouteCard extends StatelessWidget {
@@ -38,7 +36,8 @@ class RouteCard extends StatelessWidget {
             startRoute: startRoute,
             scroller: scrollController,
             setSheetWidget: setSheetWidget,
-          ), false
+          ),
+          false,
         );
       },
       child: Card(
@@ -98,7 +97,6 @@ class RouteCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Divider()
           ],
         ),
       ),

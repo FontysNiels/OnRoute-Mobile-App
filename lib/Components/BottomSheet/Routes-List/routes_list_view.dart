@@ -1,15 +1,9 @@
-import 'dart:io';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
-import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
-import 'package:onroute_app/Functions/file_storage.dart';
-import 'package:onroute_app/Functions/fetch_routes.dart';
-import 'package:onroute_app/main.dart';
 
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
@@ -37,32 +31,6 @@ class _RoutesListViewState extends State<RoutesListView> {
     super.initState();
     _futureRoutes = getRoutes();
   }
-
-  // void _refreshRoutes() {
-  //   // TODO: make this refresh the list of which ones local (and remove the online ones, no need to make more API calls)
-  //   setState(() {
-  //     _futureRoutes = fetchItems();
-  //   });
-  // }
-
-  // Future<List<WebMapCollection>> fetchItems() async {
-  //   // List of available routes
-  //   List<File> localFiles = await getRouteFiles();
-
-  //   List<WebMapCollection> allAvailableRoutes = [];
-
-  //   allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
-
-  //   final List<ConnectivityResult> connectivityResult =
-  //       await (Connectivity().checkConnectivity());
-
-  //   if (connectivityResult.contains(ConnectivityResult.mobile) ||
-  //       connectivityResult.contains(ConnectivityResult.wifi)) {
-  //     allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
-  //   }
-
-  //   return allAvailableRoutes;
-  // }
 
   @override
   Widget build(BuildContext context) {
