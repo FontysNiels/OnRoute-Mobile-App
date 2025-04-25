@@ -74,6 +74,8 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
   List filteredRouteIDs = content['items'];
 
   //TODO: remake filter already downloaded routes, for new format
+  // it now always gets and converts the routes, even if they are already downloaded
+
 
   // // Extract file names from files
   // final existingIDs =

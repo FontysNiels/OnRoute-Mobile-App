@@ -111,15 +111,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     super.dispose();
   }
 
-  // TODO: refreshing this doesnt refresh widgets list (ofc), so the check for poi is broken
-  // the check on download also needs to be fixed.
   @override
   Widget build(BuildContext context) {
     int currentPoiInt = getcurrentPOI();
-    // var test = widget.routeContent.pointsOfInterest.where(
-    //   (element) => element.objectId == currentPoiInt,
-    // );
-    // Poi? currentPoi = test.isNotEmpty ? test.first : null;
     if (currentPoiInt != currentPOI) {
       setState(() {
         currentPOI = currentPoiInt;
@@ -132,11 +126,16 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           controller: _controller,
           initialChildSize: sheetSize,
           snap: true,
+          // TODO: bespreken hoe of wat
           // snapSizes: [0.2, 0.4, 0.6, 0.9],
           // minChildSize: 0.2,
           // During route:
-          snapSizes: [0.15, 0.5, 0.9],
-          minChildSize: 0.15,
+          // snapSizes: [0.15, 0.5, 0.9],
+          snapSizes:
+              bottomSheetWidgets.length > 1
+                  ? [0.15, 0.5, 0.9]
+                  : [0.3, 0.5, 0.9],
+          minChildSize: bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {
             if (bottomSheetWidgets.isEmpty) {

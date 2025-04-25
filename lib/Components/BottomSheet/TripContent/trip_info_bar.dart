@@ -97,13 +97,19 @@ class _TripContentState extends State<TripContent> {
   @override
   Widget build(BuildContext context) {
     int newCurrentPoiInt = getcurrentPOI();
-
+    
     if (newCurrentPoiInt != currentPoiInt) {
+      currentPoiInt = newCurrentPoiInt;
+
       var poiFromList = widget.routeContent.pointsOfInterest.where(
         (element) => element.objectId == currentPoiInt,
       );
-      currentPoi = poiFromList.isNotEmpty ? poiFromList.first : null;
-      currentPoiInt = newCurrentPoiInt;
+
+      if (newCurrentPoiInt == 0) {
+        currentPoi = null;
+      } else {
+        currentPoi = poiFromList.isNotEmpty ? poiFromList.first : null;
+      }
     }
 
     return MediaQuery.removePadding(

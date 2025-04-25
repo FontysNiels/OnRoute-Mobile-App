@@ -28,7 +28,6 @@ class RouteCard extends StatelessWidget {
         // await changesheetsize(0.9);
 
         await moveSheetTo(0.9);
-        //TODO: Do not make this a navigator push, but a swap of the screen or something....
         setSheetWidget(
           SingleRoute(
             key: UniqueKey(),

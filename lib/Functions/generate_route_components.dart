@@ -53,8 +53,8 @@ List<Graphic> generatePoiGraphics(List<Poi> routeInfo) {
         Graphic(
           geometry: startPoint,
           symbol: routeStartCircleSymbol,
-          attributes: element.toJson(),
-        ), // Add attributes to the graphic
+          attributes: {'objectId': element.objectId},
+        ),
       );
     }
   }
