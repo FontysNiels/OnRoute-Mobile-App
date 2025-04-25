@@ -8,16 +8,19 @@ import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_st
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_title.dart';
 import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class SingleRoute extends StatefulWidget {
   final WebMapCollection routeContent;
   final Function startRoute;
   final ScrollController scroller;
+  final Function setSheetWidget;
   const SingleRoute({
     super.key,
     required this.routeContent,
     required this.startRoute,
     required this.scroller,
+    required this.setSheetWidget,
   });
 
   @override
@@ -55,7 +58,10 @@ class _SingleRouteState extends State<SingleRoute> {
                   child: BottomSheetHandle(context: context),
                 ),
                 // Title
-                RouteTitle(title: widget.routeContent.availableRoute[0].title),
+                RouteTitle(
+                  title: widget.routeContent.availableRoute[0].title,
+                  setSheetWidget: widget.setSheetWidget,
+                ),
 
                 // Images (PACKAGE ONLY)
                 PackegImagePreview(
@@ -65,10 +71,16 @@ class _SingleRouteState extends State<SingleRoute> {
 
                 // Download Button
                 !widget.routeContent.locally
-                    ? RouteDownloadButton(currentRoute: widget.routeContent)
+                    ? RouteDownloadButton(
+                      currentRoute: widget.routeContent,
+                      setSheetWidget: widget.setSheetWidget,
+                      
+                    )
                     : RouteStartButton(
                       routeContent: widget.routeContent,
                       startRoute: widget.startRoute,
+                      setSheetWidget: widget.setSheetWidget,
+                      scroller: widget.scroller,
                     ),
                 // Tabs
                 // Make one for Routes, or make it dynamic?
@@ -78,7 +90,9 @@ class _SingleRouteState extends State<SingleRoute> {
                   selectedIndex: _selectedIndex,
                   routeDescription:
                       widget.routeContent.availableRoute[0].description,
-                  currentRoute: widget.routeContent, scroller: widget.scroller,
+                  currentRoute: widget.routeContent,
+                  scroller: widget.scroller,
+                  setSheetWidget: widget.setSheetWidget,
                 ),
               ],
             ),

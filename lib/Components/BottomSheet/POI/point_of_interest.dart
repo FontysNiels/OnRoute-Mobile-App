@@ -8,6 +8,7 @@ import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 class POI extends StatelessWidget {
   final Poi routeContent;
   final ScrollController scroller;
+  
   const POI({super.key, required this.routeContent, required this.scroller});
 
   @override

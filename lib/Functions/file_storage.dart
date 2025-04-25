@@ -27,6 +27,20 @@ Future<File> writeFile(String content, String name, String folder) async {
   return file.writeAsString('$content');
 }
 
+Future<void> deleteAllSavedFiles() async {
+  try {
+    final path = await _localPath;
+    final directory = Directory('$path/routes');
+
+    if (await directory.exists()) {
+      await directory.delete(recursive: true);
+    }
+  } catch (e) {
+    // Handle any errors if needed
+    print('Error deleting files: $e');
+  }
+}
+
 // Get all files
 Future<List<File>> getRouteFiles() async {
   try {

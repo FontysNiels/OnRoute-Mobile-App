@@ -7,16 +7,19 @@ import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
 
 class TripContent extends StatefulWidget {
   final ScrollController scroller;
   final WebMapCollection routeContent;
+  final Function setSheetWidget;
   const TripContent({
     super.key,
     required this.scroller,
     required this.routeContent,
+    required this.setSheetWidget,
   });
 
   @override
@@ -24,55 +27,10 @@ class TripContent extends StatefulWidget {
 }
 
 String distanceToFinish = "0.0";
+Poi? currentPoi;
+int currentPoiInt = 0;
 
 class _TripContentState extends State<TripContent> {
-  @override
-  Widget build(BuildContext context) {
-    int currentPoiInt = getcurrentPOI();
-    var test = widget.routeContent.pointsOfInterest.where(
-      (element) => element.objectId == currentPoiInt,
-    );
-    Poi? currentPoi = test.isNotEmpty ? test.first : null;
-
-    return MediaQuery.removePadding(
-      context: context,
-      removeTop: true,
-      child: Scaffold(
-        body: SafeArea(
-          child: SingleChildScrollView(
-            controller: widget.scroller,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: BottomSheetHandle(context: context),
-                ),
-
-                TripInfoBar(distanceToFinish: distanceToFinish),
-
-                // TODO: link POIs to map and how close user is to them
-                currentPoi != null
-                    ? POI(routeContent: currentPoi, scroller: widget.scroller)
-                    : Container(),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class TripInfoBar extends StatefulWidget {
-  const TripInfoBar({super.key, required this.distanceToFinish});
-  final String distanceToFinish;
-
-  @override
-  State<TripInfoBar> createState() => _TripInfoBarState();
-}
-
-class _TripInfoBarState extends State<TripInfoBar> {
   ArcGISMapViewController controller = getMapViewController();
   late StreamSubscription<ArcGISLocation> subscription;
 
@@ -92,40 +50,108 @@ class _TripInfoBarState extends State<TripInfoBar> {
   void calculateDistances() {
     List<DescriptionPoint> directions = getDirectionList();
     if (directions.isEmpty) {
-      Navigator.pop(context, false);
+      // This is just a check for the start, it shouldn't happen, but just in case
+      widget.setSheetWidget(null, false);
     } else if (directions.isNotEmpty) {
       // TODO: Make this calculate (totaldistance - distance traveled (points length) & distance traveled to current point = bestemming)
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) {
-        final userPosition = controller.locationDisplay.location!.position;
+        directions = getDirectionList();
+        if (directions.isEmpty) {
+          widget.setSheetWidget(null, false);
+        } else {
+          final userPosition = controller.locationDisplay.location!.position;
 
-        final directionPointXY = convertToLatLng(
-          directions.last.x,
-          directions.last.y,
-        );
-        final directionPointX = directionPointXY[1];
-        final directionPointY = directionPointXY[0];
+          final directionPointXY = convertToLatLng(
+            directions.last.x,
+            directions.last.y,
+          );
+          final directionPointX = directionPointXY[1];
+          final directionPointY = directionPointXY[0];
 
-        final distanceToDirectionPoint = sqrt(
-          pow(userPosition.y - directionPointY, 2) +
-              pow(userPosition.x - directionPointX, 2),
-        );
+          final distanceToDirectionPoint = sqrt(
+            pow(userPosition.y - directionPointY, 2) +
+                pow(userPosition.x - directionPointX, 2),
+          );
 
-        const metersPerDegree = 111320; // Approximation for latitude
-        final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-        // print(distanceInMeters);
-        setState(() {
-          if (distanceInMeters >= 1000) {
-            distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
-          } else {
-            distanceToFinish = distanceInMeters.toStringAsFixed(0);
+          const metersPerDegree = 111320; // Approximation for latitude
+          final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
+          // print(distanceInMeters);
+          if (distanceToFinish !=
+                  (distanceInMeters / 1000).toStringAsFixed(1) ||
+              distanceToFinish != distanceInMeters.toStringAsFixed(0)) {
+            setState(() {
+              if (distanceInMeters >= 1000) {
+                distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
+              } else {
+                distanceToFinish = distanceInMeters.toStringAsFixed(0);
+              }
+            });
           }
-        });
+        }
       });
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    int newCurrentPoiInt = getcurrentPOI();
+
+    if (newCurrentPoiInt != currentPoiInt) {
+      var poiFromList = widget.routeContent.pointsOfInterest.where(
+        (element) => element.objectId == currentPoiInt,
+      );
+      currentPoi = poiFromList.isNotEmpty ? poiFromList.first : null;
+      currentPoiInt = newCurrentPoiInt;
+    }
+
+    return MediaQuery.removePadding(
+      context: context,
+      removeTop: true,
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
+            controller: widget.scroller,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: BottomSheetHandle(context: context),
+                ),
+
+                TripInfoBar(
+                  distanceToFinish: distanceToFinish,
+                  setSheetWidget: widget.setSheetWidget,
+                ),
+
+                // TODO: link POIs to map and how close user is to them
+                currentPoi != null
+                    ? POI(routeContent: currentPoi!, scroller: widget.scroller)
+                    : Container(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TripInfoBar extends StatefulWidget {
+  const TripInfoBar({
+    super.key,
+    required this.distanceToFinish,
+    required this.setSheetWidget,
+  });
+  final String distanceToFinish;
+  final Function setSheetWidget;
+  @override
+  State<TripInfoBar> createState() => _TripInfoBarState();
+}
+
+class _TripInfoBarState extends State<TripInfoBar> {
   @override
   Widget build(BuildContext context) {
     return Padding(

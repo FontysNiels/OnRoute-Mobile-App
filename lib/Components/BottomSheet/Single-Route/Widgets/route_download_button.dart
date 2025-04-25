@@ -6,10 +6,17 @@ import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
+import 'package:onroute_app/main.dart';
 
 class RouteDownloadButton extends StatelessWidget {
   final WebMapCollection currentRoute;
-  const RouteDownloadButton({super.key, required this.currentRoute});
+  final Function setSheetWidget;
+
+  const RouteDownloadButton({
+    super.key,
+    required this.currentRoute,
+    required this.setSheetWidget,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +49,6 @@ class RouteDownloadButton extends StatelessWidget {
             'pois-${currentRoute.webmapId}.json',
             currentRoute.webmapId,
           );
-
 
           //
           var folderContent = await getRouteFolders();
@@ -93,7 +99,8 @@ class RouteDownloadButton extends StatelessWidget {
           // );
 
           //LOADING INDICATOR
-          Navigator.pop(context, true);
+          // updateSavedRoutes(context);
+          await setSheetWidget(null, true);
         },
         icon: const Icon(Icons.download),
         label: Text(

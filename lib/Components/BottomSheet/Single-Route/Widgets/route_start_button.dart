@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 class RouteStartButton extends StatelessWidget {
   final WebMapCollection routeContent;
   final Function startRoute;
+  final Function setSheetWidget;
+  final ScrollController scroller;
+
   const RouteStartButton({
     super.key,
     required this.routeContent,
     required this.startRoute,
+    required this.setSheetWidget,
+    required this.scroller,
   });
 
   @override
@@ -20,11 +26,21 @@ class RouteStartButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: FilledButton.icon(
         onPressed: () async {
-          var storedFile = jsonDecode(await readFile(File(routeContent.availableRoute[0].routeID)));
+          var storedFile = jsonDecode(
+            await readFile(File(routeContent.availableRoute[0].routeID)),
+          );
           RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
           startRoute(routeInfo, routeContent.pointsOfInterest);
           // await addGraphics(routeContent.routeLayer);
-          Navigator.pop(context, false);
+          setSheetWidget(
+            TripContent(
+              key: UniqueKey(),
+              scroller: scroller,
+              routeContent: routeContent,
+              setSheetWidget: setSheetWidget,
+            ),
+            false,
+          );
         },
         icon: const Icon(Icons.directions),
         label: Text(

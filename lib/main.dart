@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
+import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
@@ -34,36 +40,37 @@ Future<void> initialize() async {
   ArcGISEnvironment.apiKey = apiKey;
 }
 
-final _mapViewController = ArcGISMapView.createController();
 final _graphicsOverlay = GraphicsOverlay();
-List<DescriptionPoint> _directionsList = [];
-late RouteLayerData _routeInfo;
-int change = 0;
 
-List<DescriptionPoint> getDirectionList() {
-  return _directionsList;
-}
-
-RouteLayerData getRouteInfo() {
-  return _routeInfo;
-}
-
+final _mapViewController = ArcGISMapView.createController();
 ArcGISMapViewController getMapViewController() {
   return _mapViewController;
 }
 
-int currenPOI = 0;
-
-int getcurrentPOI() {
-  // print('Current POI: ${currenPOI.title}');
-  return currenPOI;
+List<DescriptionPoint> _directionsList = [];
+List<DescriptionPoint> getDirectionList() {
+  return _directionsList;
 }
+
+late RouteLayerData _routeInfo;
+RouteLayerData getRouteInfo() {
+  return _routeInfo;
+}
+
+
+
+int currenPOI = 0;
+// int getcurrentPOI() {
+//   // print('Current POI: ${currenPOI.title}');
+//   return currenPOI;
+// }
+
+
 
 class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     initialize();
-
     super.initState();
   }
 
@@ -117,7 +124,7 @@ class _MainAppState extends State<MainApp> {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     print('Screen width: $screenWidth, Screen height: $screenHeight');
-  
+
     return MaterialApp(
       // theme: AppTheme,
       debugShowCheckedModeBanner: false,
@@ -187,7 +194,8 @@ class _MainAppState extends State<MainApp> {
             MapWidget(
               mapViewController: _mapViewController,
               graphicsOverlay: _graphicsOverlay,
-              directionsList: _directionsList, selectPoi: selectPoi,
+              directionsList: _directionsList,
+              selectPoi: selectPoi,
             ),
             _directionsList.isNotEmpty
                 ? DirectionsCard(
@@ -215,6 +223,25 @@ class _MainAppState extends State<MainApp> {
                 ],
               ),
             ),
+
+            Padding(
+              padding: const EdgeInsets.all(128.0),
+              child: Align(
+                alignment: Alignment.centerLeft  ,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      child: Text("Files Deleten"),
+                      onPressed: () {
+                        deleteAllSavedFiles();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             BottomSheetWidget(startRoute: _startRoute),
             // OfflineMapDownloadExample(),
           ],

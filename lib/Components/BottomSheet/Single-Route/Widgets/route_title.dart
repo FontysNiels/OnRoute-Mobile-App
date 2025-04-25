@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 class RouteTitle extends StatelessWidget {
   final String title;
-  const RouteTitle({super.key, required this.title});
+  final Function setSheetWidget;
+  const RouteTitle({
+    super.key,
+    required this.title,
+    required this.setSheetWidget,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +32,7 @@ class RouteTitle extends StatelessWidget {
           child: IconButton.filled(
             icon: Icon(Icons.close),
             onPressed: () {
-              Navigator.pop(context, true);
+              setSheetWidget(null, false);
             },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(

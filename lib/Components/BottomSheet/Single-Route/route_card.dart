@@ -7,18 +7,20 @@ import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dar
 
 class RouteCard extends StatelessWidget {
   final WebMapCollection routeContent;
-  final VoidCallback onRouteUpdated; // New callback functionF
+  // final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
   final ScrollController scrollController;
   final Function changesheetsize;
+  final Function setSheetWidget;
 
   const RouteCard({
     super.key,
     required this.routeContent,
-    required this.onRouteUpdated, // Pass the callback
+    // required this.onRouteUpdated, // Pass the callback
     required this.startRoute,
     required this.scrollController,
     required this.changesheetsize,
+    required this.setSheetWidget,
   });
 
   @override
@@ -28,36 +30,15 @@ class RouteCard extends StatelessWidget {
         // Navigate to ROUTE
         await changesheetsize(0.9);
         //TODO: Do not make this a navigator push, but a swap of the screen or something....
-        final result = Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (_) => SingleRoute(
-                  key: UniqueKey(),
-                  routeContent: routeContent,
-                  startRoute: startRoute,
-                  scroller: scrollController,
-                ),
-          ),
+        setSheetWidget(
+          SingleRoute(
+            key: UniqueKey(),
+            routeContent: routeContent,
+            startRoute: startRoute,
+            scroller: scrollController,
+            setSheetWidget: setSheetWidget,
+          ), false
         );
-
-        // Trigger the callback if result is true
-        if (await result == true) {
-          onRouteUpdated();
-          // await changesheetsize(0.4);
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder:
-                  (_) => TripContent(
-                    key: UniqueKey(),
-                    scroller: scrollController,
-                    routeContent: routeContent,
-                  ),
-            ),
-          );
-        }
       },
       child: Card(
         elevation: 0,

@@ -6,19 +6,23 @@ import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
+import 'package:onroute_app/main.dart';
 
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
   final Function startRoute;
   final Function changesheetsize;
+  final Function setSheetWidget;
 
   const RoutesListView({
     super.key,
     required this.scrollController,
     required this.startRoute,
     required this.changesheetsize,
+    required this.setSheetWidget,
   });
 
   @override
@@ -31,34 +35,34 @@ class _RoutesListViewState extends State<RoutesListView> {
   @override
   void initState() {
     super.initState();
-    _futureRoutes = fetchItems();
+    _futureRoutes = getRoutes();
   }
 
-  void _refreshRoutes() {
-    // TODO: make this refresh the list of which ones local (and remove the online ones, no need to make more API calls)
-    setState(() {
-      _futureRoutes = fetchItems();
-    });
-  }
+  // void _refreshRoutes() {
+  //   // TODO: make this refresh the list of which ones local (and remove the online ones, no need to make more API calls)
+  //   setState(() {
+  //     _futureRoutes = fetchItems();
+  //   });
+  // }
 
-  Future<List<WebMapCollection>> fetchItems() async {
-    // List of available routes
-    List<File> localFiles = await getRouteFiles();
+  // Future<List<WebMapCollection>> fetchItems() async {
+  //   // List of available routes
+  //   List<File> localFiles = await getRouteFiles();
 
-    List<WebMapCollection> allAvailableRoutes = [];
+  //   List<WebMapCollection> allAvailableRoutes = [];
 
-    allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
+  //   allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
 
-    final List<ConnectivityResult> connectivityResult =
-        await (Connectivity().checkConnectivity());
+  //   final List<ConnectivityResult> connectivityResult =
+  //       await (Connectivity().checkConnectivity());
 
-    if (connectivityResult.contains(ConnectivityResult.mobile) ||
-        connectivityResult.contains(ConnectivityResult.wifi)) {
-      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
-    }
+  //   if (connectivityResult.contains(ConnectivityResult.mobile) ||
+  //       connectivityResult.contains(ConnectivityResult.wifi)) {
+  //     allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
+  //   }
 
-    return allAvailableRoutes;
-  }
+  //   return allAvailableRoutes;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +95,7 @@ class _RoutesListViewState extends State<RoutesListView> {
 
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        } 
+        }
         // else if (snapshot.connectionState == ConnectionState.none) {
         //   listItems.add(startupText);
         //   return ListView(
@@ -99,12 +103,13 @@ class _RoutesListViewState extends State<RoutesListView> {
         //     controller: widget.scrollController,
         //     children: listItems,
         //   );
-        // } 
+        // }
         else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           listItems.add(startupText);
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,
+            // controller: getScroller(),
             children: listItems,
           );
         } else {
@@ -127,10 +132,11 @@ class _RoutesListViewState extends State<RoutesListView> {
                 return RouteCard(
                   key: UniqueKey(),
                   routeContent: item,
-                  onRouteUpdated: _refreshRoutes, // Pass the callback
+                  // onRouteUpdated: _refreshRoutes, // Pass the callback
                   startRoute: widget.startRoute,
                   scrollController: widget.scrollController,
                   changesheetsize: widget.changesheetsize,
+                  setSheetWidget: widget.setSheetWidget,
                 );
               }).toList(),
             );
@@ -170,10 +176,11 @@ class _RoutesListViewState extends State<RoutesListView> {
                     return RouteCard(
                       key: UniqueKey(),
                       routeContent: item,
-                      onRouteUpdated: _refreshRoutes, // Pass the callback
+                      // onRouteUpdated: _refreshRoutes, // Pass the callback
                       startRoute: widget.startRoute,
                       scrollController: widget.scrollController,
                       changesheetsize: widget.changesheetsize,
+                      setSheetWidget: widget.setSheetWidget,
                     );
                   } else {
                     return Container();
@@ -197,7 +204,8 @@ class _RoutesListViewState extends State<RoutesListView> {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: IconButton.filled(
-                        onPressed: _refreshRoutes,
+                        onPressed: null,
+                        // _refreshRoutes,
                         icon: Icon(Icons.refresh),
                       ),
                     ),
@@ -209,6 +217,7 @@ class _RoutesListViewState extends State<RoutesListView> {
           return ListView(
             padding: const EdgeInsets.all(5),
             controller: widget.scrollController,
+            // controller: getScroller(),
             children: listItems,
           );
         }
