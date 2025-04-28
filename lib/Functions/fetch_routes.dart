@@ -129,10 +129,10 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
             poi['attributes']['asset'] = image;
 
             //TODO: do this in the single_route itself so it doesnt affect loading times
-            if (image != '') {
-              final imageProvider = CachedNetworkImageProvider(image);
-              await precacheImage(imageProvider, context);
-            }
+            // if (image != '') {
+            //   final imageProvider = CachedNetworkImageProvider(image);
+            //   await precacheImage(imageProvider, context);
+            // }
 
             Poi parsedPoi = Poi.fromJsonOnline(poi);
             featureLayerPois.add(parsedPoi);

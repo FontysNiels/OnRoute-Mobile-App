@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/poi.dart';
@@ -70,25 +71,25 @@ class RouteDownloadButton extends StatelessWidget {
           }
           // Loop through folders and check if the route already exists
           // for (var element in folderContent) {
-            // print(
-            //   'Route: ${element['package']['files'].where((e) => e.path.contains(currentRoute.availableRoute[0].routeID) == true)}',
-            // );
-            // if (element['package']['files']
-            //     .where(
-            //       (e) =>
-            //           e.path.contains(currentRoute.availableRoute[0].routeID) ==
-            //           true,
-            //     )
-            //     .isNotEmpty) {
-            //   //true naar false zetten voor niet opnieuw downloaden
-            //   print("BESTAAT AL IN EEN MAP!!");
-            //   var encodeRoute = jsonEncode(routeInfo.toJson());
-            //   await writeFile(
-            //     encodeRoute,
-            //     'route-${currentRoute.availableRoute[0].routeID}.json',
-            //     currentRoute.webmapId,
-            //   );
-            // }
+          // print(
+          //   'Route: ${element['package']['files'].where((e) => e.path.contains(currentRoute.availableRoute[0].routeID) == true)}',
+          // );
+          // if (element['package']['files']
+          //     .where(
+          //       (e) =>
+          //           e.path.contains(currentRoute.availableRoute[0].routeID) ==
+          //           true,
+          //     )
+          //     .isNotEmpty) {
+          //   //true naar false zetten voor niet opnieuw downloaden
+          //   print("BESTAAT AL IN EEN MAP!!");
+          //   var encodeRoute = jsonEncode(routeInfo.toJson());
+          //   await writeFile(
+          //     encodeRoute,
+          //     'route-${currentRoute.availableRoute[0].routeID}.json',
+          //     currentRoute.webmapId,
+          //   );
+          // }
           // }
 
           // var encodeRoute = jsonEncode(routeInfo.toJson());
@@ -97,6 +98,13 @@ class RouteDownloadButton extends StatelessWidget {
           //   'route-${currentRoute.availableRoute[0].routeID}.json',
           //   currentRoute.webmapId,
           // );
+
+          for (var poi in currentRoute.pointsOfInterest) {
+            if (poi.asset != '') {
+              final imageProvider = CachedNetworkImageProvider(poi.asset!);
+              await precacheImage(imageProvider, context);
+            }
+          }
 
           //LOADING INDICATOR
           await moveSheetTo(0.5);
