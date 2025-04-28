@@ -7,7 +7,6 @@ import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
-import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
 
@@ -27,22 +26,27 @@ class TripContent extends StatefulWidget {
 }
 
 String distanceToFinish = "0.0";
-Poi? currentPoi;
-int currentPoiInt = 0;
+Poi? selectedPoi;
+Poi? nearestPoi;
+bool userNearPoi = false;
 
 class _TripContentState extends State<TripContent> {
   ArcGISMapViewController controller = getMapViewController();
   late StreamSubscription<ArcGISLocation> subscription;
-
+  // late StreamSubscription<ArcGISLocation> locationSubscription;
   @override
   void dispose() {
     // controller.locationDisplay.onLocationChanged.drain();
     subscription.cancel();
+    nearestPoi = null;
+    selectedPoi = null;
+    userNearPoi = false;
     super.dispose();
   }
 
   @override
   void initState() {
+    // selectedPoi = widget.routeContent.pointsOfInterest.first;
     calculateDistances();
     super.initState();
   }
@@ -51,6 +55,7 @@ class _TripContentState extends State<TripContent> {
     List<DescriptionPoint> directions = getDirectionList();
     if (directions.isEmpty) {
       // This is just a check for the start, it shouldn't happen, but just in case
+
       widget.setSheetWidget(null, false);
     } else if (directions.isNotEmpty) {
       // TODO: Make this calculate (totaldistance - distance traveled (points length) & distance traveled to current point = bestemming)
@@ -63,6 +68,71 @@ class _TripContentState extends State<TripContent> {
         } else {
           final userPosition = controller.locationDisplay.location!.position;
 
+          // Distance to POI
+
+          double closestDistance = double.infinity;
+          Poi? closestPoi;
+          for (var poi in widget.routeContent.pointsOfInterest) {
+            final poiPosition = convertToLatLng(
+              poi.geometry.x!,
+              poi.geometry.y!,
+            );
+            final poiX = poiPosition[1];
+            final poiY = poiPosition[0];
+
+            final distanceToPOI = sqrt(
+              pow(userPosition.y - poiY, 2) + pow(userPosition.x - poiX, 2),
+            );
+
+            const metersPerDegree = 111320; // Approximation for latitude
+            final distanceInMeters = distanceToPOI * metersPerDegree;
+
+            if (distanceInMeters < closestDistance) {
+              closestDistance = distanceInMeters;
+              closestPoi = poi;
+            }
+          }
+
+          // TODO: when used gets closer than # meters, show the POI
+          // shownPOI = closestPOI;
+          // set it once, so when a user clicks on another POI, it doesn't change back instantly
+          if (closestPoi != null) {
+            // if (closestDistance >= 1000) {
+            //   print(
+            //     "Closest POI: ${closestPoi!.title}, Distance: ${(closestDistance / 1000).toStringAsFixed(1)} km",
+            //   );
+            // } else {
+            //   print(
+            //     "Closest POI: ${closestPoi!.title}, Distance: ${closestDistance.toStringAsFixed(0)} m",
+            //   );
+            // }
+
+            var test = currenPOI;
+
+            if (closestDistance <= 20 && !userNearPoi) {
+              setState(() {
+                nearestPoi = closestPoi;
+                userNearPoi = true;
+              });
+            } else if (closestDistance > 20 && userNearPoi) {
+              setState(() {
+                userNearPoi = false;
+              });
+            }
+
+            if (currenPOIChanged) {
+              var poiFromList = widget.routeContent.pointsOfInterest.where(
+                (element) => element.objectId == test,
+              );
+
+              setState(() {
+                currenPOIChanged = false;
+                nearestPoi = poiFromList.first;
+              });
+            }
+          }
+
+          // Distance to finish
           final directionPointXY = convertToLatLng(
             directions.last.x,
             directions.last.y,
@@ -96,22 +166,6 @@ class _TripContentState extends State<TripContent> {
 
   @override
   Widget build(BuildContext context) {
-    int newCurrentPoiInt = getcurrentPOI();
-    
-    if (newCurrentPoiInt != currentPoiInt) {
-      currentPoiInt = newCurrentPoiInt;
-
-      var poiFromList = widget.routeContent.pointsOfInterest.where(
-        (element) => element.objectId == currentPoiInt,
-      );
-
-      if (newCurrentPoiInt == 0) {
-        currentPoi = null;
-      } else {
-        currentPoi = poiFromList.isNotEmpty ? poiFromList.first : null;
-      }
-    }
-
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
@@ -132,9 +186,8 @@ class _TripContentState extends State<TripContent> {
                   setSheetWidget: widget.setSheetWidget,
                 ),
 
-                // TODO: link POIs to map and how close user is to them
-                currentPoi != null
-                    ? POI(routeContent: currentPoi!, scroller: widget.scroller)
+                nearestPoi != null
+                    ? POI(routeContent: nearestPoi!, scroller: widget.scroller)
                     : Container(),
               ],
             ),

@@ -54,6 +54,7 @@ RouteLayerData getRouteInfo() {
 // currentPOI is the current point of interest (POI) that is selected by the user
 // This is purely used for the POI that the user clicked on, so it can be passed from MapWidget to TripInfoBar
 int currenPOI = 0;
+bool currenPOIChanged = false;
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -65,6 +66,7 @@ class _MainAppState extends State<MainApp> {
   void selectPoi(int selectedPoiObjectId) {
     setState(() {
       currenPOI = selectedPoiObjectId;
+      currenPOIChanged = true;
     });
   }
 

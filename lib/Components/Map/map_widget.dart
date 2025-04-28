@@ -77,6 +77,7 @@ class _MapWidgetState extends State<MapWidget> {
 
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
+                        print(tappedGraphic.attributes['objectId']);
                         widget.selectPoi(tappedGraphic.attributes['objectId']);
                         // Maybe show a dialog or highlight it
                       }

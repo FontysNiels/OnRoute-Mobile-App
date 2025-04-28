@@ -6,7 +6,7 @@ import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
-import 'package:onroute_app/main.dart';
+
 
 class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
@@ -14,12 +14,6 @@ class BottomSheetWidget extends StatefulWidget {
 
   @override
   State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
-}
-
-// Current POI number
-int currentPOI = 0;
-int getcurrentPOI() {
-  return currenPOI;
 }
 
 /// Scroll controller for the bottom sheet
@@ -113,12 +107,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
-    int currentPoiInt = getcurrentPOI();
-    if (currentPoiInt != currentPOI) {
-      setState(() {
-        currentPOI = currentPoiInt;
-      });
-    }
     return Stack(
       children: [
         // Persistent bottom sheet
@@ -139,7 +127,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {
             if (bottomSheetWidgets.isEmpty) {
-              print('objects empty');
               bottomSheetWidgets.add(
                 RoutesListView(
                   scrollController: scrollController,
