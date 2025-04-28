@@ -119,6 +119,8 @@ class _MainAppState extends State<MainApp> {
         // Color Scheme Changes
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: primaryAccent, // Define primaryAccent in color scheme
+          // primaryContainer: navigationIcons // FAB
+          // onPrimaryContainer: primaryAppColor // FAB Icons
         ),
 
         // Appbar Theme

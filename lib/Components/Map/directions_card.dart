@@ -452,9 +452,14 @@ class _DirectionsCardState extends State<DirectionsCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top,
+        left: 6,
+        right: 6,
+      ),
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -480,8 +485,68 @@ class _DirectionsCardState extends State<DirectionsCard> {
                   ),
                 ),
               ),
+
               // Text('$metersToNextDirection Meter'),
-              Text('${metersToCurrentDirection} m'),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12.0,
+                    vertical: 8.0,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        metersToCurrentDirection > 1000
+                            ? '${(metersToCurrentDirection / 1000).toStringAsFixed(1).replaceAll('.', ',')}'
+                            : '$metersToCurrentDirection',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleLarge?.copyWith(height: 1.0),
+                      ),
+                      Text(
+                         metersToCurrentDirection > 1000?
+                        'Km':'Meter',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(height: 1.2),
+                      ),
+                    ],
+                  ),
+
+                  //  child: Column(
+                  //   mainAxisSize: MainAxisSize.min,
+                  //   children: [
+                  //     Text(
+                  //     '${metersToCurrentDirection}',
+                  //     style: Theme.of(
+                  //       context,
+                  //     ).textTheme.titleLarge?.copyWith(
+                  //         height: 1.0,
+                  //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
+                  //           ? Colors.black
+                  //           : Colors.white,
+                  //       ),
+                  //     ),
+                  //     Text(
+                  //     'Meter',
+                  //     style: Theme.of(
+                  //       context,
+                  //     ).textTheme.bodyMedium?.copyWith(
+                  //         height: 1.2,
+                  //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
+                  //           ? Colors.black
+                  //           : Colors.white,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                ),
+              ),
             ],
           ),
         ),
