@@ -7,7 +7,6 @@ import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
-
 class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
   const BottomSheetWidget({super.key, required this.startRoute});
@@ -27,6 +26,7 @@ Future<List<WebMapCollection>> getRoutes() {
 
 // Sheet controller
 late final DraggableScrollableController _controller;
+
 // Sheet size
 double sheetSize = 0.4;
 // Sheet size animator
@@ -107,6 +107,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print('sheetstate');
     return Stack(
       children: [
         // Persistent bottom sheet

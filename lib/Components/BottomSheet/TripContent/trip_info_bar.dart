@@ -7,6 +7,7 @@ import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
 
@@ -61,7 +62,7 @@ class _TripContentState extends State<TripContent> {
       // TODO: Make this calculate (totaldistance - distance traveled (points length) & distance traveled to current point = bestemming)
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
-      ) {
+      ) async {
         directions = getDirectionList();
         if (directions.isEmpty) {
           widget.setSheetWidget(null, false);
@@ -93,9 +94,6 @@ class _TripContentState extends State<TripContent> {
             }
           }
 
-          // TODO: when used gets closer than # meters, show the POI
-          // shownPOI = closestPOI;
-          // set it once, so when a user clicks on another POI, it doesn't change back instantly
           if (closestPoi != null) {
             // if (closestDistance >= 1000) {
             //   print(
@@ -107,9 +105,10 @@ class _TripContentState extends State<TripContent> {
             //   );
             // }
 
-            var test = currenPOI;
-
+            var latestPoi = currenPOI;
+            // Distance based
             if (closestDistance <= 20 && !userNearPoi) {
+              await moveSheetTo(0.9);
               setState(() {
                 nearestPoi = closestPoi;
                 userNearPoi = true;
@@ -120,11 +119,12 @@ class _TripContentState extends State<TripContent> {
               });
             }
 
+            // User selection based
             if (currenPOIChanged) {
               var poiFromList = widget.routeContent.pointsOfInterest.where(
-                (element) => element.objectId == test,
+                (element) => element.objectId == latestPoi,
               );
-
+              await moveSheetTo(0.9);
               setState(() {
                 currenPOIChanged = false;
                 nearestPoi = poiFromList.first;
@@ -187,7 +187,7 @@ class _TripContentState extends State<TripContent> {
                 ),
 
                 nearestPoi != null
-                    ? POI(routeContent: nearestPoi!, scroller: widget.scroller)
+                    ? POI(routeContent: nearestPoi!)
                     : Container(),
               ],
             ),

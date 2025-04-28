@@ -33,10 +33,9 @@ class POICard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 5.0),
                     child: BottomSheetHandle(context: context),
                   ),
-                  POI(
-                    key: UniqueKey(),
-                    routeContent: currentPoi,
-                    scroller: scroller,
+                  SingleChildScrollView(
+                    controller: scroller,
+                    child: POI(key: UniqueKey(), routeContent: currentPoi),
                   ),
                 ],
               ),
