@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 
 // Get ArcGIS content from specific file
 Future<http.Response> getRouteLayerJSON(String routeID) async {
-  // Get Car Id (By License Plate)
   final response = await http.get(
     Uri.parse(
       'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/data',
@@ -19,7 +18,9 @@ Future<http.Response> getRouteLayerJSON(String routeID) async {
 }
 
 // Get ArcGIS data, like title and description, from specific file
+// Momenteel (28/04) niet in gebruik, doordat titel en description ook in de getall zitten
 Future<http.Response> getRouteInfo(String routeID) async {
+  print('object');
   final response = await http.get(
     Uri.parse(
       'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/?f=json',

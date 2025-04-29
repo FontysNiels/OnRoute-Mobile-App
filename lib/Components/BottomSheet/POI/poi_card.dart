@@ -60,8 +60,6 @@ class POICard extends StatelessWidget {
           ),
           false,
         );
-
-        // Trigger the callback if result is true
       },
       child: Card(
         elevation: 0,

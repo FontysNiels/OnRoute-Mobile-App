@@ -27,7 +27,8 @@ class TripContent extends StatefulWidget {
 }
 
 String distanceToFinish = "0.0";
-Poi? selectedPoi;
+String distanceToNextPoi = "0.0";
+
 Poi? nearestPoi;
 bool userNearPoi = false;
 
@@ -40,7 +41,6 @@ class _TripContentState extends State<TripContent> {
     // controller.locationDisplay.onLocationChanged.drain();
     subscription.cancel();
     nearestPoi = null;
-    selectedPoi = null;
     userNearPoi = false;
     super.dispose();
   }
@@ -73,6 +73,9 @@ class _TripContentState extends State<TripContent> {
 
           double closestDistance = double.infinity;
           Poi? closestPoi;
+
+          double closestDistanceDisplay = 0;
+
           for (var poi in widget.routeContent.pointsOfInterest) {
             final poiPosition = convertToLatLng(
               poi.geometry.x!,
@@ -109,6 +112,7 @@ class _TripContentState extends State<TripContent> {
             // Distance based
             if (closestDistance <= 20 && !userNearPoi) {
               await moveSheetTo(0.9);
+
               setState(() {
                 nearestPoi = closestPoi;
                 userNearPoi = true;
@@ -116,6 +120,7 @@ class _TripContentState extends State<TripContent> {
             } else if (closestDistance > 20 && userNearPoi) {
               setState(() {
                 userNearPoi = false;
+                distanceToNextPoi = closestDistanceDisplay.toString();
               });
             }
 
@@ -151,7 +156,40 @@ class _TripContentState extends State<TripContent> {
           if (distanceToFinish !=
                   (distanceInMeters / 1000).toStringAsFixed(1) ||
               distanceToFinish != distanceInMeters.toStringAsFixed(0)) {
+            for (var poi in widget.routeContent.pointsOfInterest) {
+              final poiPosition = convertToLatLng(
+                poi.geometry.x!,
+                poi.geometry.y!,
+              );
+              final poiX = poiPosition[1];
+              final poiY = poiPosition[0];
+
+              final distanceToPOI = sqrt(
+                pow(userPosition.y - poiY, 2) + pow(userPosition.x - poiX, 2),
+              );
+
+              const metersPerDegree = 111320; // Approximation for latitude
+              final distanceInMeters = distanceToPOI * metersPerDegree;
+
+              // if (closestPoi != nearestPoi && distanceInMeters > 20) {
+              if (distanceInMeters < closestDistance) {
+                closestDistanceDisplay = distanceInMeters;
+              }
+              // }
+            }
+
+            // List with alreadypassed?
+            // or
+            // check which one user is walking away from and which oen is getting closer
+
             setState(() {
+              if (closestDistance >= 1000) {
+                distanceToNextPoi = (closestDistance / 1000).toStringAsFixed(1);
+              } else {
+                distanceToNextPoi = closestDistance.toStringAsFixed(0);
+              }
+              // distanceToNextPoi = closestDistanceDisplay.toString();
+
               if (distanceInMeters >= 1000) {
                 distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
               } else {
@@ -231,7 +269,7 @@ class _TripInfoBarState extends State<TripInfoBar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "120",
+                    distanceToNextPoi,
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

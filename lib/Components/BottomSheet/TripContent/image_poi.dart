@@ -20,12 +20,14 @@ class ImagePOI extends StatelessWidget {
                 aspectRatio: 16 / 9,
                 child: CachedNetworkImage(
                   imageUrl: poiList.asset ?? '',
+                  // placeholder:
+                  //     (context, url) => Image.asset(
+                  //       'assets/temp.png',
+                  //       height: MediaQuery.of(context).size.height * 0.2,
+                  //       // fit: BoxFit.cover,
+                  //     ),
                   placeholder:
-                      (context, url) => Image.asset(
-                        'assets/temp.png',
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        // fit: BoxFit.cover,
-                      ),
+                      (context, url) => CircularProgressIndicator(),
                   errorWidget:
                       (context, url, error) => Image.asset(
                         'assets/temp.png',
@@ -37,7 +39,6 @@ class ImagePOI extends StatelessWidget {
             ),
           ],
         ),
-        
       ],
     );
   }
