@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
@@ -27,6 +28,7 @@ class RouteDownloadButton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: TextButton.icon(
         onPressed: () async {
+          context.loaderOverlay.show();
           // Get ArcGIS route layer data JSON
           var routeResponse = await getRouteLayerJSON(
             currentRoute.availableRoute[0].routeID,
@@ -105,7 +107,7 @@ class RouteDownloadButton extends StatelessWidget {
               await precacheImage(imageProvider, context);
             }
           }
-
+          context.loaderOverlay.hide();
           //LOADING INDICATOR
           await moveSheetTo(0.5);
 

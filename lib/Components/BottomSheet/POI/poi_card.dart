@@ -52,6 +52,10 @@ class POICard extends StatelessWidget {
                       backgroundColor: WidgetStateProperty.all(
                         Theme.of(context).primaryColor.withValues(alpha: 1.0),
                       ),
+                      shadowColor: WidgetStateProperty.all(
+                        Colors.black.withValues(alpha: 1),
+                      ),
+                      elevation: WidgetStateProperty.all(4.0),
                     ),
                   ),
                 ),

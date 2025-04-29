@@ -53,7 +53,7 @@ class PoiButtons extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Wrap(
-        spacing: 20,
+        spacing: 10,
         children: [
           if (routeContent.website != null)
             ElevatedButton.icon(

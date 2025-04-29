@@ -1,5 +1,6 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
@@ -201,6 +202,7 @@ class _MainAppState extends State<MainApp> {
                   TextButton(
                     child: Text("Route Verwijderen"),
                     onPressed: () async {
+                
                       setState(() {
                         _directionsList.clear();
                         _graphicsOverlay.graphics.clear();
@@ -230,7 +232,7 @@ class _MainAppState extends State<MainApp> {
               ),
             ),
 
-            BottomSheetWidget(startRoute: _startRoute),
+            LoaderOverlay(child: BottomSheetWidget(startRoute: _startRoute)),
 
             // OfflineMapDownloadExample(),
           ],

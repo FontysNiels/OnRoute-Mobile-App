@@ -120,7 +120,7 @@ class _TripContentState extends State<TripContent> {
             } else if (closestDistance > 20 && userNearPoi) {
               setState(() {
                 userNearPoi = false;
-                distanceToNextPoi = closestDistanceDisplay.toString();
+                // distanceToNextPoi = closestDistanceDisplay.toString();
               });
             }
 
@@ -183,12 +183,7 @@ class _TripContentState extends State<TripContent> {
             // check which one user is walking away from and which oen is getting closer
 
             setState(() {
-              if (closestDistance >= 1000) {
-                distanceToNextPoi = (closestDistance / 1000).toStringAsFixed(1);
-              } else {
-                distanceToNextPoi = closestDistance.toStringAsFixed(0);
-              }
-              // distanceToNextPoi = closestDistanceDisplay.toString();
+              distanceToNextPoi = closestDistance.toString();
 
               if (distanceInMeters >= 1000) {
                 distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
@@ -269,12 +264,22 @@ class _TripInfoBarState extends State<TripInfoBar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    distanceToNextPoi,
+                    double.parse(distanceToNextPoi) >= 1000
+                        ? distanceToNextPoi = (double.parse(distanceToNextPoi) /
+                                1000)
+                            .toStringAsFixed(1)
+                        : distanceToNextPoi = double.parse(
+                          distanceToNextPoi,
+                        ).toStringAsFixed(0),
+
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("m", style: Theme.of(context).textTheme.labelMedium),
+                  Text(
+                    double.parse(distanceToNextPoi) >= 1000 ? "km" : "m",
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ],
               ),
             ],

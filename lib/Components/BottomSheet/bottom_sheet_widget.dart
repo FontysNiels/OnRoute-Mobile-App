@@ -107,7 +107,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('sheetstate');
     return Stack(
       children: [
         // Persistent bottom sheet

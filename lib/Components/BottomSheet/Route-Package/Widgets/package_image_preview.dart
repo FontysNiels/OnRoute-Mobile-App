@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 class PackegImagePreview extends StatelessWidget {
@@ -35,17 +36,18 @@ class PackegImagePreview extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.2,
                     fit: BoxFit.cover,
                     imageUrl: getImageSource(),
-                    // placeholder:
-                    //     (context, url) => Image.asset(
-                    //       'assets/temp.png',
-                    //       height: MediaQuery.of(context).size.height * 0.2,
-                    //       fit: BoxFit.cover,
-                    //     ),
-                    errorWidget: (context, url, error) =>  Image.asset(
-                    'assets/temp.png',
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    fit: BoxFit.cover,
-                  ),
+                    placeholder:
+                        (context, url) => Image.network(
+                          getImageSource(),
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          fit: BoxFit.cover,
+                        ),
+                    errorWidget:
+                        (context, url, error) => Image.asset(
+                          'assets/temp.png',
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          fit: BoxFit.cover,
+                        ),
                   ),
                 ),
               ),
