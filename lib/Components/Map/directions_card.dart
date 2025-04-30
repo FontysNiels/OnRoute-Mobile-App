@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/conversions.dart';
+import 'package:onroute_app/main.dart';
 
 class DirectionsCard extends StatefulWidget {
   const DirectionsCard({
@@ -152,6 +153,21 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
       const metersPerDegree = 111320;
       final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
+
+      var distanceToEveryDirection =
+          widget._routeInfo.layers[1].featureSet.features
+              .map((feature) => feature.attributes['Meters'])
+              .toList();
+
+      distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
+      distanceToEveryDirection = distanceToEveryDirection.sublist(
+        descriptionNum - 1,
+      );
+      var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
+
+      if (finishLine != totalDistance) {
+        finishLine = totalDistance;
+      }
 
       setState(() {
         metersToCurrentDirection = distanceInMeters.toInt();
@@ -509,8 +525,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
                         ).textTheme.titleLarge?.copyWith(height: 1.0),
                       ),
                       Text(
-                         metersToCurrentDirection > 1000?
-                        'Km':'Meter',
+                        metersToCurrentDirection > 1000 ? 'Km' : 'Meter',
                         style: Theme.of(
                           context,
                         ).textTheme.bodyMedium?.copyWith(height: 1.2),

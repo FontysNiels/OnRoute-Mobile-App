@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/TESTCLASS.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
@@ -70,11 +71,8 @@ class _TripContentState extends State<TripContent> {
           final userPosition = controller.locationDisplay.location!.position;
 
           // Distance to POI
-
           double closestDistance = double.infinity;
           Poi? closestPoi;
-
-          double closestDistanceDisplay = 0;
 
           for (var poi in widget.routeContent.pointsOfInterest) {
             final poiPosition = convertToLatLng(
@@ -120,7 +118,6 @@ class _TripContentState extends State<TripContent> {
             } else if (closestDistance > 20 && userNearPoi) {
               setState(() {
                 userNearPoi = false;
-                // distanceToNextPoi = closestDistanceDisplay.toString();
               });
             }
 
@@ -135,6 +132,27 @@ class _TripContentState extends State<TripContent> {
                 nearestPoi = poiFromList.first;
               });
             }
+          }
+
+          // var distanceToEveryDirection = [];
+          // RouteLayerData routeInfo = getRouteInfo();
+          // routeInfo.layers[1].featureSet.features.where((test)=> test.attributes['Meters']))
+
+          for (var _direction in directions) {
+            final directionPointXY = convertToLatLng(
+              directions.last.x,
+              directions.last.y,
+            );
+            final directionPointX = directionPointXY[1];
+            final directionPointY = directionPointXY[0];
+
+            final distanceToDirectionPoint = sqrt(
+              pow(userPosition.y - directionPointY, 2) +
+                  pow(userPosition.x - directionPointX, 2),
+            );
+
+            const metersPerDegree = 111320; // Approximation for latitude
+            final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
           }
 
           // Distance to finish
@@ -156,28 +174,6 @@ class _TripContentState extends State<TripContent> {
           if (distanceToFinish !=
                   (distanceInMeters / 1000).toStringAsFixed(1) ||
               distanceToFinish != distanceInMeters.toStringAsFixed(0)) {
-            for (var poi in widget.routeContent.pointsOfInterest) {
-              final poiPosition = convertToLatLng(
-                poi.geometry.x!,
-                poi.geometry.y!,
-              );
-              final poiX = poiPosition[1];
-              final poiY = poiPosition[0];
-
-              final distanceToPOI = sqrt(
-                pow(userPosition.y - poiY, 2) + pow(userPosition.x - poiX, 2),
-              );
-
-              const metersPerDegree = 111320; // Approximation for latitude
-              final distanceInMeters = distanceToPOI * metersPerDegree;
-
-              // if (closestPoi != nearestPoi && distanceInMeters > 20) {
-              if (distanceInMeters < closestDistance) {
-                closestDistanceDisplay = distanceInMeters;
-              }
-              // }
-            }
-
             // List with alreadypassed?
             // or
             // check which one user is walking away from and which oen is getting closer
@@ -318,13 +314,16 @@ class _TripInfoBarState extends State<TripInfoBar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.distanceToFinish,
+                    // widget.distanceToFinish,
+                    finishLine >= 1000
+                        ? (finishLine / 1000).toStringAsFixed(1)
+                        : finishLine.toStringAsFixed(0),
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    double.parse(widget.distanceToFinish) > 999 ? "km" : "m",
+                    finishLine > 999 ? "km" : "m",
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ],
