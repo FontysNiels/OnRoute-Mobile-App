@@ -2,17 +2,12 @@ import 'dart:async';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/description_point.dart';
+import 'package:onroute_app/main.dart';
 
 class MapWidget extends StatefulWidget {
-  final ArcGISMapViewController mapViewController;
-  final GraphicsOverlay graphicsOverlay;
-  final List<DescriptionPoint> directionsList;
   final Function selectPoi;
   const MapWidget({
     super.key,
-    required this.mapViewController,
-    required this.graphicsOverlay,
-    required this.directionsList,
     required this.selectPoi,
   });
 
@@ -35,10 +30,10 @@ class _MapWidgetState extends State<MapWidget> {
   }
 
   // create a controller for the map view
-  late final _mapViewController = widget.mapViewController;
+  late final _mapViewController = mapViewController;
   late ArcGISMap _webMap;
   // Create a graphics overlay.
-  late final _graphicsOverlay = widget.graphicsOverlay;
+  late final _graphicsOverlay = graphicsOverlay;
   // A flag for when the map view is ready and controls can be used.
   var _ready = false;
   // A flag for when the settings bottom sheet is visible.
@@ -78,7 +73,7 @@ class _MapWidgetState extends State<MapWidget> {
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
                         if (tappedGraphic.attributes['objectId'] != null) {
-                          widget.selectPoi(
+                          selectPoi(
                             tappedGraphic.attributes['objectId'],
                           );
                         }

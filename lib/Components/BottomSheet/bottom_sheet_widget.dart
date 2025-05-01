@@ -19,10 +19,7 @@ class BottomSheetWidget extends StatefulWidget {
 final ScrollController scrollController = ScrollController();
 
 // List of available routes
-late Future<List<WebMapCollection>> _futureRoutes;
-Future<List<WebMapCollection>> getRoutes() {
-  return _futureRoutes;
-}
+late Future<List<WebMapCollection>> futureRoutes;
 
 // Sheet controller
 late final DraggableScrollableController _controller;
@@ -47,33 +44,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   // List of all the widgets in the bottom sheet
   List<Widget> bottomSheetWidgets = [];
 
-  // Changes the current widget, and has the ability to reload the list of routes
-  Future<void> setSheetWidget(Widget? widget, bool? reload) async {
-    List<File> localFiles = await getRouteFiles();
-    List<WebMapCollection> futureRoutes = await _futureRoutes;
-    List<WebMapCollection> localItems = await fetchLocalItems(localFiles);
-
-    setState(() {
-      if (widget != null) {
-        bottomSheetWidgets.add(widget);
-      } else {
-        if (reload == true) {
-          futureRoutes.addAll(
-            localItems.where(
-              (localItem) =>
-                  !futureRoutes.any(
-                    (route) =>
-                        route.webmapId == localItem.webmapId &&
-                        route.locally == localItem.locally,
-                  ),
-            ),
-          );
-        }
-        bottomSheetWidgets.removeLast();
-      }
-    });
-  }
-
+  // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
     List<File> localFiles = await getRouteFiles();
 
@@ -96,13 +67,40 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void initState() {
     super.initState();
     _controller = DraggableScrollableController();
-    _futureRoutes = getRouteList();
+    futureRoutes = getRouteList();
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  // Changes the current widget, and has the ability to reload the list of routes
+  Future<void> setSheetWidget(Widget? widget, bool? reload) async {
+    List<File> localFiles = await getRouteFiles();
+    List<WebMapCollection> receivedRoutes = await futureRoutes;
+    List<WebMapCollection> localItems = await fetchLocalItems(localFiles);
+
+    setState(() {
+      if (widget != null) {
+        bottomSheetWidgets.add(widget);
+      } else {
+        if (reload == true) {
+          receivedRoutes.addAll(
+            localItems.where(
+              (localItem) =>
+                  !receivedRoutes.any(
+                    (route) =>
+                        route.webmapId == localItem.webmapId &&
+                        route.locally == localItem.locally,
+                  ),
+            ),
+          );
+        }
+        bottomSheetWidgets.removeLast();
+      }
+    });
   }
 
   @override

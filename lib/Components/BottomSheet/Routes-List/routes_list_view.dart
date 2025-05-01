@@ -29,7 +29,7 @@ class _RoutesListViewState extends State<RoutesListView> {
   @override
   void initState() {
     super.initState();
-    _futureRoutes = getRoutes();
+    _futureRoutes = futureRoutes;
   }
 
   @override

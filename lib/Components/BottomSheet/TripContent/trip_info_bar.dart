@@ -34,7 +34,7 @@ Poi? _nearestPoi;
 bool _userNearPoi = false;
 
 class _TripContentState extends State<TripContent> {
-  ArcGISMapViewController controller = getMapViewController();
+  ArcGISMapViewController controller = mapViewController;
   late StreamSubscription<ArcGISLocation> subscription;
   // late StreamSubscription<ArcGISLocation> locationSubscription;
   @override
@@ -303,15 +303,15 @@ class _TripInfoBarState extends State<TripInfoBar> {
                 children: [
                   Text(
                     // widget.distanceToFinish,
-                    finishLine >= 1000
-                        ? (finishLine / 1000).toStringAsFixed(1)
-                        : finishLine.toStringAsFixed(0),
+                    disrabceToFinish >= 1000
+                        ? (disrabceToFinish / 1000).toStringAsFixed(1)
+                        : disrabceToFinish.toStringAsFixed(0),
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    finishLine > 999 ? "km" : "m",
+                    disrabceToFinish > 999 ? "km" : "m",
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ],

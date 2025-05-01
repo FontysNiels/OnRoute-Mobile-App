@@ -35,29 +35,24 @@ Future<void> initialize() async {
   ArcGISEnvironment.apiKey = apiKey;
 }
 
-final _graphicsOverlay = GraphicsOverlay();
-
+final graphicsOverlay = GraphicsOverlay();
 final mapViewController = ArcGISMapView.createController();
-ArcGISMapViewController getMapViewController() {
-  return mapViewController;
-}
 
 List<DescriptionPoint> directionsList = [];
-// List<DescriptionPoint> getDirectionList() {
-//   return directionsList;
-// }
-
 late RouteLayerData _routeInfo;
-RouteLayerData getRouteInfo() {
-  return _routeInfo;
-}
 
-double finishLine = 0.0;
+double disrabceToFinish = 0.0;
 
 // currentPOI is the current point of interest (POI) that is selected by the user
 // This is purely used for the POI that the user clicked on, so it can be passed from MapWidget to TripInfoBar
 int currenPOI = 0;
 bool currenPOIChanged = false;
+void selectPoi(int selectedPoiObjectId) {
+  // setState(() {
+  currenPOI = selectedPoiObjectId;
+  currenPOIChanged = true;
+  // });
+}
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -66,16 +61,9 @@ class _MainAppState extends State<MainApp> {
     super.initState();
   }
 
-  void selectPoi(int selectedPoiObjectId) {
-    setState(() {
-      currenPOI = selectedPoiObjectId;
-      currenPOIChanged = true;
-    });
-  }
-
   Future<void> _startRoute(RouteLayerData route, List<Poi> pois) async {
-    _graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
-    _graphicsOverlay.graphics.addAll(generatePoiGraphics(pois));
+    graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
+    graphicsOverlay.graphics.addAll(generatePoiGraphics(pois));
 
     List<DescriptionPoint> routeDirections = [];
 
@@ -182,12 +170,7 @@ class _MainAppState extends State<MainApp> {
       home: Scaffold(
         body: Stack(
           children: [
-            MapWidget(
-              mapViewController: mapViewController,
-              graphicsOverlay: _graphicsOverlay,
-              directionsList: directionsList,
-              selectPoi: selectPoi,
-            ),
+            MapWidget(selectPoi: selectPoi),
             directionsList.isNotEmpty
                 ? DirectionsCard(
                   directionsList: directionsList,
@@ -204,10 +187,9 @@ class _MainAppState extends State<MainApp> {
                   TextButton(
                     child: Text("Route Verwijderen"),
                     onPressed: () async {
-                
                       setState(() {
                         directionsList.clear();
-                        _graphicsOverlay.graphics.clear();
+                        graphicsOverlay.graphics.clear();
                         currenPOI = 0;
                       });
                     },
