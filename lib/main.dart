@@ -37,15 +37,15 @@ Future<void> initialize() async {
 
 final _graphicsOverlay = GraphicsOverlay();
 
-final _mapViewController = ArcGISMapView.createController();
+final mapViewController = ArcGISMapView.createController();
 ArcGISMapViewController getMapViewController() {
-  return _mapViewController;
+  return mapViewController;
 }
 
-List<DescriptionPoint> _directionsList = [];
-List<DescriptionPoint> getDirectionList() {
-  return _directionsList;
-}
+List<DescriptionPoint> directionsList = [];
+// List<DescriptionPoint> getDirectionList() {
+//   return directionsList;
+// }
 
 late RouteLayerData _routeInfo;
 RouteLayerData getRouteInfo() {
@@ -98,7 +98,7 @@ class _MainAppState extends State<MainApp> {
 
     setState(() {
       _routeInfo = route;
-      _directionsList = routeDirections;
+      directionsList = routeDirections;
     });
   }
 
@@ -183,16 +183,16 @@ class _MainAppState extends State<MainApp> {
         body: Stack(
           children: [
             MapWidget(
-              mapViewController: _mapViewController,
+              mapViewController: mapViewController,
               graphicsOverlay: _graphicsOverlay,
-              directionsList: _directionsList,
+              directionsList: directionsList,
               selectPoi: selectPoi,
             ),
-            _directionsList.isNotEmpty
+            directionsList.isNotEmpty
                 ? DirectionsCard(
-                  directionsList: _directionsList,
+                  directionsList: directionsList,
                   routeInfo: _routeInfo,
-                  mapViewController: _mapViewController,
+                  mapViewController: mapViewController,
                 )
                 : Container(),
 
@@ -206,7 +206,7 @@ class _MainAppState extends State<MainApp> {
                     onPressed: () async {
                 
                       setState(() {
-                        _directionsList.clear();
+                        directionsList.clear();
                         _graphicsOverlay.graphics.clear();
                         currenPOI = 0;
                       });

@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/TESTCLASS.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
-import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
@@ -27,11 +26,12 @@ class TripContent extends StatefulWidget {
   State<TripContent> createState() => _TripContentState();
 }
 
-String distanceToFinish = "0.0";
-String distanceToNextPoi = "0.0";
-
-Poi? nearestPoi;
-bool userNearPoi = false;
+// String distanceToFinish = "0.0";
+double _distanceToNextPoi = 0.0;
+double _traveledDistance = 0.0;
+ArcGISPoint? userPosition;
+Poi? _nearestPoi;
+bool _userNearPoi = false;
 
 class _TripContentState extends State<TripContent> {
   ArcGISMapViewController controller = getMapViewController();
@@ -41,8 +41,10 @@ class _TripContentState extends State<TripContent> {
   void dispose() {
     // controller.locationDisplay.onLocationChanged.drain();
     subscription.cancel();
-    nearestPoi = null;
-    userNearPoi = false;
+    _nearestPoi = null;
+    _traveledDistance = 0.0;
+    _distanceToNextPoi = 0.0;
+    _userNearPoi = false;
     super.dispose();
   }
 
@@ -54,26 +56,46 @@ class _TripContentState extends State<TripContent> {
   }
 
   void calculateDistances() {
-    List<DescriptionPoint> directions = getDirectionList();
+    List<DescriptionPoint> directions = directionsList;
     if (directions.isEmpty) {
       // This is just a check for the start, it shouldn't happen, but just in case
 
       widget.setSheetWidget(null, false);
     } else if (directions.isNotEmpty) {
-      // TODO: Make this calculate (totaldistance - distance traveled (points length) & distance traveled to current point = bestemming)
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) async {
-        directions = getDirectionList();
+        // directions = directionsList;
         if (directions.isEmpty) {
           widget.setSheetWidget(null, false);
         } else {
-          final userPosition = controller.locationDisplay.location!.position;
+          double distance = 0.0;
+          if (userPosition != null) {
+            final userLat = userPosition!.y;
+            final userLng = userPosition!.x;
+            final currentLat = controller.locationDisplay.location!.position.y;
+            final currentLng = controller.locationDisplay.location!.position.x;
+
+            const metersPerDegree = 111320; // Approximation for latitude
+            distance =
+                sqrt(
+                  pow(currentLat - userLat, 2) + pow(currentLng - userLng, 2),
+                ) *
+                metersPerDegree;
+
+            // print(distance);
+          }
+          userPosition = controller.locationDisplay.location!.position;
 
           // Distance to POI
           double closestDistance = double.infinity;
           Poi? closestPoi;
 
+          // Sets the closest POI and distance to it
+
+          //This just overwrites itself over and over, untill reaching the closests
+          // make a list of poi + distance, update that, so we can see which one is getting closer and which one isnt
+          // or just make a check that says, already visited, so it wont open again....
           for (var poi in widget.routeContent.pointsOfInterest) {
             final poiPosition = convertToLatLng(
               poi.geometry.x!,
@@ -83,7 +105,7 @@ class _TripContentState extends State<TripContent> {
             final poiY = poiPosition[0];
 
             final distanceToPOI = sqrt(
-              pow(userPosition.y - poiY, 2) + pow(userPosition.x - poiX, 2),
+              pow(userPosition!.y - poiY, 2) + pow(userPosition!.x - poiX, 2),
             );
 
             const metersPerDegree = 111320; // Approximation for latitude
@@ -95,100 +117,64 @@ class _TripContentState extends State<TripContent> {
             }
           }
 
+          // basically checks if distance has been calculated
           if (closestPoi != null) {
-            // if (closestDistance >= 1000) {
-            //   print(
-            //     "Closest POI: ${closestPoi!.title}, Distance: ${(closestDistance / 1000).toStringAsFixed(1)} km",
-            //   );
-            // } else {
-            //   print(
-            //     "Closest POI: ${closestPoi!.title}, Distance: ${closestDistance.toStringAsFixed(0)} m",
-            //   );
-            // }
+            int latestPoi = currenPOI;
 
-            var latestPoi = currenPOI;
             // Distance based
-            if (closestDistance <= 20 && !userNearPoi) {
-              await moveSheetTo(0.9);
-
-              setState(() {
-                nearestPoi = closestPoi;
-                userNearPoi = true;
-              });
-            } else if (closestDistance > 20 && userNearPoi) {
-              setState(() {
-                userNearPoi = false;
-              });
-            }
+            await _distanceBasedPoiSetter(closestDistance, closestPoi);
 
             // User selection based
-            if (currenPOIChanged) {
-              var poiFromList = widget.routeContent.pointsOfInterest.where(
-                (element) => element.objectId == latestPoi,
-              );
-              await moveSheetTo(0.9);
-              setState(() {
-                currenPOIChanged = false;
-                nearestPoi = poiFromList.first;
-              });
-            }
+            await _inputBasedPoiSetter(latestPoi);
           }
 
-          // var distanceToEveryDirection = [];
-          // RouteLayerData routeInfo = getRouteInfo();
-          // routeInfo.layers[1].featureSet.features.where((test)=> test.attributes['Meters']))
-
-          for (var _direction in directions) {
-            final directionPointXY = convertToLatLng(
-              directions.last.x,
-              directions.last.y,
-            );
-            final directionPointX = directionPointXY[1];
-            final directionPointY = directionPointXY[0];
-
-            final distanceToDirectionPoint = sqrt(
-              pow(userPosition.y - directionPointY, 2) +
-                  pow(userPosition.x - directionPointX, 2),
-            );
-
-            const metersPerDegree = 111320; // Approximation for latitude
-            final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-          }
-
-          // Distance to finish
-          final directionPointXY = convertToLatLng(
-            directions.last.x,
-            directions.last.y,
-          );
-          final directionPointX = directionPointXY[1];
-          final directionPointY = directionPointXY[0];
-
-          final distanceToDirectionPoint = sqrt(
-            pow(userPosition.y - directionPointY, 2) +
-                pow(userPosition.x - directionPointX, 2),
-          );
-
-          const metersPerDegree = 111320; // Approximation for latitude
-          final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-          // print(distanceInMeters);
-          if (distanceToFinish !=
-                  (distanceInMeters / 1000).toStringAsFixed(1) ||
-              distanceToFinish != distanceInMeters.toStringAsFixed(0)) {
+          if (_distanceToNextPoi != closestDistance) {
             // List with alreadypassed?
             // or
             // check which one user is walking away from and which oen is getting closer
 
             setState(() {
-              distanceToNextPoi = closestDistance.toString();
-
-              if (distanceInMeters >= 1000) {
-                distanceToFinish = (distanceInMeters / 1000).toStringAsFixed(1);
-              } else {
-                distanceToFinish = distanceInMeters.toStringAsFixed(0);
-              }
+              _distanceToNextPoi = closestDistance;
+              _traveledDistance += distance;
             });
           }
         }
+      });
+    }
+  }
+
+  Future<void> _inputBasedPoiSetter(int latestPoi) async {
+    // User selection based
+    if (currenPOIChanged) {
+      var poiFromList = widget.routeContent.pointsOfInterest.where(
+        (element) => element.objectId == latestPoi,
+      );
+      await moveSheetTo(0.9);
+      setState(() {
+        currenPOIChanged = false;
+        _nearestPoi = poiFromList.first;
+      });
+    }
+  }
+
+  Future<void> _distanceBasedPoiSetter(
+    double closestDistance,
+    Poi? closestPoi,
+  ) async {
+    // Distance based
+    if (closestDistance <= 20 && !_userNearPoi) {
+      //changes sheet height
+      await moveSheetTo(0.9);
+      //sets poi to the POI user is near
+      setState(() {
+        _nearestPoi = closestPoi;
+        _userNearPoi = true;
+      });
+    }
+    //resets userNearPei, so it can get triggered again
+    else if (closestDistance > 20 && _userNearPoi) {
+      setState(() {
+        _userNearPoi = false;
       });
     }
   }
@@ -211,12 +197,12 @@ class _TripContentState extends State<TripContent> {
                 ),
 
                 TripInfoBar(
-                  distanceToFinish: distanceToFinish,
+                  // distanceToFinish: distanceToFinish,
                   setSheetWidget: widget.setSheetWidget,
                 ),
 
-                nearestPoi != null
-                    ? POI(routeContent: nearestPoi!)
+                _nearestPoi != null
+                    ? POI(routeContent: _nearestPoi!)
                     : Container(),
               ],
             ),
@@ -230,10 +216,10 @@ class _TripContentState extends State<TripContent> {
 class TripInfoBar extends StatefulWidget {
   const TripInfoBar({
     super.key,
-    required this.distanceToFinish,
+    // required this.distanceToFinish,
     required this.setSheetWidget,
   });
-  final String distanceToFinish;
+  // final String distanceToFinish;
   final Function setSheetWidget;
   @override
   State<TripInfoBar> createState() => _TripInfoBarState();
@@ -260,20 +246,16 @@ class _TripInfoBarState extends State<TripInfoBar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    double.parse(distanceToNextPoi) >= 1000
-                        ? distanceToNextPoi = (double.parse(distanceToNextPoi) /
-                                1000)
-                            .toStringAsFixed(1)
-                        : distanceToNextPoi = double.parse(
-                          distanceToNextPoi,
-                        ).toStringAsFixed(0),
+                    _distanceToNextPoi >= 1000
+                        ? (_distanceToNextPoi / 1000).toStringAsFixed(1)
+                        : _distanceToNextPoi.toStringAsFixed(0),
 
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
-                    double.parse(distanceToNextPoi) >= 1000 ? "km" : "m",
+                    _distanceToNextPoi > 999 ? "km" : "m",
                     style: Theme.of(context).textTheme.labelMedium,
                   ),
                 ],
@@ -291,13 +273,19 @@ class _TripInfoBarState extends State<TripInfoBar> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "1,8",
+                   Text(
+                    _traveledDistance >= 1000
+                        ? (_traveledDistance / 1000).toStringAsFixed(1)
+                        : _traveledDistance.toStringAsFixed(0),
+
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text("km", style: Theme.of(context).textTheme.labelMedium),
+                  Text(
+                    _traveledDistance > 999 ? "km" : "m",
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ],
               ),
             ],

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/TESTCLASS.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_download_button.dart';

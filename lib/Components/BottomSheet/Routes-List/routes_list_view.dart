@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/TESTCLASS.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';

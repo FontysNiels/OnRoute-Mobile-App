@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/TESTCLASS.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/poi_card.dart';
 import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description_block.dart';
 

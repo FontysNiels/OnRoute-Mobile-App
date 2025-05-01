@@ -76,7 +76,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
     if (!found && !userAwayFromRoute) {
       setState(() {
-        userAwayFromRoute = !userAwayFromRoute;
+        userAwayFromRoute = true;
       });
     }
 
@@ -159,14 +159,18 @@ class _DirectionsCardState extends State<DirectionsCard> {
               .map((feature) => feature.attributes['Meters'])
               .toList();
 
-      distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
-      distanceToEveryDirection = distanceToEveryDirection.sublist(
-        descriptionNum - 1,
-      );
-      var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
+      if (descriptionNum == 0) {
+        distanceToEveryDirection[descriptionNum] = distanceInMeters.toInt();
+      } else {
+        distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
+        distanceToEveryDirection = distanceToEveryDirection.sublist(
+          descriptionNum - 1,
+        );
+        var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
 
-      if (finishLine != totalDistance) {
-        finishLine = totalDistance;
+        if (finishLine != totalDistance) {
+          finishLine = totalDistance;
+        }
       }
 
       setState(() {
@@ -494,7 +498,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
                   padding: const EdgeInsets.symmetric(horizontal: 12.0),
                   child: Text(
                     directionList.isNotEmpty
-                        ? userAwayFromRoute
+                        ? userAwayFromRoute && descriptionNum == 0
+                            ? metersToCurrentDirection > 20
+                                ? "Ga naar de start van de route"
+                                : directionList[descriptionNum].description
+                            : userAwayFromRoute
                             ? "Ga terug naar de route"
                             : directionList[descriptionNum].description
                         : "NIKS",
