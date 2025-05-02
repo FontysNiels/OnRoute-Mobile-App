@@ -45,8 +45,18 @@ Future<http.Response> getAllFromFolder() async {
       'Content-Type': 'application/json; charset=UTF-8',
     },
   );
+
+  var test = jsonDecode(response.body);
+  for (var item in test['items']) {
+    if (item['thumbnail'] != null) {
+      item['thumbnail'] =
+          "https://bragis-def.maps.arcgis.com/sharing/rest/content/items/${item['id']}/info/${item['thumbnail']}?token=$generatedToken";
+    }
+  }
+  var enresponse = jsonEncode(test);
+  return http.Response(enresponse, response.statusCode, headers: response.headers);
   // print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken');
-  return response;
+  // return response;
 }
 
 //
@@ -74,7 +84,7 @@ Future<String> getServiceAssets(String url, int id) async {
 
   var repsonseAttechments = jsonDecode(response.body);
 
-  if(repsonseAttechments['attachmentInfos'].isEmpty) {
+  if (repsonseAttechments['attachmentInfos'].isEmpty) {
     return '';
   }
   var attachments = repsonseAttechments['attachmentInfos'][0]['id'];

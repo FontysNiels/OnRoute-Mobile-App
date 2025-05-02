@@ -62,17 +62,13 @@ class _SingleRouteState extends State<SingleRoute> {
                 ),
 
                 // Images (PACKAGE ONLY)
-                PackegImagePreview(
-                  description:
-                      widget.routeContent.availableRoute[0].description,
-                ),
+                PackegImagePreview(routeContent: widget.routeContent),
 
                 // Download Button
                 !widget.routeContent.locally
                     ? RouteDownloadButton(
                       currentRoute: widget.routeContent,
                       setSheetWidget: widget.setSheetWidget,
-                      
                     )
                     : RouteStartButton(
                       routeContent: widget.routeContent,

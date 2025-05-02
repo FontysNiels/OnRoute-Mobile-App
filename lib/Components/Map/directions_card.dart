@@ -175,6 +175,12 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
       setState(() {
         metersToCurrentDirection = distanceInMeters.toInt();
+
+        // if (descriptionNum == 0) {
+        //   metersToCurrentDirection = distanceInMeters.toInt();
+        // } else {
+        //   metersToCurrentDirection = int.parse(distanceToEveryDirection[descriptionNum -1]);
+        // }
       });
     }
   }

@@ -49,7 +49,7 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
           routeID: file.path,
           title: routeInfo.title,
           description: routeInfo.description,
-          locally: true,
+          locally: true, thumbnail: routeInfo.thumbnail,
         ),
       ],
       locally: true,
@@ -127,12 +127,6 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
             );
             poi['attributes']['asset'] = image;
 
-            //TODO: do this in the single_route itself so it doesnt affect loading times
-            // if (image != '') {
-            //   final imageProvider = CachedNetworkImageProvider(image);
-            //   await precacheImage(imageProvider, context);
-            // }
-
             Poi parsedPoi = Poi.fromJsonOnline(poi);
             featureLayerPois.add(parsedPoi);
           }
@@ -149,6 +143,8 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
                     .first['description'] ??
                 '...',
             locally: false,
+            thumbnail: filteredRouteIDs.where((route) => route['id'] == element['itemId'])
+                    .first['thumbnail']
           );
           webMapCollection.availableRoute.add(onlineRoute);
         }
@@ -190,6 +186,7 @@ RouteLayerData filterRouteInfo(
   var modifiedResponse = jsonDecode(routeResponse.body);
   modifiedResponse['title'] = layerInfo.title;
   modifiedResponse['description'] = layerInfo.description;
+  modifiedResponse['thumbnail'] = layerInfo.thumbnail;
 
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
