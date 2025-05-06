@@ -5,6 +5,7 @@ class RouteLayerData {
   final List<int> visibleLayers;
   final String title;
   final String description;
+  final String thumbnail;
 
   RouteLayerData({
     // required this.opacity,
@@ -12,6 +13,7 @@ class RouteLayerData {
     required this.layers,
     required this.visibleLayers,
     required this.title,
+    required this.thumbnail,
     required this.description,
   });
 
@@ -26,6 +28,7 @@ class RouteLayerData {
       visibleLayers: List<int>.from(json['visibleLayers']),
       title: json['title'],
       description: json['description'],
+      thumbnail: json['thumbnail'],
     );
   }
 
@@ -33,6 +36,7 @@ class RouteLayerData {
     'layers': layers.map((layer) => layer.toJson()).toList(),
     'visibleLayers': visibleLayers,
     'title': title,
+    'thumbnail': thumbnail,
     'description': description,
   };
 }

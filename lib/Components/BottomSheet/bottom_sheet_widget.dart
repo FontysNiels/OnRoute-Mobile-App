@@ -1,10 +1,118 @@
+import 'dart:io';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
+import 'package:onroute_app/Functions/file_storage.dart';
 
-class BottomSheetWidget extends StatelessWidget {
+class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
+  final Function cancelRoute;
+  const BottomSheetWidget({
+    super.key,
+    required this.startRoute,
+    required this.cancelRoute,
+  });
 
-  const BottomSheetWidget({super.key, required this.startRoute});
+  @override
+  State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
+}
+
+// Function to cancel the route (made global, so the received setstate function can be used globally)
+late Function cancel;
+
+/// Scroll controller for the bottom sheet
+final ScrollController scrollController = ScrollController();
+
+// List of available routes
+late Future<List<WebMapCollection>> futureRoutes;
+
+// Sheet controller
+late final DraggableScrollableController _controller;
+
+// Sheet size
+double sheetSize = 0.4;
+// Sheet size animator
+
+// TODO: vaste maten maken, ipv variable double
+// Function that animates the sheet to a certain size
+Future<void> moveSheetTo(double size) async {
+  while (!_controller.isAttached) {
+    await Future.delayed(Duration(milliseconds: 50));
+  }
+  _controller.animateTo(
+    size,
+    duration: Duration(milliseconds: 300),
+    curve: Curves.easeInOut,
+  );
+  await Future.delayed(Duration(milliseconds: 300));
+}
+
+class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+  // List of all the widgets in the bottom sheet
+  final List<Widget> _bottomSheetWidgets = [];
+
+  // Function that gets and sets the future routeList
+  Future<List<WebMapCollection>> getRouteList() async {
+    List<File> localFiles = await getRouteFiles();
+
+    List<WebMapCollection> allAvailableRoutes = [];
+
+    allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
+
+    final List<ConnectivityResult> connectivityResult =
+        await (Connectivity().checkConnectivity());
+
+    if (connectivityResult.contains(ConnectivityResult.mobile) ||
+        connectivityResult.contains(ConnectivityResult.wifi)) {
+      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
+    }
+
+    return allAvailableRoutes;
+  }
+
+  // Changes the current widget, and has the ability to reload the list of routes
+  Future<void> setSheetWidget(Widget? widget, bool? reload) async {
+    List<File> localFiles = await getRouteFiles();
+    List<WebMapCollection> receivedRoutes = await futureRoutes;
+    List<WebMapCollection> localItems = await fetchLocalItems(localFiles);
+
+    setState(() {
+      if (widget != null) {
+        _bottomSheetWidgets.add(widget);
+      } else {
+        if (reload == true) {
+          receivedRoutes.addAll(
+            localItems.where(
+              (localItem) =>
+                  !receivedRoutes.any(
+                    (route) =>
+                        route.webmapId == localItem.webmapId &&
+                        route.locally == localItem.locally,
+                  ),
+            ),
+          );
+        }
+        _bottomSheetWidgets.removeLast();
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController();
+    cancel = widget.cancelRoute;
+    futureRoutes = getRouteList();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -12,12 +120,31 @@ class BottomSheetWidget extends StatelessWidget {
       children: [
         // Persistent bottom sheet
         DraggableScrollableSheet(
-          initialChildSize: 0.4,
+          controller: _controller,
+          initialChildSize: sheetSize,
           snap: true,
-          snapSizes: [0.2, 0.4, 0.6, 0.9],
-          minChildSize: 0.2,
+          // TODO: bespreken hoe of wat
+          // snapSizes: [0.2, 0.4, 0.6, 0.9],
+          // minChildSize: 0.2,
+          // During route:
+          // snapSizes: [0.15, 0.5, 0.9],
+          snapSizes:
+              _bottomSheetWidgets.length > 1
+                  ? [0.15, 0.5, 0.9]
+                  : [0.3, 0.5, 0.9],
+          minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
           maxChildSize: 0.9,
-          builder: (BuildContext context, ScrollController scrollController) {
+          builder: (BuildContext context, scrollController) {
+            if (_bottomSheetWidgets.isEmpty) {
+              _bottomSheetWidgets.add(
+                RoutesListView(
+                  scrollController: scrollController,
+                  startRoute: widget.startRoute,
+                  setSheetWidget: setSheetWidget,
+                ),
+              );
+            }
+
             return Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
@@ -30,9 +157,9 @@ class BottomSheetWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              child: RoutesListView(
-                scrollController: scrollController,
-                startRoute: startRoute,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: _bottomSheetWidgets.last,
               ),
             );
           },

@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:http/http.dart' as http;
 
-Future<http.Response> getRouteData(String routeID) async {
-  // Get Car Id (By License Plate)
+// Get ArcGIS content from specific file
+Future<http.Response> getRouteLayerJSON(String routeID) async {
   final response = await http.get(
     Uri.parse(
       'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/data',
@@ -15,7 +17,10 @@ Future<http.Response> getRouteData(String routeID) async {
   return response;
 }
 
+// Get ArcGIS data, like title and description, from specific file
+// Momenteel (28/04) niet in gebruik, doordat titel en description ook in de getall zitten
 Future<http.Response> getRouteInfo(String routeID) async {
+  print('object');
   final response = await http.get(
     Uri.parse(
       'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/?f=json',
@@ -25,4 +30,87 @@ Future<http.Response> getRouteInfo(String routeID) async {
     },
   );
   return response;
+}
+
+// Gets all files in a folder
+Future<http.Response> getAllFromFolder() async {
+  var tokenResponse = await generateToken();
+  var generatedToken = jsonDecode(tokenResponse.body)['token'];
+  final response = await http.get(
+    Uri.parse(
+      // 'https://gisportal.bragis.nl/arcgis/sharing/rest/content/users/bragis_stagiair/c792879e301c4fdd94dcf6cbf4874bc5?f=pjson&token=$routeID',
+      'https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken',
+    ),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+
+  var test = jsonDecode(response.body);
+  for (var item in test['items']) {
+    if (item['thumbnail'] != null) {
+      item['thumbnail'] =
+          "https://bragis-def.maps.arcgis.com/sharing/rest/content/items/${item['id']}/info/${item['thumbnail']}?token=$generatedToken";
+    }
+  }
+  var enresponse = jsonEncode(test);
+  return http.Response(enresponse, response.statusCode, headers: response.headers);
+  // print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken');
+  // return response;
+}
+
+//
+Future<http.Response> getServiceContent(String url) async {
+  String madeUrl = "$url/query?where=1%3D1&outFields=*&f=json";
+  final response = await http.get(
+    Uri.parse(madeUrl),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+  return response;
+}
+
+//
+Future<String> getServiceAssets(String url, int id) async {
+  String madeUrl = "$url/$id/attachments/?f=json";
+
+  final response = await http.get(
+    Uri.parse(madeUrl),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+  );
+
+  var repsonseAttechments = jsonDecode(response.body);
+
+  if (repsonseAttechments['attachmentInfos'].isEmpty) {
+    return '';
+  }
+  var attachments = repsonseAttechments['attachmentInfos'][0]['id'];
+
+  String attechmentUrl = "$url/$id/attechments/$attachments";
+
+  return attechmentUrl;
+}
+
+Future<http.Response> generateToken() async {
+  var request = http.MultipartRequest(
+    'POST',
+    Uri.parse('https://bpwa.eu/appmobile/gettoken.php'),
+  );
+  request.fields['name'] = 'apptest';
+  request.fields['pass'] = 'dOOrnhOEk#823';
+  request.fields['server'] = '0';
+
+  var streamedResponse = await request.send();
+  var response = await http.Response.fromStream(streamedResponse);
+
+  if (response.statusCode == 200) {
+    // print('Success: ${response.body}');
+    return response;
+  } else {
+    // print('Failed with status: ${response.statusCode}');
+    return response;
+  }
 }

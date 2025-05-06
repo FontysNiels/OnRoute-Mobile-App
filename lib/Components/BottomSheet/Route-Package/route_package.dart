@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_download_button.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
-import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_title.dart';
-import 'package:onroute_app/Components/BottomSheet/Tabs/tabs_body.dart';
 
 
 class RoutePackage extends StatefulWidget {
@@ -18,7 +16,6 @@ int _selectedIndex = 0;
 class _RoutePackageState extends State<RoutePackage> {
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -45,14 +42,14 @@ class _RoutePackageState extends State<RoutePackage> {
           // Title
           const PackageTitle(),
           // Images
-          const PackegImagePreview(),
+          // const PackegImagePreview(description: '',),
           // Download Button
           const PackageDownloadButton(),
           // Tabs
           // Make one for Routes, or make it dynamic?
-          PackageTabs(setIndex: setIndex, isPackage: true),
+          // PackageTabs(setIndex: setIndex, isPackage: true),
           // Body of tabs
-          TabsBody(selectedIndex: _selectedIndex),
+          // TabsBody(selectedIndex: _selectedIndex),
         ],
       ),
     );

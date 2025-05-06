@@ -1,18 +1,23 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/available_routes.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
-
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 class RouteCard extends StatelessWidget {
-  final AvailableRoutes routeContent;
-  final VoidCallback onRouteUpdated; // New callback functionF
+  final WebMapCollection routeContent;
+  // final VoidCallback onRouteUpdated; // New callback functionF
   final Function startRoute;
+  final ScrollController scrollController;
+  final Function setSheetWidget;
 
   const RouteCard({
     super.key,
     required this.routeContent,
-    required this.onRouteUpdated, // Pass the callback
+    // required this.onRouteUpdated, // Pass the callback
     required this.startRoute,
+    required this.scrollController,
+    required this.setSheetWidget,
   });
 
   @override
@@ -20,28 +25,19 @@ class RouteCard extends StatelessWidget {
     return GestureDetector(
       onTap: () async {
         // Navigate to ROUTE
-        final result = await Navigator.push(
-          context,
+        // await changesheetsize(0.9);
 
-          // PageRouteBuilder(
-          //   pageBuilder:
-          //       (context, animation, secondaryAnimation) => SingleRoute(key: UniqueKey(), routeContent: routeContent),
-          //   transitionDuration: Duration.zero, // No transition effect
-          // ),
-          MaterialPageRoute(
-            builder:
-                (context) => SingleRoute(
-                  key: UniqueKey(),
-                  routeContent: routeContent,
-                  startRoute: startRoute,
-                ),
+        await moveSheetTo(0.9);
+        setSheetWidget(
+          SingleRoute(
+            key: UniqueKey(),
+            routeContent: routeContent,
+            startRoute: startRoute,
+            scroller: scrollController,
+            setSheetWidget: setSheetWidget,
           ),
+          false,
         );
-
-        // Trigger the callback if result is true
-        if (result == true) {
-          onRouteUpdated();
-        }
       },
       child: Card(
         elevation: 0,
@@ -57,11 +53,14 @@ class RouteCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/temp.png',
+                    child: CachedNetworkImage(
                       height: 56,
                       width: 56,
-                      fit: BoxFit.cover,
+                      imageUrl:
+                          "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                      // placeholder:
+                      //     (context, url) => CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
                   ),
                   Expanded(
@@ -74,11 +73,12 @@ class RouteCard extends StatelessWidget {
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
                             // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
-                            routeContent.routeLayer.title,
+                            routeContent.availableRoute[0].title,
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
+                            // "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
+                            "GEEN KM MEER",
                             style: Theme.of(context).textTheme.bodyMedium!
                                 .copyWith(fontStyle: FontStyle.italic),
                           ),
@@ -93,28 +93,9 @@ class RouteCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  // IconButton(
-                  //   icon: const Icon(Icons.more_vert),
-                  //   onPressed: () {
-                  //   showPopover(context: context, bodyBuilder: (context)=> PopupMenuItem(child: Text('Download'), value: Text('yes'),));
-                  //   },
-                  // ),
-                  // PopupMenuButton(
-                  //   itemBuilder:
-                  //       (BuildContext context) => <PopupMenuEntry>[
-                  //         const PopupMenuItem(
-                  //           // value: SampleItem.itemOne,
-                  //           child: Padding(
-                  //             padding: EdgeInsets.all(0),
-                  //             child: Text('Download'),
-                  //           ),
-                  //         ),
-                  //       ],
-                  // ),
                 ],
               ),
             ),
-            // Divider()
           ],
         ),
       ),

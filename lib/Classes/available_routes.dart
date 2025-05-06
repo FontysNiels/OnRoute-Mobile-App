@@ -1,20 +1,24 @@
-import 'package:onroute_app/Classes/route_layer_data.dart';
-
 class AvailableRoutes {
   final String routeID;
+  final String title;
+  final String description;
+  final String thumbnail;
   final bool locally;
-  final RouteLayerData routeLayer;
+  // probably will change when POIs are added to the route
 
   AvailableRoutes({
     required this.routeID,
+    required this.title,
+    required this.description,
     required this.locally,
-    required this.routeLayer,
+    required this.thumbnail,
   });
-}
 
-class RouteData {
-  final String title;
-  final String description;
-
-  RouteData({required this.title, required this.description});
+  Map<String, dynamic> toJson() => {
+    'routeID': routeID,
+    'title': title,
+    'description': description,
+    'locally': locally,
+    'thumbnail': thumbnail,
+  };
 }
