@@ -625,10 +625,12 @@ class _DirectionsCardState extends State<DirectionsCard> {
                 heroTag: UniqueKey(),
                 onPressed:
                     () => {
+                      enabledNotifiation = !enabledNotifiation,
+
                       mapViewController.locationDisplay.autoPanMode =
                           LocationDisplayAutoPanMode.compassNavigation,
                     },
-                child: Icon(Icons.notifications),
+                child: Icon(enabledNotifiation ? Icons.notifications: Icons.notifications_off),
               ),
             ],
           ),

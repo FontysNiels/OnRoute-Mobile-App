@@ -44,6 +44,8 @@ late RouteLayerData _routeInfo;
 
 double disrabceToFinish = 0.0;
 
+bool enabledNotifiation = true;
+
 // currentPOI is the current point of interest (POI) that is selected by the user
 // This is purely used for the POI that the user clicked on, so it can be passed from MapWidget to TripInfoBar
 int currenPOI = 0;

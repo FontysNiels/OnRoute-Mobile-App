@@ -174,7 +174,10 @@ class _TripContentState extends State<TripContent> {
       //changes sheet height
       await moveSheetTo(0.9);
       //sets poi to the POI user is near
-      beeper();
+      if (enabledNotifiation) {
+        beeper();
+      }
+
       setState(() {
         _nearestPoi = closestPoi;
         _userNearPoi = true;
