@@ -63,7 +63,7 @@ class RouteDownloadButton extends StatelessWidget {
               currentRoute.webmapId,
             );
           } else {
-            // TODO: iets van check toevoegen of de route al bestaat in een folder
+            // TODO: iets van check toevoegen of de route al bestaat in een folder (voor als er een route 2x gebruikt wordt of package)
             var encodeRoute = jsonEncode(routeInfo.toJson());
             await writeFile(
               encodeRoute,

@@ -2,55 +2,45 @@ import 'dart:async';
 import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/description_point.dart';
-import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/conversions.dart';
 import 'package:onroute_app/main.dart';
 
 class DirectionsCard extends StatefulWidget {
-  const DirectionsCard({
-    super.key,
-    required RouteLayerData routeInfo,
-    required List<DescriptionPoint> directionsList,
-    required ArcGISMapViewController mapViewController,
-  }) : _directionsList = directionsList,
-       _routeInfo = routeInfo,
-       _mapViewController = mapViewController;
-
-  final List<DescriptionPoint> _directionsList;
-  final ArcGISMapViewController _mapViewController;
-  final RouteLayerData _routeInfo;
+  const DirectionsCard({super.key});
 
   @override
   State<DirectionsCard> createState() => _DirectionsCardState();
 }
 
 class _DirectionsCardState extends State<DirectionsCard> {
+  // Variable that shows the distance in meters to the current direction
   int metersToCurrentDirection = 0;
+  // The number description the user is on
   int descriptionNum = 0;
-  // int amountOfDirections = 0;
-  // bool skipNextCheck = false;
-
+  // Condition that shows if user is away from route
   bool userAwayFromRoute = false;
-  // Create a list of descriptions and distances
-  // List<Map<String, dynamic>> descriptionDistanceList = [];
-  late final List<DescriptionPoint> directionList;
+  // The subscription that subscribes the to user's location
   late StreamSubscription<ArcGISLocation> subscription;
 
+  // Function that initializes the subscription and handles the location updates
   void _initializeLocationSubscription(List lines) {
-    subscription = widget._mapViewController.locationDisplay.onLocationChanged
-        .listen((mode) {
-          _handleLocationUpdate(lines);
-        });
+    subscription = mapViewController.locationDisplay.onLocationChanged.listen((
+      mode,
+    ) {
+      _handleLocationUpdate(lines);
+    });
   }
 
-  // Handle location updates and check if the user is near a line segment
+  // Function that handles location updates and check if the user is near a line segment
   void _handleLocationUpdate(List lines) {
-    final userPosition =
-        widget._mapViewController.locationDisplay.location!.position;
+    // User's locatoon
+    final userPosition = mapViewController.locationDisplay.location!.position;
+    // List of distances to direction points
     List closeto = [];
-    var closestPoint = [];
+    // List of the closest point and it's distance
+    List closestPoint = [];
 
+    // Filling these lists, by looping through all the direction points and calculating the distance to them
     for (int i = 0; i < lines.length - 1; i++) {
       final start = lines[i];
       final end = lines[i + 1];
@@ -67,19 +57,23 @@ class _DirectionsCardState extends State<DirectionsCard> {
       }
     }
 
+    // If there is a closest one, add it
     if (closeto.isNotEmpty) {
       final closestEntry = closeto.reduce((a, b) => a[0] < b[0] ? a : b);
       closestPoint = closestEntry;
     }
 
+    // Variable that checks if the user is near or on the route
     bool found = _updateCurrentDirection(userPosition, lines, closestPoint);
 
+    // If not the case, and the userAwayFromRoute is still false, change the userAwayFromRoute to true
     if (!found && !userAwayFromRoute) {
       setState(() {
         userAwayFromRoute = true;
       });
     }
 
+    // Handles all updates to the distance numbers
     _updateDistanceToNextPoint(userPosition);
   }
 
@@ -97,7 +91,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
           (position.x <= start[1] && position.x >= end[1]);
 
       if (isBetweenLat && isBetweenLng) {
-        print("inbetween");
+        // print("inbetween");
 
         return _setDirectionFromObjectID(start[2]);
       } else if (closestPoint.isNotEmpty && closestPoint[0] < 40) {
@@ -115,7 +109,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
       });
       return true;
     } else {
-      for (var element in widget._routeInfo.layers[2].featureSet.features) {
+      for (var element in routeInfo.layers[2].featureSet.features) {
         if (element.attributes['ObjectID'] == objectID) {
           var testIndex = directionList.indexWhere(
             (direct) => direct.description == element.attributes['DisplayText'],
@@ -135,7 +129,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
     return true;
   }
 
-  /// Update the distance to the next point
+  /// Update the distance to the next point, and all the distance in general
   void _updateDistanceToNextPoint(dynamic userPosition) {
     if (directionList.isNotEmpty) {
       final directionPointXY = convertToLatLng(
@@ -155,7 +149,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
       final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
 
       var distanceToEveryDirection =
-          widget._routeInfo.layers[1].featureSet.features
+          routeInfo.layers[1].featureSet.features
               .map((feature) => feature.attributes['Meters'])
               .toList();
 
@@ -163,9 +157,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
         distanceToEveryDirection[descriptionNum] = distanceInMeters.toInt();
       } else {
         // print(distanceToEveryDirection[descriptionNum - 1]);
-
         distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
-        // print(distanceToEveryDirection[descriptionNum - 1]);
         distanceToEveryDirection = distanceToEveryDirection.sublist(
           descriptionNum - 1,
         );
@@ -178,12 +170,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
       setState(() {
         metersToCurrentDirection = distanceInMeters.toInt();
-
-        // if (descriptionNum == 0) {
-        //   metersToCurrentDirection = distanceInMeters.toInt();
-        // } else {
-        //   metersToCurrentDirection = int.parse(distanceToEveryDirection[descriptionNum -1]);
-        // }
       });
     }
   }
@@ -191,7 +177,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
   // Return a list of the points with normalized coordinates and the direction point ID
   List _generateLinePoints() {
     List lines = [];
-    for (var element in widget._routeInfo.layers[1].featureSet.features) {
+    for (var element in routeInfo.layers[1].featureSet.features) {
       for (var i = 0; i < element.geometry.paths![0].length; i++) {
         lines.add(
           convertToLatLngSpecial(
@@ -219,267 +205,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
   @override
   void initState() {
     super.initState();
-    // routing();
-    directionList = widget._directionsList;
 
-    if (widget._directionsList.isNotEmpty) {
+    if (directionList.isNotEmpty) {
       final lines = _generateLinePoints();
       _initializeLocationSubscription(lines);
     }
-
-    // void routing() {
-    //   // amountOfDirections = widget._directionsList.length;
-    //   directionList = widget._directionsList;
-
-    //   // print(directionList);
-    //   List lines = [];
-    //   if (widget._directionsList.isNotEmpty) {
-    //     for (var element in widget._routeInfo.layers[1].featureSet.features) {
-    //       // print(routeInfo.layers[2].featureSet.features.where((item)=> item.attributes['ObjectID'] == ));
-    //       for (var i = 0; i < element.geometry.paths![0].length; i++) {
-    //         lines.add(
-    //           convertToLatLngSpecial(
-    //             element.geometry.paths![0][i][0],
-    //             element.geometry.paths![0][i][1],
-    //             element.attributes['DirectionPointID'],
-    //           ),
-    //         );
-    //       }
-    //     }
-
-    //     subscription = widget._mapViewController.locationDisplay.onLocationChanged.listen((
-    //       mode,
-    //     ) {
-    //       if (widget._directionsList.isNotEmpty) {
-    //         final userPosition =
-    //             widget._mapViewController.locationDisplay.location!.position;
-    //         List closeto = [];
-    //         var closestPoint = [];
-    //         for (int i = 0; i < lines.length - 1; i++) {
-    //           final start = lines[i];
-    //           final end = lines[i + 1];
-
-    //           // print(lines);
-    //           final distanceBetweenUserAndLine = sqrt(
-    //             pow(userPosition.y - ((start[0] + end[0]) / 2), 2) +
-    //                 pow(userPosition.x - ((start[1] + end[1]) / 2), 2),
-    //           );
-
-    //           final distanceInMeters = distanceBetweenUserAndLine * 111320;
-
-    //           if (distanceInMeters < 50) {
-    //             closeto.add([distanceInMeters, start[2]]);
-    //             // print("Distance to line segment: ${distanceInMeters} meters");
-    //           }
-    //         }
-    //         if (closeto.isNotEmpty) {
-    //           final closestEntry = closeto.reduce((a, b) => a[0] < b[0] ? a : b);
-    //           // print(closestEntry);
-    //           closestPoint = closestEntry;
-    //           // setState(() {
-    //           //   metersToCurrentDirection = closestEntry[0].toInt();
-    //           // });
-    //         }
-
-    //         for (int i = 0; i < lines.length - 1; i++) {
-    //           final start = lines[i];
-    //           final end = lines[i + 1];
-
-    //           // Check if the user is between the two points
-    //           final isBetweenLat =
-    //               (userPosition.y >= start[0] && userPosition.y <= end[0]) ||
-    //               (userPosition.y <= start[0] && userPosition.y >= end[0]);
-    //           final isBetweenLng =
-    //               (userPosition.x >= start[1] && userPosition.x <= end[1]) ||
-    //               (userPosition.x <= start[1] && userPosition.x >= end[1]);
-
-    //           if (isBetweenLat && isBetweenLng) {
-    //             // print("User is between coordinates: $start and $end");
-    //             for (var element
-    //                 in widget._routeInfo.layers[2].featureSet.features) {
-    //               if (element.attributes['ObjectID'] == start[2]) {
-    //                 // print(element.attributes['DisplayText']);
-    //                 var testIndex = directionList.indexWhere(
-    //                   (direct) =>
-    //                       direct.description == element.attributes['DisplayText'],
-    //                 );
-    //                 // print(directionList[testIndex]);
-    //                 descriptionNum = testIndex + 1;
-    //               }
-    //             }
-    //             if (userAwayFromRoute) {
-    //               userAwayFromRoute = !userAwayFromRoute;
-    //             }
-    //             // print("Distance to line segment: ${distanceInMeters} meters");
-    //             break;
-    //           } else if (closestPoint.length != 0) {
-    //             if (closestPoint[0] < 40) {
-    //               for (var element
-    //                   in widget._routeInfo.layers[2].featureSet.features) {
-    //                 if (element.attributes['ObjectID'] == closestPoint[1]) {
-    //                   // print(element.attributes['DisplayText']);
-    //                   var testIndex = directionList.indexWhere(
-    //                     (direct) =>
-    //                         direct.description ==
-    //                         element.attributes['DisplayText'],
-    //                   );
-
-    //                   // print(directionList[testIndex]);
-    //                   if (descriptionNum != testIndex + 1) {
-    //                     descriptionNum = testIndex + 1;
-    //                   }
-    //                 }
-    //               }
-
-    //               if (userAwayFromRoute) {
-    //                 userAwayFromRoute = !userAwayFromRoute;
-    //               }
-    //               // print("Distance to line segment: ${distanceInMeters} meters");
-    //               break;
-    //             }
-    //           } else if (i == lines.length - 2) {
-    //             if (!userAwayFromRoute) {
-    //               setState(() {
-    //                 userAwayFromRoute = !userAwayFromRoute;
-    //               });
-
-    //               print("nergens");
-    //             }
-    //           }
-    //         }
-    //       }
-    //       // check that checks if user is facing a point and moving towards it?
-
-    //       if (widget._directionsList.isNotEmpty) {
-    //         // Calculate the distance between the user's current position and the direction's coordinates
-    //         final userPosition =
-    //             widget._mapViewController.locationDisplay.location!.position;
-
-    //         final directionPointXY = convertToLatLng(
-    //           directionList[descriptionNum].x,
-    //           directionList[descriptionNum].y,
-    //         );
-    //         final directionPointX = directionPointXY[1];
-    //         final directionPointY = directionPointXY[0];
-
-    //         final distanceToDirectionPoint = sqrt(
-    //           pow(userPosition.y - directionPointY, 2) +
-    //               pow(userPosition.x - directionPointX, 2),
-    //         );
-
-    //         // Define a threshold distance (e.g., 10 meters)
-    //         // Approx. 10 meters in lat/long degrees
-    //         const thresholdDistance = 0.0001;
-    //         const metersPerDegree = 111320; // Approximation for latitude
-    //         final distanceInMeters = distanceToDirectionPoint * metersPerDegree;
-    //         // List<Map<String, dynamic>> descriptionDistanceListTemp = [];
-    //         // for (int index = 0; index < directionList.length; index++) {
-    //         //   final point = directionList[index];
-    //         //   final pointXY = convertToLatLng(point.x, point.y);
-    //         //   final pointX = pointXY[1];
-    //         //   final pointY = pointXY[0];
-
-    //         //   final distanceToPoint = sqrt(
-    //         //     pow(userPosition.y - pointY, 2) + pow(userPosition.x - pointX, 2),
-    //         //   );
-
-    //         //   final distanceInMetersToPoint = distanceToPoint * metersPerDegree;
-
-    //         //   int distanceBetweenPoints = 0;
-    //         //   // Get distance between points
-
-    //         //   final matchingFeatures = widget
-    //         //       ._routeInfo
-    //         //       .layers[1]
-    //         //       .featureSet
-    //         //       .features
-    //         //       .where(
-    //         //         (feature) =>
-    //         //             feature.attributes['DirectionPointID'] ==
-    //         //             (widget
-    //         //                 ._routeInfo
-    //         //                 .layers[2]
-    //         //                 .featureSet
-    //         //                 .features[index]
-    //         //                 .attributes["ObjectID"]),
-    //         //       );
-
-    //         //   // Set distance between points
-    //         //   if (matchingFeatures.isNotEmpty) {
-    //         //     distanceBetweenPoints =
-    //         //         matchingFeatures.first.attributes['Meters'].toInt();
-    //         //   }
-    //         //   descriptionDistanceListTemp.add({
-    //         //     'desc': point.description,
-    //         //     'userDistanceFromPoint': distanceInMetersToPoint.toInt(),
-    //         //     'distanceBetweenPoints': distanceBetweenPoints,
-    //         //   });
-    //         // }
-
-    //         // MAKE IT SO IT CHECK IF WALKING AWAY (_mapViewController.locationDisplay.location!.course)
-    //         // print(descriptionDistanceList);
-    //         // if (distanceToDirectionPoint < thresholdDistance) {
-    //         //   if (descriptionNum < amountOfDirections - 1) {
-    //         //     print("User has passed the current direction's coordinates.");
-    //         //     setState(() {
-    //         //       descriptionNum++;
-    //         //       skipNextCheck = true; // Skip the next check
-    //         //       // ^ uit setstate zetten?
-    //         //     });
-    //         //   }
-    //         // } else if (!skipNextCheck) {
-    //         //   // Check if the distance to current direction is increasing
-    //         //   if (metersToCurrentDirection < distanceInMeters.toInt() &&
-    //         //       metersToCurrentDirection != 0) {
-    //         //     // If so, check if user is getting closer to a different point
-    //         //     for (
-    //         //       var iLoop = 0;
-    //         //       iLoop < descriptionDistanceList.length;
-    //         //       iLoop++
-    //         //     ) {
-    //         //       // Can't check the one after the last
-    //         //       if (iLoop != descriptionDistanceList.length - 1) {
-    //         //         // print('tempdistance ${descriptionDistanceListTemp[1]['userDistanceFromPoint']}');
-    //         //         // print('main distance ${descriptionDistanceList[1]['userDistanceFromPoint']}');
-    //         //         // print('0--------0');
-
-    //         //         // Check if user is closer than the set distance to it
-
-    //         //         // if (descriptionDistanceList[iLoop +
-    //         //         //         1]['userDistanceFromPoint'] <
-    //         //         //     descriptionDistanceList[iLoop]['distanceBetweenPoints']) {
-    //         //         if (descriptionDistanceListTemp[iLoop]['userDistanceFromPoint'] >
-    //         //                 descriptionDistanceList[iLoop]['userDistanceFromPoint'] &&
-    //         //             descriptionDistanceListTemp[iLoop +
-    //         //                     1]['userDistanceFromPoint'] <
-    //         //                 descriptionDistanceList[iLoop +
-    //         //                     1]['userDistanceFromPoint']) {
-    //         //           // Skip if the user is getting closer to one that they already passed
-
-    //         //           if (descriptionNum > iLoop) {
-    //         //             continue;
-    //         //           }
-
-    //         //           // Change to the next description and stop the loop
-    //         //           descriptionNum++;
-    //         //           break;
-    //         //         }
-    //         //       }
-    //         //     }
-    //         //   }
-    //         // } else {
-    //         //   skipNextCheck = false; // Reset the flag after skipping
-    //         // }
-
-    //         // Update distance to nect direction
-    //         setState(() {
-    //           metersToCurrentDirection = distanceInMeters.toInt();
-    //           // descriptionDistanceList = descriptionDistanceListTemp;
-    //         });
-    //       }
-    //     });
-    //   }
-    // }
   }
 
   @override
@@ -630,7 +360,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
                       mapViewController.locationDisplay.autoPanMode =
                           LocationDisplayAutoPanMode.compassNavigation,
                     },
-                child: Icon(enabledNotifiation ? Icons.notifications: Icons.notifications_off),
+                child: Icon(
+                  enabledNotifiation
+                      ? Icons.notifications
+                      : Icons.notifications_off,
+                ),
               ),
             ],
           ),

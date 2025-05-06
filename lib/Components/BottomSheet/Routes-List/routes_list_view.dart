@@ -8,14 +8,12 @@ import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 class RoutesListView extends StatefulWidget {
   final ScrollController scrollController;
   final Function startRoute;
-  final Function changesheetsize;
   final Function setSheetWidget;
 
   const RoutesListView({
     super.key,
     required this.scrollController,
     required this.startRoute,
-    required this.changesheetsize,
     required this.setSheetWidget,
   });
 
@@ -128,7 +126,6 @@ class _RoutesListViewState extends State<RoutesListView> {
           // Add the online items section
           listItems.add(const ListDivider(text: 'Niet Gedownloade Routes'));
           // TODO: Not container, remove earlier
-          // TODO: Add something for when everything is downloaded
           if (onlineItems.isNotEmpty) {
             listItems.addAll(
               onlineItems.map((item) {
@@ -166,7 +163,7 @@ class _RoutesListViewState extends State<RoutesListView> {
                       "Verbind met het internet om alle routes te zien",
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    // TODO: add a loading modal
+                    // TODO: add a loading modal & functioneel maken
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: IconButton.filled(

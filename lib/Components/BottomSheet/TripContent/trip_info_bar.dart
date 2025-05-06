@@ -57,7 +57,7 @@ class _TripContentState extends State<TripContent> {
   }
 
   void calculateDistances() {
-    List<DescriptionPoint> directions = directionsList;
+    List<DescriptionPoint> directions = directionList;
     if (directions.isEmpty) {
       // This is just a check for the start, it shouldn't happen, but just in case
 
@@ -120,7 +120,7 @@ class _TripContentState extends State<TripContent> {
 
           // basically checks if distance has been calculated
           if (closestPoi != null) {
-            int latestPoi = currenPOI;
+            int latestPoi = selectedPOI;
 
             // Distance based
             await _distanceBasedPoiSetter(closestDistance, closestPoi);

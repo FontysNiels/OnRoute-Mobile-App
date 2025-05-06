@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/main.dart';
 
 class MapWidget extends StatefulWidget {
@@ -13,9 +12,6 @@ class MapWidget extends StatefulWidget {
 }
 
 class _MapWidgetState extends State<MapWidget> {
-  // Create a GlobalKey for the ArcGISMapView to persist its state.
-  final GlobalKey _mapViewKey = GlobalKey();
-
   @override
   void initState() {
     super.initState();
@@ -26,23 +22,18 @@ class _MapWidgetState extends State<MapWidget> {
     super.dispose();
   }
 
-  // create a controller for the map view
+  // Create a GlobalKey for the ArcGISMapView to persist its state.
+  final GlobalKey _mapViewKey = GlobalKey();
+  // Create a local controller for the map view
   late final _mapViewController = mapViewController;
+  // Create a ArcGISMap variable
   late ArcGISMap _webMap;
   // Create a graphics overlay.
   late final _graphicsOverlay = graphicsOverlay;
   // A flag for when the map view is ready and controls can be used.
   var _ready = false;
-  // A flag for when the settings bottom sheet is visible.
-  // var _settingsVisible = false;
   // Create the system location data source.
   final _locationDataSource = SystemLocationDataSource();
-  // A subscription to receive status changes of the location data source.
-  // StreamSubscription? _statusSubscription;
-  // var _status = LocationDataSourceStatus.stopped;
-  // A subscription to receive changes to the auto-pan mode.
-  // StreamSubscription? _autoPanModeSubscription;
-  // var _autoPanMode = LocationDisplayAutoPanMode.compassNavigation;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +55,8 @@ class _MapWidgetState extends State<MapWidget> {
                           .identifyGraphicsOverlay(
                             _graphicsOverlay,
                             screenPoint: screenPoint,
-                            tolerance: 10.0, // tolerance in screen points
+                            tolerance:
+                                10.0, // tolerance in screen points TODO: test for optimal size
                           );
 
                       if (result.graphics.isNotEmpty) {
@@ -78,49 +70,6 @@ class _MapWidgetState extends State<MapWidget> {
                 ),
               ],
             ),
-            // navigate button
-            // Padding(
-            //   padding: EdgeInsets.only(
-            //     top: MediaQuery.of(context).padding.top,
-            //     left: 6,
-            //     right: 6,
-            //   ),
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.start,
-            //     crossAxisAlignment: CrossAxisAlignment.end,
-            //     spacing: 12,
-            //     children: [
-            //       FloatingActionButton(
-            //         heroTag: UniqueKey(),
-            //         onPressed:
-            //             () => {
-            //               _mapViewController.locationDisplay.autoPanMode =
-            //                   LocationDisplayAutoPanMode.recenter,
-            //             },
-            //         child: Icon(Icons.gps_fixed),
-            //       ),
-            //       FloatingActionButton(
-            //         heroTag: UniqueKey(),
-            //         onPressed:
-            //             () => {
-            //               _mapViewController.locationDisplay.autoPanMode =
-            //                   // LocationDisplayAutoPanMode.compassNavigation,
-            //                   LocationDisplayAutoPanMode.navigation,
-            //             },
-            //         child: Icon(Icons.compass_calibration),
-            //       ),
-            //       FloatingActionButton(
-            //         heroTag: UniqueKey(),
-            //         onPressed:
-            //             () => {
-            //               _mapViewController.locationDisplay.autoPanMode =
-            //                   LocationDisplayAutoPanMode.recenter,
-            //             },
-            //         child: Icon(Icons.notifications),
-            //       ),
-            //     ],
-            //   ),
-            // ),
 
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
@@ -192,39 +141,6 @@ class _MapWidgetState extends State<MapWidget> {
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
       _mapViewController.locationDisplay.autoPanMode =
           LocationDisplayAutoPanMode.navigation;
-      // _mapViewController.locationDisplay.onAutoPanModeChanged.listen((mode) {
-      //   if (mounted) {
-      //     setState(() => _autoPanMode = mode);
-      //   }
-      // });
-
-      // Setting the location type, probably don't need this later on
-      //////////////////////////////////////////////////////////////////////////////////////////
-      // Subscribe to status changes and changes to the auto-pan mode.
-      // _statusSubscription = _locationDataSource.onStatusChanged.listen((
-      //   status,
-      // ) {
-      //   if (mounted) {
-      //     setState(() => _status = status);
-      //   }
-      // });
-      // if (mounted) {
-      //   setState(() => _status = _locationDataSource.status);
-      //   _autoPanModeSubscription = _mapViewController
-      //       .locationDisplay
-      //       .onAutoPanModeChanged
-      //       .listen((mode) {
-      //         if (mounted) {
-      //           setState(() => _autoPanMode = mode);
-      //         }
-      //       });
-      // }
-      // if (mounted) {
-      //   setState(
-      //     () => _autoPanMode = _mapViewController.locationDisplay.autoPanMode,
-      //   );
-      // }
-      //////////////////////////////////////////////////////////////////////////////////////////
 
       // Attempt to start the location data source (this will prompt the user for permission).
       try {
@@ -242,58 +158,10 @@ class _MapWidgetState extends State<MapWidget> {
       if (mounted) {
         setState(() {
           _ready = true;
-          // print("_ready set to true");
         });
       }
     } catch (e) {
       print("Error in onMapViewReady: $e");
     }
-  }
-}
-
-class locationsettings extends StatelessWidget {
-  const locationsettings({
-    super.key,
-    required LocationDisplayAutoPanMode autoPanMode,
-    required ArcGISMapViewController mapViewController,
-  }) : _autoPanMode = autoPanMode,
-       _mapViewController = mapViewController;
-
-  final LocationDisplayAutoPanMode _autoPanMode;
-  final ArcGISMapViewController _mapViewController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const Text('Auto-Pan Mode'),
-        const Spacer(),
-        // A dropdown button to select the auto-pan mode.
-        DropdownButton(
-          value: _autoPanMode,
-          onChanged: (value) {
-            _mapViewController.locationDisplay.autoPanMode = value!;
-          },
-          items: const [
-            DropdownMenuItem(
-              value: LocationDisplayAutoPanMode.off,
-              child: Text('Off'),
-            ),
-            DropdownMenuItem(
-              value: LocationDisplayAutoPanMode.recenter,
-              child: Text('Recenter'),
-            ),
-            DropdownMenuItem(
-              value: LocationDisplayAutoPanMode.navigation,
-              child: Text('Navigation'),
-            ),
-            DropdownMenuItem(
-              value: LocationDisplayAutoPanMode.compassNavigation,
-              child: Text('Compass'),
-            ),
-          ],
-        ),
-      ],
-    );
   }
 }

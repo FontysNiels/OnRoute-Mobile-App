@@ -20,7 +20,9 @@ class BottomSheetWidget extends StatefulWidget {
   State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
 }
 
+// Function to cancel the route (made global, so the received setstate function can be used globally)
 late Function cancel;
+
 /// Scroll controller for the bottom sheet
 final ScrollController scrollController = ScrollController();
 
@@ -33,7 +35,9 @@ late final DraggableScrollableController _controller;
 // Sheet size
 double sheetSize = 0.4;
 // Sheet size animator
+
 // TODO: vaste maten maken, ipv variable double
+// Function that animates the sheet to a certain size
 Future<void> moveSheetTo(double size) async {
   while (!_controller.isAttached) {
     await Future.delayed(Duration(milliseconds: 50));
@@ -48,7 +52,7 @@ Future<void> moveSheetTo(double size) async {
 
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   // List of all the widgets in the bottom sheet
-  List<Widget> bottomSheetWidgets = [];
+  final List<Widget> _bottomSheetWidgets = [];
 
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
@@ -69,20 +73,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     return allAvailableRoutes;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = DraggableScrollableController();
-    cancel = widget.cancelRoute;
-    futureRoutes = getRouteList();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
     List<File> localFiles = await getRouteFiles();
@@ -91,7 +81,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     setState(() {
       if (widget != null) {
-        bottomSheetWidgets.add(widget);
+        _bottomSheetWidgets.add(widget);
       } else {
         if (reload == true) {
           receivedRoutes.addAll(
@@ -105,9 +95,23 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
             ),
           );
         }
-        bottomSheetWidgets.removeLast();
+        _bottomSheetWidgets.removeLast();
       }
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = DraggableScrollableController();
+    cancel = widget.cancelRoute;
+    futureRoutes = getRouteList();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -125,18 +129,17 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           // During route:
           // snapSizes: [0.15, 0.5, 0.9],
           snapSizes:
-              bottomSheetWidgets.length > 1
+              _bottomSheetWidgets.length > 1
                   ? [0.15, 0.5, 0.9]
                   : [0.3, 0.5, 0.9],
-          minChildSize: bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
+          minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {
-            if (bottomSheetWidgets.isEmpty) {
-              bottomSheetWidgets.add(
+            if (_bottomSheetWidgets.isEmpty) {
+              _bottomSheetWidgets.add(
                 RoutesListView(
                   scrollController: scrollController,
                   startRoute: widget.startRoute,
-                  changesheetsize: moveSheetTo,
                   setSheetWidget: setSheetWidget,
                 ),
               );
@@ -156,7 +159,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: bottomSheetWidgets.last,
+                child: _bottomSheetWidgets.last,
               ),
             );
           },
