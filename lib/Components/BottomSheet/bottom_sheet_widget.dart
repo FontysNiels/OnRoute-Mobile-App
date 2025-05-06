@@ -9,12 +9,18 @@ import 'package:onroute_app/Functions/file_storage.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
-  const BottomSheetWidget({super.key, required this.startRoute});
+  final Function cancelRoute;
+  const BottomSheetWidget({
+    super.key,
+    required this.startRoute,
+    required this.cancelRoute,
+  });
 
   @override
   State<BottomSheetWidget> createState() => _BottomSheetWidgetState();
 }
 
+late Function cancel;
 /// Scroll controller for the bottom sheet
 final ScrollController scrollController = ScrollController();
 
@@ -67,6 +73,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   void initState() {
     super.initState();
     _controller = DraggableScrollableController();
+    cancel = widget.cancelRoute;
     futureRoutes = getRouteList();
   }
 

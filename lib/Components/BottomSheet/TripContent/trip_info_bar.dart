@@ -196,10 +196,7 @@ class _TripContentState extends State<TripContent> {
                   child: BottomSheetHandle(context: context),
                 ),
 
-                TripInfoBar(
-                  // distanceToFinish: distanceToFinish,
-                  setSheetWidget: widget.setSheetWidget,
-                ),
+                TripInfoBar(setSheetWidget: widget.setSheetWidget),
 
                 _nearestPoi != null
                     ? POI(routeContent: _nearestPoi!)
@@ -235,45 +232,42 @@ class _TripInfoBarState extends State<TripInfoBar> {
         spacing: 28,
         children: [
           // Next POI
-          Column(
-            spacing: 4,
-            children: [
-              Text(
-                "Volgende POI",
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _distanceToNextPoi >= 1000
-                        ? (_distanceToNextPoi / 1000).toStringAsFixed(1)
-                        : _distanceToNextPoi.toStringAsFixed(0),
+          // Column(
+          //   spacing: 4,
+          //   children: [
+          //     Text(
+          //       "Volgende POI",
+          //       style: Theme.of(context).textTheme.labelMedium,
+          //     ),
+          //     Row(
+          //       crossAxisAlignment: CrossAxisAlignment.start,
+          //       children: [
+          //         Text(
+          //           _distanceToNextPoi >= 1000
+          //               ? (_distanceToNextPoi / 1000).toStringAsFixed(1)
+          //               : _distanceToNextPoi.toStringAsFixed(0),
 
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    _distanceToNextPoi > 999 ? "km" : "m",
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ],
-              ),
-            ],
-          ),
+          //           style: Theme.of(context).textTheme.titleLarge!.copyWith(
+          //             fontWeight: FontWeight.bold,
+          //           ),
+          //         ),
+          //         Text(
+          //           _distanceToNextPoi > 999 ? "km" : "m",
+          //           style: Theme.of(context).textTheme.labelMedium,
+          //         ),
+          //       ],
+          //     ),
+          //   ],
+          // ),
           // Tripteller
           Column(
             spacing: 4,
             children: [
-              Text(
-                "Tripteller",
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
+              Text("Voltooid", style: Theme.of(context).textTheme.labelMedium),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text(
+                  Text(
                     _traveledDistance >= 1000
                         ? (_traveledDistance / 1000).toStringAsFixed(1)
                         : _traveledDistance.toStringAsFixed(0),
@@ -290,14 +284,29 @@ class _TripInfoBarState extends State<TripInfoBar> {
               ),
             ],
           ),
+
+          //...
+          ElevatedButton.icon(
+            onPressed: () async {
+              cancel();
+              // directionsList.clear();
+              // graphicsOverlay.graphics.clear();
+              // currenPOI = 0;
+            },
+            icon: const Icon(Icons.highlight_off),
+            label: Text(
+              'Stoppen',
+              style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                color: const Color.fromARGB(255, 0, 0, 0),
+              ),
+            ),
+          ),
+
           // Bestemming Distance
           Column(
             spacing: 4,
             children: [
-              Text(
-                "Bestemming",
-                style: Theme.of(context).textTheme.labelMedium,
-              ),
+              Text("Resterend", style: Theme.of(context).textTheme.labelMedium),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

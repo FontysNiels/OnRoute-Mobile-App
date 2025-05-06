@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/poi.dart';
-import 'package:onroute_app/Components/BottomSheet/TripContent/description_poi.dart';
-import 'package:onroute_app/Components/BottomSheet/TripContent/image_poi.dart';
-import 'package:onroute_app/Components/BottomSheet/TripContent/title_poi.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/Widgets/description_poi.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/Widgets/image_poi.dart';
+import 'package:onroute_app/Components/BottomSheet/POI/Widgets/title_poi.dart';
 
 class POI extends StatelessWidget {
   final Poi routeContent;

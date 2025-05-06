@@ -1,4 +1,5 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/description_point.dart';
@@ -58,6 +59,11 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     initialize();
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.initState();
   }
 
@@ -90,6 +96,14 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+  void cancelRoute() {
+    setState(() {
+      directionsList.clear();
+      graphicsOverlay.graphics.clear();
+      currenPOI = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
@@ -110,8 +124,6 @@ class _MainAppState extends State<MainApp> {
         // Color Scheme Changes
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: primaryAccent, // Define primaryAccent in color scheme
-          // primaryContainer: navigationIcons // FAB
-          // onPrimaryContainer: primaryAppColor // FAB Icons
         ),
 
         // Appbar Theme
@@ -119,6 +131,11 @@ class _MainAppState extends State<MainApp> {
           backgroundColor: primaryAppColor,
           // scrolledUnderElevation: 0
           scrolledUnderElevation: 1,
+        ),
+
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: primaryAppColor,
+          // foregroundColor:
         ),
 
         // SeachBar Theme
@@ -177,29 +194,55 @@ class _MainAppState extends State<MainApp> {
                   routeInfo: _routeInfo,
                   mapViewController: mapViewController,
                 )
-                : Container(),
+                : Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      right: 8.0,
+                      top: MediaQuery.of(context).padding.top + 88,
+                    ),
+                    child: Column(
+                      spacing: 12,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        FloatingActionButton(
+                          heroTag: UniqueKey(),
+                          onPressed:
+                              () => {
+                                mapViewController.locationDisplay.autoPanMode =
+                                    LocationDisplayAutoPanMode.recenter,
+                              },
+                          child: Icon(Icons.gps_fixed),
+                        ),
 
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  TextButton(
-                    child: Text("Route Verwijderen"),
-                    onPressed: () async {
-                      setState(() {
-                        directionsList.clear();
-                        graphicsOverlay.graphics.clear();
-                        currenPOI = 0;
-                      });
-                    },
+                        FloatingActionButton(
+                          heroTag: UniqueKey(),
+                          onPressed:
+                              () => {
+                                mapViewController.locationDisplay.autoPanMode =
+                                    // LocationDisplayAutoPanMode.compassNavigation,
+                                    LocationDisplayAutoPanMode.navigation,
+                              },
+                          child: Icon(Icons.compass_calibration),
+                        ),
+
+                        // FloatingActionButton(
+                        //   heroTag: UniqueKey(),
+                        //   onPressed:
+                        //       () => {
+                        //         mapViewController.locationDisplay.autoPanMode =
+                        //             LocationDisplayAutoPanMode.recenter,
+                        //       },
+                        //   child: Icon(Icons.notifications),
+                        // ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
-            ),
+                ),
 
             Padding(
-              padding: const EdgeInsets.all(128.0),
+              padding: const EdgeInsets.all(18.0),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Row(
@@ -216,7 +259,12 @@ class _MainAppState extends State<MainApp> {
               ),
             ),
 
-            LoaderOverlay(child: BottomSheetWidget(startRoute: _startRoute)),
+            LoaderOverlay(
+              child: BottomSheetWidget(
+                startRoute: _startRoute,
+                cancelRoute: cancelRoute,
+              ),
+            ),
 
             // OfflineMapDownloadExample(),
           ],

@@ -162,7 +162,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
       if (descriptionNum == 0) {
         distanceToEveryDirection[descriptionNum] = distanceInMeters.toInt();
       } else {
+        print(distanceToEveryDirection[descriptionNum - 1]);
+
         distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
+        // print(distanceToEveryDirection[descriptionNum - 1]);
         distanceToEveryDirection = distanceToEveryDirection.sublist(
           descriptionNum - 1,
         );
@@ -205,6 +208,11 @@ class _DirectionsCardState extends State<DirectionsCard> {
   @override
   void dispose() {
     subscription.cancel();
+    metersToCurrentDirection = 0;
+    descriptionNum = 0;
+    userAwayFromRoute = false;
+    directionList.clear();
+
     super.dispose();
   }
 
@@ -212,7 +220,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
   void initState() {
     super.initState();
     // routing();
-
     directionList = widget._directionsList;
 
     if (widget._directionsList.isNotEmpty) {
@@ -477,109 +484,156 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        left: 6,
-        right: 6,
-      ),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.asset(
-                  'assets/temp.png',
-                  height: 56,
-                  width: 56,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: Text(
-                    directionList.isNotEmpty
-                        ? userAwayFromRoute && descriptionNum == 0
-                            ? metersToCurrentDirection > 20
-                                ? "Ga naar de start van de route"
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).padding.top,
+            left: 6,
+            right: 6,
+          ),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/temp.png',
+                      height: 56,
+                      width: 56,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                      child: Text(
+                        directionList.isNotEmpty
+                            ? userAwayFromRoute && descriptionNum == 0
+                                ? metersToCurrentDirection > 20
+                                    ? "Ga naar de start van de route"
+                                    : directionList[descriptionNum].description
+                                : userAwayFromRoute
+                                ? "Ga terug naar de route"
                                 : directionList[descriptionNum].description
-                            : userAwayFromRoute
-                            ? "Ga terug naar de route"
-                            : directionList[descriptionNum].description
-                        : "NIKS",
+                            : "NIKS",
+                      ),
+                    ),
                   ),
-                ),
+
+                  // Text('$metersToNextDirection Meter'),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0,
+                        vertical: 8.0,
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            metersToCurrentDirection > 1000
+                                ? '${(metersToCurrentDirection / 1000).toStringAsFixed(1).replaceAll('.', ',')}'
+                                : '$metersToCurrentDirection',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.titleLarge?.copyWith(height: 1.0),
+                          ),
+                          Text(
+                            metersToCurrentDirection > 1000 ? 'Km' : 'Meter',
+                            style: Theme.of(
+                              context,
+                            ).textTheme.bodyMedium?.copyWith(height: 1.2),
+                          ),
+                        ],
+                      ),
+
+                      //  child: Column(
+                      //   mainAxisSize: MainAxisSize.min,
+                      //   children: [
+                      //     Text(
+                      //     '${metersToCurrentDirection}',
+                      //     style: Theme.of(
+                      //       context,
+                      //     ).textTheme.titleLarge?.copyWith(
+                      //         height: 1.0,
+                      //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
+                      //           ? Colors.black
+                      //           : Colors.white,
+                      //       ),
+                      //     ),
+                      //     Text(
+                      //     'Meter',
+                      //     style: Theme.of(
+                      //       context,
+                      //     ).textTheme.bodyMedium?.copyWith(
+                      //         height: 1.2,
+                      //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
+                      //           ? Colors.black
+                      //           : Colors.white,
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
+                    ),
+                  ),
+                ],
               ),
+            ),
+          ),
+        ),
 
-              // Text('$metersToNextDirection Meter'),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(12.0)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 8.0,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        metersToCurrentDirection > 1000
-                            ? '${(metersToCurrentDirection / 1000).toStringAsFixed(1).replaceAll('.', ',')}'
-                            : '$metersToCurrentDirection',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge?.copyWith(height: 1.0),
-                      ),
-                      Text(
-                        metersToCurrentDirection > 1000 ? 'Km' : 'Meter',
-                        style: Theme.of(
-                          context,
-                        ).textTheme.bodyMedium?.copyWith(height: 1.2),
-                      ),
-                    ],
-                  ),
-
-                  //  child: Column(
-                  //   mainAxisSize: MainAxisSize.min,
-                  //   children: [
-                  //     Text(
-                  //     '${metersToCurrentDirection}',
-                  //     style: Theme.of(
-                  //       context,
-                  //     ).textTheme.titleLarge?.copyWith(
-                  //         height: 1.0,
-                  //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
-                  //           ? Colors.black
-                  //           : Colors.white,
-                  //       ),
-                  //     ),
-                  //     Text(
-                  //     'Meter',
-                  //     style: Theme.of(
-                  //       context,
-                  //     ).textTheme.bodyMedium?.copyWith(
-                  //         height: 1.2,
-                  //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
-                  //           ? Colors.black
-                  //           : Colors.white,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
-                ),
+        Padding(
+          padding: EdgeInsets.only(left: 14, right: 8, top: 8),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            spacing: 12,
+            children: [
+              FloatingActionButton(
+                heroTag: UniqueKey(),
+                onPressed:
+                    () => {
+                      mapViewController.locationDisplay.autoPanMode =
+                          LocationDisplayAutoPanMode.recenter,
+                    },
+                child: Icon(Icons.gps_fixed),
+              ),
+              FloatingActionButton(
+                heroTag: UniqueKey(),
+                onPressed:
+                    () => {
+                      mapViewController.locationDisplay.autoPanMode =
+                          // LocationDisplayAutoPanMode.compassNavigation,
+                          LocationDisplayAutoPanMode.navigation,
+                    },
+                child: Icon(Icons.compass_calibration),
+              ),
+              FloatingActionButton(
+                heroTag: UniqueKey(),
+                onPressed:
+                    () => {
+                      mapViewController.locationDisplay.autoPanMode =
+                          LocationDisplayAutoPanMode.compassNavigation,
+                    },
+                child: Icon(Icons.notifications),
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 }

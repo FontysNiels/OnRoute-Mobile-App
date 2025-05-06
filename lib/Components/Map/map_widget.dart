@@ -6,10 +6,7 @@ import 'package:onroute_app/main.dart';
 
 class MapWidget extends StatefulWidget {
   final Function selectPoi;
-  const MapWidget({
-    super.key,
-    required this.selectPoi,
-  });
+  const MapWidget({super.key, required this.selectPoi});
 
   @override
   State<MapWidget> createState() => _MapWidgetState();
@@ -73,9 +70,7 @@ class _MapWidgetState extends State<MapWidget> {
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
                         if (tappedGraphic.attributes['objectId'] != null) {
-                          selectPoi(
-                            tappedGraphic.attributes['objectId'],
-                          );
+                          selectPoi(tappedGraphic.attributes['objectId']);
                         }
                       }
                     },
@@ -84,36 +79,48 @@ class _MapWidgetState extends State<MapWidget> {
               ],
             ),
             // navigate button
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FloatingActionButton(
-                    heroTag: UniqueKey(),
-                    onPressed:
-                        () => {
-                          _mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.recenter,
-                        },
-                    child: Icon(Icons.gps_fixed),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: FloatingActionButton(
-                    heroTag: UniqueKey(),
-                    onPressed:
-                        () => {
-                          _mapViewController.locationDisplay.autoPanMode =
-                              // LocationDisplayAutoPanMode.compassNavigation,
-                              LocationDisplayAutoPanMode.navigation,
-                        },
-                    child: Icon(Icons.compass_calibration),
-                  ),
-                ),
-              ],
-            ),
+            // Padding(
+            //   padding: EdgeInsets.only(
+            //     top: MediaQuery.of(context).padding.top,
+            //     left: 6,
+            //     right: 6,
+            //   ),
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.start,
+            //     crossAxisAlignment: CrossAxisAlignment.end,
+            //     spacing: 12,
+            //     children: [
+            //       FloatingActionButton(
+            //         heroTag: UniqueKey(),
+            //         onPressed:
+            //             () => {
+            //               _mapViewController.locationDisplay.autoPanMode =
+            //                   LocationDisplayAutoPanMode.recenter,
+            //             },
+            //         child: Icon(Icons.gps_fixed),
+            //       ),
+            //       FloatingActionButton(
+            //         heroTag: UniqueKey(),
+            //         onPressed:
+            //             () => {
+            //               _mapViewController.locationDisplay.autoPanMode =
+            //                   // LocationDisplayAutoPanMode.compassNavigation,
+            //                   LocationDisplayAutoPanMode.navigation,
+            //             },
+            //         child: Icon(Icons.compass_calibration),
+            //       ),
+            //       FloatingActionButton(
+            //         heroTag: UniqueKey(),
+            //         onPressed:
+            //             () => {
+            //               _mapViewController.locationDisplay.autoPanMode =
+            //                   LocationDisplayAutoPanMode.recenter,
+            //             },
+            //         child: Icon(Icons.notifications),
+            //       ),
+            //     ],
+            //   ),
+            // ),
 
             // Display a progress indicator and prevent interaction until state is ready.
             Visibility(
