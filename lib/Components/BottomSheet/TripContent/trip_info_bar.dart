@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
@@ -157,6 +158,13 @@ class _TripContentState extends State<TripContent> {
     }
   }
 
+  Future<void> beeper() async {
+    var player = AudioPlayer();
+    await player.setAsset('assets/beep.mp3');
+    await player.play();
+    await player.stop();
+  }
+
   Future<void> _distanceBasedPoiSetter(
     double closestDistance,
     Poi? closestPoi,
@@ -166,6 +174,7 @@ class _TripContentState extends State<TripContent> {
       //changes sheet height
       await moveSheetTo(0.9);
       //sets poi to the POI user is near
+      beeper();
       setState(() {
         _nearestPoi = closestPoi;
         _userNearPoi = true;

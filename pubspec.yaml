@@ -17,6 +17,7 @@ dependencies:
   connectivity_plus: ^6.1.3
   flutter_archive: ^6.0.0
   loader_overlay: ^5.0.0
+  just_audio: ^0.9.36
 
 
 dev_dependencies:
@@ -30,6 +31,7 @@ flutter:
   assets:
     - .env
     - assets/temp.png
+    - assets/beep.mp3
     - assets/temp-vertical.png
     - assets/gisdata.json
     - assets/bragis_onroute.png

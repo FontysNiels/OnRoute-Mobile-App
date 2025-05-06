@@ -162,7 +162,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
       if (descriptionNum == 0) {
         distanceToEveryDirection[descriptionNum] = distanceInMeters.toInt();
       } else {
-        print(distanceToEveryDirection[descriptionNum - 1]);
+        // print(distanceToEveryDirection[descriptionNum - 1]);
 
         distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
         // print(distanceToEveryDirection[descriptionNum - 1]);
