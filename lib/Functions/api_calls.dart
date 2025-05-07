@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 // Get ArcGIS content from specific file
@@ -55,7 +54,11 @@ Future<http.Response> getAllFromFolder() async {
   }
   var enresponse = jsonEncode(test);
   // print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken');
-  return http.Response(enresponse, response.statusCode, headers: response.headers);
+  return http.Response(
+    enresponse,
+    response.statusCode,
+    headers: response.headers,
+  );
   // return response;
 }
 

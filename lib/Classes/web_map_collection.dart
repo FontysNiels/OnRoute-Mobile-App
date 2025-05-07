@@ -8,6 +8,7 @@ class WebMapCollection {
   final bool locally;
   String title;
   String description;
+  dynamic viewpoint;
 
   WebMapCollection({
     required this.webmapId,
@@ -16,6 +17,7 @@ class WebMapCollection {
     required this.locally,
     required this.title,
     required this.description,
+    this.viewpoint
   });
 
   Map<String, dynamic> toJson() => {

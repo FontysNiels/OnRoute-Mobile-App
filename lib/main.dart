@@ -27,6 +27,7 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+
 /// Global Variables ///
 ///  --------------- ///
 // Graphics which go on the map
@@ -45,6 +46,9 @@ bool enabledNotifiation = true;
 int selectedPOI = 0;
 // Condition showing if the user changed the selected POI
 bool currenPOIChanged = false;
+// Condition to show appbar (to close preview)
+bool previewEnabled = false;
+
 
 /// Global Functions ///
 ///  --------------- ///
@@ -114,12 +118,25 @@ class _MainAppState extends State<MainApp> {
   }
 
   /// Function that cancels the route
-  void cancelRoute() {
+  void _cancelRoute() {
     // Setting the state and clearing every important variable (refreshing the state)
     setState(() {
       directionList.clear();
       graphicsOverlay.graphics.clear();
       selectedPOI = 0;
+    });
+  }
+
+  void _enablePreview() {
+    // Setting the state and clearing every important variable (refreshing the state)
+    setState(() {
+      if (previewEnabled) {
+        graphicsOverlay.graphics.clear();
+        mapViewController.setViewpointRotation(angleDegrees: 0.0);
+        mapViewController.locationDisplay.autoPanMode =
+            LocationDisplayAutoPanMode.recenter;
+      }
+      previewEnabled = !previewEnabled;
     });
   }
 
@@ -195,6 +212,16 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
+        appBar:
+            previewEnabled
+                ? AppBar(
+                  leading: IconButton(
+                    onPressed: _enablePreview,
+                    icon: Icon(Icons.arrow_back),
+                  ),
+                )
+                : null,
+        extendBodyBehindAppBar: true,
         body: Stack(
           children: [
             // The Map
@@ -223,7 +250,8 @@ class _MainAppState extends State<MainApp> {
             LoaderOverlay(
               child: BottomSheetWidget(
                 startRoute: _startRoute,
-                cancelRoute: cancelRoute,
+                cancelRoute: _cancelRoute,
+                enablePreview: _enablePreview,
               ),
             ),
 
@@ -255,7 +283,7 @@ class NavigationButtons extends StatelessWidget {
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
-                  () => {
+                  () async => {
                     mapViewController.setViewpointRotation(angleDegrees: 0.0),
                     mapViewController.locationDisplay.autoPanMode =
                         LocationDisplayAutoPanMode.recenter,

@@ -78,7 +78,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(
   List filteredRouteIDs = content['items'];
 
   //TODO: (IDFK what I meant with this) it now always gets and converts the routes, even if they are already downloaded
-  // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo)
+  // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo) (ookal als die offline beschikbaaar is)
 
   // // Extract file names from files
   // final existingIDs =
@@ -152,10 +152,18 @@ Future<List<WebMapCollection>> fetchOnlineItems(
                     .where((route) => route['id'] == element['itemId'])
                     .first['thumbnail'],
             tags:
-                (filteredRouteIDs.where((child) => child['id'] == element['itemId']).first['tags'] as List<dynamic>)
+                (filteredRouteIDs
+                            .where((child) => child['id'] == element['itemId'])
+                            .first['tags']
+                        as List<dynamic>)
                     .map((tag) => tag.toString())
                     .toList(),
+            viewpoint:
+                jsonDecode(publishedRoute.body)['initialState']['viewpoint'],
           );
+
+          webMapCollection.viewpoint =
+              jsonDecode(publishedRoute.body)['initialState']['viewpoint'];
           webMapCollection.availableRoute.add(onlineRoute);
         }
       }
@@ -198,6 +206,7 @@ RouteLayerData filterRouteInfo(
   modifiedResponse['description'] = layerInfo.description;
   modifiedResponse['thumbnail'] = layerInfo.thumbnail;
   modifiedResponse['tags'] = layerInfo.tags!;
+  modifiedResponse['viewpoint'] = layerInfo.viewpoint;
 
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
