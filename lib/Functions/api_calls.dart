@@ -54,8 +54,8 @@ Future<http.Response> getAllFromFolder() async {
     }
   }
   var enresponse = jsonEncode(test);
-  return http.Response(enresponse, response.statusCode, headers: response.headers);
   // print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken');
+  return http.Response(enresponse, response.statusCode, headers: response.headers);
   // return response;
 }
 

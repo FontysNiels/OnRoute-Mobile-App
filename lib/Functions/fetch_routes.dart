@@ -49,7 +49,9 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
           routeID: file.path,
           title: routeInfo.title,
           description: routeInfo.description,
-          locally: true, thumbnail: routeInfo.thumbnail,
+          locally: true,
+          thumbnail: routeInfo.thumbnail,
+          tags: routeInfo.tags,
         ),
       ],
       locally: true,
@@ -65,7 +67,10 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
 
 // TODO: Rewrite this, so it gets WebMaps, goes trhough the layers and gets the routes and POIs seperatly (maybe make different functions for getting the actial route info, but idk yet)
 // Fetches online routes that are not already downloaded
-Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildContext context) async {
+Future<List<WebMapCollection>> fetchOnlineItems(
+  List<File> localFiles,
+  BuildContext context,
+) async {
   var responseAll = await getAllFromFolder();
   var content = jsonDecode(responseAll.body);
   // List routeIDs = content['items'];
@@ -73,7 +78,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
   List filteredRouteIDs = content['items'];
 
   //TODO: (IDFK what I meant with this) it now always gets and converts the routes, even if they are already downloaded
-
+  // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo)
 
   // // Extract file names from files
   // final existingIDs =
@@ -142,8 +147,14 @@ Future<List<WebMapCollection>> fetchOnlineItems(List<File> localFiles, BuildCont
                     .first['description'] ??
                 '...',
             locally: false,
-            thumbnail: filteredRouteIDs.where((route) => route['id'] == element['itemId'])
-                    .first['thumbnail']
+            thumbnail:
+                filteredRouteIDs
+                    .where((route) => route['id'] == element['itemId'])
+                    .first['thumbnail'],
+            tags:
+                (filteredRouteIDs.where((child) => child['id'] == element['itemId']).first['tags'] as List<dynamic>)
+                    .map((tag) => tag.toString())
+                    .toList(),
           );
           webMapCollection.availableRoute.add(onlineRoute);
         }
@@ -186,6 +197,7 @@ RouteLayerData filterRouteInfo(
   modifiedResponse['title'] = layerInfo.title;
   modifiedResponse['description'] = layerInfo.description;
   modifiedResponse['thumbnail'] = layerInfo.thumbnail;
+  modifiedResponse['tags'] = layerInfo.tags!;
 
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
@@ -195,5 +207,6 @@ RouteLayerData filterRouteInfo(
                 .toList())
       ..['layers'][2]['featureSet']['features'].add(lastding),
   );
+
   return routeInfo;
 }

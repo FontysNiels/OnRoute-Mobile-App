@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:icon_decoration/icon_decoration.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
@@ -51,17 +52,45 @@ class RouteCard extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: CachedNetworkImage(
-                      height: 56,
-                      width: 56,
-                      imageUrl:
-                          "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
-                      // placeholder:
-                      //     (context, url) => CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
-                    ),
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: CachedNetworkImage(
+                          height: 56,
+                          width: 56,
+                          imageUrl:
+                              "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                          // placeholder:
+                          //     (context, url) => CircularProgressIndicator(),
+                          errorWidget:
+                              (context, url, error) => Icon(Icons.error),
+                        ),
+                      ),
+
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: DecoratedIcon(
+                          icon: Icon(
+                            routeContent.availableRoute[0].tags!.contains(
+                                  "Wandel",
+                                )
+                                ? Icons.directions_walk
+                                : routeContent.availableRoute[0].tags!.contains(
+                                  "Fiets",
+                                )
+                                ? Icons.directions_bike
+                                : Icons.question_mark,
+                            // Icons.directions_walk,
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          decoration: IconDecoration(
+                            border: IconBorder(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   Expanded(
                     flex: 3,

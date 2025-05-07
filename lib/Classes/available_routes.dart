@@ -4,6 +4,7 @@ class AvailableRoutes {
   final String description;
   final String thumbnail;
   final bool locally;
+  List<String>? tags;
   // probably will change when POIs are added to the route
 
   AvailableRoutes({
@@ -12,6 +13,7 @@ class AvailableRoutes {
     required this.description,
     required this.locally,
     required this.thumbnail,
+    this.tags,
   });
 
   Map<String, dynamic> toJson() => {

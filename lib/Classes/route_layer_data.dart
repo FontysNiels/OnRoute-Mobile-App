@@ -6,6 +6,7 @@ class RouteLayerData {
   final String title;
   final String description;
   final String thumbnail;
+  final List<String> tags;
 
   RouteLayerData({
     // required this.opacity,
@@ -15,6 +16,7 @@ class RouteLayerData {
     required this.title,
     required this.thumbnail,
     required this.description,
+    required this.tags,
   });
 
   factory RouteLayerData.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,11 @@ class RouteLayerData {
       title: json['title'],
       description: json['description'],
       thumbnail: json['thumbnail'],
+      tags: (json['tags'] as List<dynamic>)
+                    .map((tag) => tag.toString())
+                    .toList(),
+      
+    
     );
   }
 
@@ -38,6 +45,7 @@ class RouteLayerData {
     'title': title,
     'thumbnail': thumbnail,
     'description': description,
+    'tags': tags,
   };
 }
 
