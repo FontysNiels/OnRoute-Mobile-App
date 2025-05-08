@@ -19,6 +19,7 @@ dependencies:
   loader_overlay: ^5.0.0
   just_audio: ^0.9.36
   icon_decoration: ^2.1.0
+  shared_preferences: ^2.5.3
 
 
 dev_dependencies:

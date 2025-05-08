@@ -105,9 +105,11 @@ Future<List<WebMapCollection>> fetchOnlineItems(
     );
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /// TODO: isntead of having an empty one above, make variables, and set those at the end once in the WebMapCollection
+
     // Get Web Map collection
     if (filteredRouteIDs[i]['type'] == 'Web Map') {
-      var publishedRoute = await getRouteLayerJSON(filteredRouteIDs[i]['id']);
+      var publishedRoute = await getArcgisItemData(filteredRouteIDs[i]['id']);
       var responseBodyPublished =
           jsonDecode(publishedRoute.body)['operationalLayers'];
       webMapCollection.title = filteredRouteIDs[i]['title'];
@@ -117,9 +119,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(
       // Loop through all the layers
       for (var element in responseBodyPublished) {
         // Get POIs (feature-layer)
-        if (element['url'] != null &&
-            element['url'].isNotEmpty &&
-            element['title'] != "puntenlaag test") {
+        if (element['url'] != null) {
           var poiResponse = await getServiceContent(element['url']);
           var poiResponseBody = jsonDecode(poiResponse.body)['features'];
           List<Poi> featureLayerPois = [];
@@ -136,12 +136,13 @@ Future<List<WebMapCollection>> fetchOnlineItems(
           }
           webMapCollection.pointsOfInterest.addAll(featureLayerPois);
         }
-        // GET ROUTE
+        // GET ROUTE INFO
         else if (element["featureCollectionType"] == "route") {
           AvailableRoutes onlineRoute = AvailableRoutes(
             routeID: element['itemId'],
             title: element['title'],
             description:
+                // All filteredRouteIDs.where are instances of the value getting pulled from the getAllFromFolder(), since otherwise we'd need to make another call to the route itself
                 filteredRouteIDs
                     .where((route) => route['id'] == element['itemId'])
                     .first['description'] ??

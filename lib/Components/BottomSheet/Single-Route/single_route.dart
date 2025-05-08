@@ -123,7 +123,7 @@ class _SingleRouteState extends State<SingleRoute> {
                           Viewpoint.fromJson(widget.routeContent.viewpoint),
                         );
                         // get route-layer JSON
-                        var routeResponse = await getRouteLayerJSON(
+                        var routeResponse = await getArcgisItemData(
                           widget.routeContent.availableRoute[0].routeID,
                         );
                         // Clean it up

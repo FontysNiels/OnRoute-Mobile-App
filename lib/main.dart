@@ -27,7 +27,6 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
-
 /// Global Variables ///
 ///  --------------- ///
 // Graphics which go on the map
@@ -48,7 +47,6 @@ int selectedPOI = 0;
 bool currenPOIChanged = false;
 // Condition to show appbar (to close preview)
 bool previewEnabled = false;
-
 
 /// Global Functions ///
 ///  --------------- ///
@@ -140,6 +138,11 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+
+
+  
+
+  String test = 'tetst';
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
@@ -246,7 +249,7 @@ class _MainAppState extends State<MainApp> {
                 ),
               ),
             ),
-            // Bottomsheet, with loader wrapped over it (so when it downloads the user can't fuck it up)
+            // Bottomsheet, with loader wrapped over it (so when it downloads a route the user can't fuck it up)
             LoaderOverlay(
               child: BottomSheetWidget(
                 startRoute: _startRoute,

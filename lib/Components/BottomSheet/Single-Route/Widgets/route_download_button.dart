@@ -30,7 +30,7 @@ class RouteDownloadButton extends StatelessWidget {
         onPressed: () async {
           context.loaderOverlay.show();
           // Get ArcGIS route layer data JSON
-          var routeResponse = await getRouteLayerJSON(
+          var routeResponse = await getArcgisItemData(
             currentRoute.availableRoute[0].routeID,
           );
 
