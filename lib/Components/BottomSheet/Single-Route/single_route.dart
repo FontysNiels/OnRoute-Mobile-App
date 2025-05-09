@@ -75,86 +75,21 @@ class _SingleRouteState extends State<SingleRoute> {
                 PackegImagePreview(routeContent: widget.routeContent),
 
                 // Download Button
-                !widget.routeContent.locally
-                    ? RouteDownloadButton(
-                      currentRoute: widget.routeContent,
-                      setSheetWidget: widget.setSheetWidget,
-                    )
-                    : RouteStartButton(
-                      routeContent: widget.routeContent,
-                      startRoute: widget.startRoute,
-                      setSheetWidget: widget.setSheetWidget,
-                      scroller: widget.scroller,
-                    ),
-
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                  child: FilledButton.icon(
-                    onPressed: () async {
-                      if (widget.routeContent.locally) {
-                        var storedFile = jsonDecode(
-                          await readFile(
-                            File(widget.routeContent.availableRoute[0].routeID),
-                          ),
-                        );
-                        RouteLayerData routeInfo = RouteLayerData.fromJson(
-                          storedFile,
-                        );
-
-                        mapViewController.setViewpoint(
-                          Viewpoint.fromJson(routeInfo.viewpoint),
-                        );
-
-                        graphicsOverlay.graphics.addAll(
-                          await generateLinesAndPoints(routeInfo),
-                        );
-
-                        // Add the generated POI points
-                        graphicsOverlay.graphics.addAll(
-                          generatePoiGraphics(
-                            widget.routeContent.pointsOfInterest,
-                          ),
-                        );
-
-                        preview();
-                      } else {
-                        //  set viewpoint to the viewpoint
-                        mapViewController.setViewpoint(
-                          Viewpoint.fromJson(widget.routeContent.viewpoint),
-                        );
-                        // get route-layer JSON
-                        var routeResponse = await getArcgisItemData(
-                          widget.routeContent.availableRoute[0].routeID,
-                        );
-                        // Clean it up
-                        RouteLayerData routeInfo = filterRouteInfo(
-                          routeResponse,
-                          widget.routeContent.availableRoute[0],
-                        );
-                        // create Lines
-                        graphicsOverlay.graphics.addAll(
-                          await generateLinesAndPoints(routeInfo),
-                        );
-
-                        // Add the generated POI points
-                        graphicsOverlay.graphics.addAll(
-                          generatePoiGraphics(
-                            widget.routeContent.pointsOfInterest,
-                          ),
-                        );
-
-                        preview();
-                      }
-                    },
-                    icon: const Icon(Icons.map),
-                    label: Text(
-                      'Route Bekijken',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.labelLarge!.copyWith(color: Colors.white),
-                    ),
-                    iconAlignment: IconAlignment.start,
-                  ),
+                Row(
+                  children: [
+                    !widget.routeContent.locally
+                        ? RouteDownloadButton(
+                          currentRoute: widget.routeContent,
+                          setSheetWidget: widget.setSheetWidget,
+                        )
+                        : RouteStartButton(
+                          routeContent: widget.routeContent,
+                          startRoute: widget.startRoute,
+                          setSheetWidget: widget.setSheetWidget,
+                          scroller: widget.scroller,
+                        ),
+                    RoutePreviewButton(widget: widget),
+                  ],
                 ),
 
                 // Tabs
@@ -173,6 +108,77 @@ class _SingleRouteState extends State<SingleRoute> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class RoutePreviewButton extends StatelessWidget {
+  const RoutePreviewButton({super.key, required this.widget});
+
+  final SingleRoute widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 0),
+      child: TextButton.icon(
+        onPressed: () async {
+          if (widget.routeContent.locally) {
+            // Read the local route file
+            var storedFile = jsonDecode(
+              await readFile(
+                File(widget.routeContent.availableRoute[0].routeID),
+              ),
+            );
+            // Turn it into RouteLayerData
+            RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
+            // Set the viewpoint
+            mapViewController.setViewpoint(
+              Viewpoint.fromJson(routeInfo.viewpoint),
+            );
+            // Add the generated Route lines
+            graphicsOverlay.graphics.addAll(
+              await generateLinesAndPoints(routeInfo),
+            );
+            // Add the generated POI points
+            graphicsOverlay.graphics.addAll(
+              generatePoiGraphics(widget.routeContent.pointsOfInterest),
+            );
+            // Enable the preview overlay
+            preview();
+          } else {
+            //  set viewpoint to the viewpoint
+            mapViewController.setViewpoint(
+              Viewpoint.fromJson(widget.routeContent.viewpoint),
+            );
+            // get route-layer JSON
+            var routeResponse = await getArcgisItemData(
+              widget.routeContent.availableRoute[0].routeID,
+            );
+            // Clean it up
+            RouteLayerData routeInfo = filterRouteInfo(
+              routeResponse,
+              widget.routeContent.availableRoute[0],
+            );
+            // create Lines
+            graphicsOverlay.graphics.addAll(
+              await generateLinesAndPoints(routeInfo),
+            );
+            // Add the generated POI points
+            graphicsOverlay.graphics.addAll(
+              generatePoiGraphics(widget.routeContent.pointsOfInterest),
+            );
+            // Enable the preview overlay
+            preview();
+          }
+        },
+        icon: const Icon(Icons.map),
+        label: Text(
+          'Route Bekijken',
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
+        iconAlignment: IconAlignment.start,
       ),
     );
   }

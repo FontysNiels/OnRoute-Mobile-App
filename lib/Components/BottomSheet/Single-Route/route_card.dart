@@ -68,28 +68,7 @@ class RouteCard extends StatelessWidget {
                         ),
                       ),
 
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: DecoratedIcon(
-                          icon: Icon(
-                            routeContent.availableRoute[0].tags!.contains(
-                                  "Wandel",
-                                )
-                                ? Icons.directions_walk
-                                : routeContent.availableRoute[0].tags!.contains(
-                                  "Fiets",
-                                )
-                                ? Icons.directions_bike
-                                : Icons.question_mark,
-                            // Icons.directions_walk,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                          decoration: IconDecoration(
-                            border: IconBorder(color: Colors.white),
-                          ),
-                        ),
-                      ),
+                      cardImageButton(routeContent: routeContent),
                     ],
                   ),
                   Expanded(
@@ -129,5 +108,40 @@ class RouteCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class cardImageButton extends StatelessWidget {
+  const cardImageButton({super.key, required this.routeContent});
+
+  final WebMapCollection routeContent;
+
+  @override
+  Widget build(BuildContext context) {
+    return routeContent.availableRoute[0].tags!.contains("Fiets")
+        ? Positioned(
+          bottom: 0,
+          right: 0,
+          child: DecoratedIcon(
+            icon: Icon(
+              Icons.directions_bike,
+              color: const Color.fromARGB(255, 0, 0, 0),
+            ),
+            decoration: IconDecoration(border: IconBorder(color: Colors.white)),
+          ),
+        )
+        : routeContent.availableRoute[0].tags!.contains("Wandel")
+        ? Positioned(
+          bottom: 0,
+          right: 0,
+          child: DecoratedIcon(
+            icon: Icon(
+              Icons.directions_walk,
+              color: const Color.fromARGB(255, 0, 0, 0),
+            ),
+            decoration: IconDecoration(border: IconBorder(color: Colors.white)),
+          ),
+        )
+        : Container();
   }
 }

@@ -11,6 +11,7 @@ class Poi {
   final String? address;
   final String? asset;
   final PoiGeometry geometry;
+  final String? routes;
 
   Poi({
     required this.objectId,
@@ -24,6 +25,7 @@ class Poi {
     this.address,
     this.asset,
     required this.geometry,
+    required this.routes,
   });
 
   factory Poi.fromJsonOnline(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class Poi {
       openingHours: json['attributes']['openingstijden'],
       address: json['attributes']['adres'],
       asset: json['attributes']['asset'],
+      routes: json['attributes']['routes'],
       geometry: PoiGeometry.fromJson(json['geometry']),
     );
   }
@@ -64,6 +67,7 @@ class Poi {
       openingHours: json['openingHours'],
       address: json['address'],
       asset: json['asset'],
+      routes: json['routes'],
       geometry: PoiGeometry.fromJson(json['geometry']),
     );
   }
@@ -79,6 +83,7 @@ class Poi {
     // 'openingHours': openingHours?.toIso8601String(),
     'address': address,
     'asset': asset,
+    'routes': routes,
     'geometry': geometry.toJson(),
   };
 }

@@ -65,131 +65,112 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
   return webMapCollectionList;
 }
 
-// TODO: Rewrite this, so it gets WebMaps, goes trhough the layers and gets the routes and POIs seperatly (maybe make different functions for getting the actial route info, but idk yet)
 // Fetches online routes that are not already downloaded
 Future<List<WebMapCollection>> fetchOnlineItems(
   List<File> localFiles,
   BuildContext context,
 ) async {
+  // Get all items from the OnRoute folder
   var responseAll = await getAllFromFolder();
   var content = jsonDecode(responseAll.body);
-  // List routeIDs = content['items'];
-  //temp
+  // Turn it into a list
   List filteredRouteIDs = content['items'];
 
   //TODO: (IDFK what I meant with this) it now always gets and converts the routes, even if they are already downloaded
   // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo) (ookal als die offline beschikbaaar is)
 
-  // // Extract file names from files
-  // final existingIDs =
-  //     localFiles.map((file) {
-  //       final filename = file.path.split('/').last;
-  //       return filename.split('.').first;
-  //     }).toSet();
-
-  // // Filter routeIDs that are not in existingIDs
-  // final filteredRouteIDs =
-  //     routeIDs.where((id) => !existingIDs.contains(id['id'])).toList();
-
-  // List<AvailableRoutes> availableOnlineRoutes = [];
   List<WebMapCollection> webMapCollectionList = [];
 
-  for (var i = 0; i < filteredRouteIDs.length; i++) {
+  // Create and fill a list with all the POIs (from 1 POI file)
+  List<Poi> allPoisList = [];
+  await getAllPoi(filteredRouteIDs, allPoisList);
+
+  // Fill the list of WebMapCollections
+  for (var webMap in filteredRouteIDs.where((r) => r['type'] == 'Web Map')) {
+    // Get data from Web Map
+    var publishedRoute = await getArcgisItemData(webMap['id']);
+    var responseBodyPublished =
+        jsonDecode(publishedRoute.body)['operationalLayers'];
+
+    // Create the WebMapCollection, and set the already available values
     WebMapCollection webMapCollection = WebMapCollection(
       pointsOfInterest: [],
       availableRoute: [],
       locally: false,
-      title: '',
-      description: '',
-      webmapId: '',
+      title: webMap['title'],
+      description: webMap['description'] ?? '...',
+      webmapId: webMap['id'],
+      viewpoint: jsonDecode(publishedRoute.body)['initialState']['viewpoint'],
     );
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /// TODO: isntead of having an empty one above, make variables, and set those at the end once in the WebMapCollection
+    // Loop through the layers of the webmap to find the route(s)
+    for (var layer in responseBodyPublished.where(
+      (l) => l["featureCollectionType"] == "route",
+    )) {
+      // Looks at all the POIs and the routes they are linked to
+      var matchingPois =
+          allPoisList
+              .where((poi) => poi.routes?.contains(layer['itemId']) ?? false)
+              .toList();
+      // Add the linked POIs
+      webMapCollection.pointsOfInterest.addAll(matchingPois);
 
-    // Get Web Map collection
-    if (filteredRouteIDs[i]['type'] == 'Web Map') {
-      var publishedRoute = await getArcgisItemData(filteredRouteIDs[i]['id']);
-      var responseBodyPublished =
-          jsonDecode(publishedRoute.body)['operationalLayers'];
-      webMapCollection.title = filteredRouteIDs[i]['title'];
-      webMapCollection.webmapId = filteredRouteIDs[i]['id'];
-      webMapCollection.description =
-          filteredRouteIDs[i]['description'] ?? '...';
-      // Loop through all the layers
-      for (var element in responseBodyPublished) {
-        // Get POIs (feature-layer)
-        if (element['url'] != null) {
-          var poiResponse = await getServiceContent(element['url']);
-          var poiResponseBody = jsonDecode(poiResponse.body)['features'];
-          List<Poi> featureLayerPois = [];
-          // create POIs per feature-layer
-          for (var poi in poiResponseBody) {
-            var image = await getServiceAssets(
-              element['url'],
-              poi['attributes']['OBJECTID'],
-            );
-            poi['attributes']['asset'] = image;
+      // Checks if the route is the same as the one from the OnRoute Folder
+      var matchingRoute = filteredRouteIDs.firstWhere(
+        (r) => r['id'] == layer['itemId'],
+      );
 
-            Poi parsedPoi = Poi.fromJsonOnline(poi);
-            featureLayerPois.add(parsedPoi);
-          }
-          webMapCollection.pointsOfInterest.addAll(featureLayerPois);
-        }
-        // GET ROUTE INFO
-        else if (element["featureCollectionType"] == "route") {
-          AvailableRoutes onlineRoute = AvailableRoutes(
-            routeID: element['itemId'],
-            title: element['title'],
-            description:
-                // All filteredRouteIDs.where are instances of the value getting pulled from the getAllFromFolder(), since otherwise we'd need to make another call to the route itself
-                filteredRouteIDs
-                    .where((route) => route['id'] == element['itemId'])
-                    .first['description'] ??
-                '...',
-            locally: false,
-            thumbnail:
-                filteredRouteIDs
-                    .where((route) => route['id'] == element['itemId'])
-                    .first['thumbnail'],
-            tags:
-                (filteredRouteIDs
-                            .where((child) => child['id'] == element['itemId'])
-                            .first['tags']
-                        as List<dynamic>)
-                    .map((tag) => tag.toString())
-                    .toList(),
-            viewpoint:
-                jsonDecode(publishedRoute.body)['initialState']['viewpoint'],
-          );
-
-          webMapCollection.viewpoint =
-              jsonDecode(publishedRoute.body)['initialState']['viewpoint'];
-          webMapCollection.availableRoute.add(onlineRoute);
-        }
-      }
-      // print(webMapCollection.toJson());
-      webMapCollectionList.add(webMapCollection);
+      // Add the data into the route (matchingRoute, is the info from the OnRoute folder since that contains more info)
+      webMapCollection.availableRoute.add(
+        AvailableRoutes(
+          routeID: layer['itemId'],
+          title: layer['title'],
+          description: matchingRoute['description'] ?? '...',
+          locally: false,
+          thumbnail: matchingRoute['thumbnail'],
+          tags:
+              (matchingRoute['tags'] as List<dynamic>)
+                  .map((tag) => tag.toString())
+                  .toList(),
+          viewpoint: webMapCollection.viewpoint,
+        ),
+      );
     }
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Add info of online route to list
-    // if (filteredRouteIDs[i]['type'] != 'Feature Collection') {
-    //   continue;
-    // }
-    // // print(filteredRouteIDs[i]);
-    // AvailableRoutes onlineRoute = AvailableRoutes(
-    //   routeID: filteredRouteIDs[i]['id'],
-    //   title: filteredRouteIDs[i]['title'],
-    //   description: filteredRouteIDs[i]['description'] ?? '...',
-    //   locally: false,
-    // );
-    // availableOnlineRoutes.add(onlineRoute);
+    // Add the WebMapCollection to the list
+    webMapCollectionList.add(webMapCollection);
   }
-
-  // return availableOnlineRoutes;
   return webMapCollectionList;
+}
+
+Future<void> getAllPoi(
+  List<dynamic> filteredRouteIDs,
+  List<Poi> allPoisList,
+) async {
+  // TODO: make this work for any poi bestand
+  // ID omdat momenteel er meerdere bestaan (is TEMP)
+  var specificRoute = filteredRouteIDs.firstWhere(
+    (route) => route['id'] == '1c049e864f1643bda530ae45fd1591cf',
+    orElse: () => null,
+  );
+
+  if (specificRoute != null &&
+      specificRoute['url'] != null &&
+      specificRoute['type'] == "Feature Service") {
+    var poiResponse = await getServiceContent('${specificRoute['url']}/0');
+    var poiResponseBody = jsonDecode(poiResponse.body)['features'];
+
+    // create POIs per feature-layer
+    for (var poi in poiResponseBody) {
+      var image = await getServiceAssets(
+        '${specificRoute['url']}/0',
+        poi['attributes']['OBJECTID'],
+      );
+      poi['attributes']['asset'] = image;
+
+      Poi parsedPoi = Poi.fromJsonOnline(poi);
+      allPoisList.add(parsedPoi);
+    }
+  }
 }
 
 // Filters the route-JSON so that only the necessary data is returned

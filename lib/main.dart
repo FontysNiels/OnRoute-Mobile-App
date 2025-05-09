@@ -218,6 +218,7 @@ class _MainAppState extends State<MainApp> {
         appBar:
             previewEnabled
                 ? AppBar(
+                  title: Text("Terug naar informatie"),
                   leading: IconButton(
                     onPressed: _enablePreview,
                     icon: Icon(Icons.arrow_back),

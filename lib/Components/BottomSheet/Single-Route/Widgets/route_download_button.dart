@@ -25,8 +25,8 @@ class RouteDownloadButton extends StatelessWidget {
     // print(currentRoute.availableRoute);
     currentRoute.availableRoute[0];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: TextButton.icon(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: FilledButton.icon(
         onPressed: () async {
           context.loaderOverlay.show();
           // Get ArcGIS route layer data JSON
@@ -123,7 +123,7 @@ class RouteDownloadButton extends StatelessWidget {
         icon: const Icon(Icons.download),
         label: Text(
           'Download route',
-          style: Theme.of(context).textTheme.labelLarge,
+          style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
         ),
         iconAlignment: IconAlignment.start,
       ),
