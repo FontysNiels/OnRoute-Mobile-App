@@ -80,7 +80,7 @@ class Poi {
     'mail': mail,
     'phone': phone,
     'website': website,
-    // 'openingHours': openingHours?.toIso8601String(),
+    'openingHours': openingHours,
     'address': address,
     'asset': asset,
     'routes': routes,
