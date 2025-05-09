@@ -60,7 +60,8 @@ class RouteCard extends StatelessWidget {
                           height: 56,
                           width: 56,
                           imageUrl:
-                              "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                              // "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                              routeContent.availableRoute[0].thumbnail.split("--ONROUTE--")[0],
                           // placeholder:
                           //     (context, url) => CircularProgressIndicator(),
                           errorWidget:

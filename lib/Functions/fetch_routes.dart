@@ -127,7 +127,9 @@ Future<List<WebMapCollection>> fetchOnlineItems(
           title: layer['title'],
           description: matchingRoute['description'] ?? '...',
           locally: false,
-          thumbnail: matchingRoute['thumbnail'],
+          // thumbnail: matchingRoute['thumbnail'],
+          thumbnail:
+              '${webMap['thumbnail']}--ONROUTE--${matchingRoute['thumbnail']}',
           tags:
               (matchingRoute['tags'] as List<dynamic>)
                   .map((tag) => tag.toString())

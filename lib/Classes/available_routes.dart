@@ -5,7 +5,7 @@ class AvailableRoutes {
   final String thumbnail;
   final bool locally;
   List<String>? tags;
-    dynamic viewpoint;
+  dynamic viewpoint;
   // probably will change when POIs are added to the route
 
   AvailableRoutes({
