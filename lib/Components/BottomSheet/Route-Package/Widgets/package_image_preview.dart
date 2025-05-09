@@ -23,7 +23,7 @@ class PackegImagePreview extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: CachedNetworkImage(
-                      imageUrl: routeContent.availableRoute[0].thumbnail,
+                      imageUrl: routeContent.availableRoute[0].thumbnail.split("--ONROUTE--")[1],
                       fit: BoxFit.cover,
                       placeholder:
                           (context, url) => CircularProgressIndicator(),

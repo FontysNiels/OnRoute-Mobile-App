@@ -13,7 +13,8 @@ class DescriptionPOI extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 8.0),
           child: Text(
-            'POI beschrijving',
+            // 'POI beschrijving',
+            'Beschrijving',
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),

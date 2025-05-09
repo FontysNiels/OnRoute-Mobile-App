@@ -6,14 +6,17 @@ import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
+import 'package:onroute_app/main.dart';
 
 class BottomSheetWidget extends StatefulWidget {
   final Function startRoute;
   final Function cancelRoute;
+  final Function enablePreview;
   const BottomSheetWidget({
     super.key,
     required this.startRoute,
     required this.cancelRoute,
+    required this.enablePreview,
   });
 
   @override
@@ -22,6 +25,8 @@ class BottomSheetWidget extends StatefulWidget {
 
 // Function to cancel the route (made global, so the received setstate function can be used globally)
 late Function cancel;
+// Function to enable the preview
+late Function preview;
 
 /// Scroll controller for the bottom sheet
 final ScrollController scrollController = ScrollController();
@@ -105,6 +110,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     super.initState();
     _controller = DraggableScrollableController();
     cancel = widget.cancelRoute;
+    preview = widget.enablePreview;
     futureRoutes = getRouteList();
   }
 
@@ -133,6 +139,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   ? [0.15, 0.5, 0.9]
                   : [0.3, 0.5, 0.9],
           minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
+          // minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0,
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {
             if (_bottomSheetWidgets.isEmpty) {
@@ -145,7 +152,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               );
             }
 
-            return Container(
+            return !previewEnabled? Container(
               decoration: const BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
@@ -161,7 +168,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                 borderRadius: BorderRadius.circular(16),
                 child: _bottomSheetWidgets.last,
               ),
-            );
+            ): Container();
           },
         ),
       ],

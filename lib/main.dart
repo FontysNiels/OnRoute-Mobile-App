@@ -45,6 +45,8 @@ bool enabledNotifiation = true;
 int selectedPOI = 0;
 // Condition showing if the user changed the selected POI
 bool currenPOIChanged = false;
+// Condition to show appbar (to close preview)
+bool previewEnabled = false;
 
 /// Global Functions ///
 ///  --------------- ///
@@ -114,7 +116,7 @@ class _MainAppState extends State<MainApp> {
   }
 
   /// Function that cancels the route
-  void cancelRoute() {
+  void _cancelRoute() {
     // Setting the state and clearing every important variable (refreshing the state)
     setState(() {
       directionList.clear();
@@ -123,6 +125,24 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
+  void _enablePreview() {
+    // Setting the state and clearing every important variable (refreshing the state)
+    setState(() {
+      if (previewEnabled) {
+        graphicsOverlay.graphics.clear();
+        mapViewController.setViewpointRotation(angleDegrees: 0.0);
+        mapViewController.locationDisplay.autoPanMode =
+            LocationDisplayAutoPanMode.recenter;
+      }
+      previewEnabled = !previewEnabled;
+    });
+  }
+
+
+
+  
+
+  String test = 'tetst';
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
@@ -195,6 +215,17 @@ class _MainAppState extends State<MainApp> {
         ),
       ),
       home: Scaffold(
+        appBar:
+            previewEnabled
+                ? AppBar(
+                  title: Text("Terug naar informatie"),
+                  leading: IconButton(
+                    onPressed: _enablePreview,
+                    icon: Icon(Icons.arrow_back),
+                  ),
+                )
+                : null,
+        extendBodyBehindAppBar: true,
         body: Stack(
           children: [
             // The Map
@@ -219,11 +250,12 @@ class _MainAppState extends State<MainApp> {
                 ),
               ),
             ),
-            // Bottomsheet, with loader wrapped over it (so when it downloads the user can't fuck it up)
+            // Bottomsheet, with loader wrapped over it (so when it downloads a route the user can't fuck it up)
             LoaderOverlay(
               child: BottomSheetWidget(
                 startRoute: _startRoute,
-                cancelRoute: cancelRoute,
+                cancelRoute: _cancelRoute,
+                enablePreview: _enablePreview,
               ),
             ),
 
@@ -255,7 +287,7 @@ class NavigationButtons extends StatelessWidget {
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
-                  () => {
+                  () async => {
                     mapViewController.setViewpointRotation(angleDegrees: 0.0),
                     mapViewController.locationDisplay.autoPanMode =
                         LocationDisplayAutoPanMode.recenter,

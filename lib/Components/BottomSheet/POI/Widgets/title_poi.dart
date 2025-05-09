@@ -19,7 +19,7 @@ class TitlePOI extends StatelessWidget {
         ),
         // type
         Text(
-          "TYPE",
+          pointOfInterest.category ?? "POI",
           style: Theme.of(context).textTheme.bodySmall,
           // style: Theme.of(context).textTheme.bodySmall!.copyWith(fontStyle: FontStyle.italic),
         ),

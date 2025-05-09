@@ -23,14 +23,14 @@ class RouteDownloadButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // print(currentRoute.availableRoute);
-
+    currentRoute.availableRoute[0];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2.0),
-      child: TextButton.icon(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: FilledButton.icon(
         onPressed: () async {
           context.loaderOverlay.show();
           // Get ArcGIS route layer data JSON
-          var routeResponse = await getRouteLayerJSON(
+          var routeResponse = await getArcgisItemData(
             currentRoute.availableRoute[0].routeID,
           );
 
@@ -46,20 +46,20 @@ class RouteDownloadButton extends StatelessWidget {
             (allPoiJSON['points'] as List).add(poiAsJSON);
           }
 
-          var encodePoi = jsonEncode(allPoiJSON);
-          await writeFile(
-            encodePoi,
-            'pois-${currentRoute.webmapId}.json',
-            currentRoute.webmapId,
-          );
-
-          //
           var folderContent = await getRouteFolders();
           if (folderContent.isEmpty) {
             var encodeRoute = jsonEncode(routeInfo.toJson());
+
             await writeFile(
               encodeRoute,
               'route-${currentRoute.availableRoute[0].routeID}.json',
+              currentRoute.webmapId,
+            );
+
+            var encodePoi = jsonEncode(allPoiJSON);
+            await writeFile(
+              encodePoi,
+              'pois-${currentRoute.webmapId}.json',
               currentRoute.webmapId,
             );
           } else {
@@ -68,6 +68,13 @@ class RouteDownloadButton extends StatelessWidget {
             await writeFile(
               encodeRoute,
               'route-${currentRoute.availableRoute[0].routeID}.json',
+              currentRoute.webmapId,
+            );
+
+            var encodePoi = jsonEncode(allPoiJSON);
+            await writeFile(
+              encodePoi,
+              'pois-${currentRoute.webmapId}.json',
               currentRoute.webmapId,
             );
           }
@@ -116,7 +123,7 @@ class RouteDownloadButton extends StatelessWidget {
         icon: const Icon(Icons.download),
         label: Text(
           'Download route',
-          style: Theme.of(context).textTheme.labelLarge,
+          style: Theme.of(context).textTheme.labelLarge!.copyWith(color: Colors.white),
         ),
         iconAlignment: IconAlignment.start,
       ),

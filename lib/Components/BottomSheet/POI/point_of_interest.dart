@@ -33,6 +33,14 @@ class POI extends StatelessWidget {
 
               // FUNCTION TO SHOW BUTTONS OF AVAILABLE CONATCT TYPES
               PoiButtons(routeContent: routeContent),
+              if (routeContent.openingHours != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    'Opent om: ${routeContent.openingHours!.replaceAll(RegExp(r':00$'), '')}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+                ),
 
               // description
               DescriptionPOI(description: routeContent.description!),
