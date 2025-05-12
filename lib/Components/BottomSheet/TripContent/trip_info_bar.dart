@@ -27,6 +27,7 @@ class TripContent extends StatefulWidget {
   State<TripContent> createState() => _TripContentState();
 }
 
+final GlobalKey _key = GlobalKey();
 // String distanceToFinish = "0.0";
 double _distanceToNextPoi = 0.0;
 double _traveledDistance = 0.0;
@@ -60,12 +61,13 @@ class _TripContentState extends State<TripContent> {
     List<DescriptionPoint> directions = directionList;
     if (directions.isEmpty) {
       // This is just a check for the start, it shouldn't happen, but just in case
-
       widget.setSheetWidget(null, false);
     } else if (directions.isNotEmpty) {
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) async {
+        await setInfoHeight();
+
         // directions = directionsList;
         if (directions.isNotEmpty) {
           // widget.setSheetWidget(null, false);
@@ -143,6 +145,25 @@ class _TripContentState extends State<TripContent> {
     }
   }
 
+  Future<void> setInfoHeight() async {
+        final RenderBox box =
+        _key.currentContext!.findRenderObject() as RenderBox;
+    final Size size = box.size;
+    final screenSize = MediaQuery.of(context).size;
+    
+    final navigationBarHeight = MediaQuery.of(context).padding.bottom;
+    (size.height + navigationBarHeight) / screenSize.height;
+    
+    if (_nearestPoi == null) {
+      sheetMinSize =
+          (size.height + navigationBarHeight) / screenSize.height;
+      globalSetState(
+        (size.height + navigationBarHeight) / screenSize.height,
+      );
+      await moveSheetTo(sheetMinSize);
+    }
+  }
+
   Future<void> _inputBasedPoiSetter(int latestPoi) async {
     // User selection based
     if (currenPOIChanged) {
@@ -202,12 +223,18 @@ class _TripContentState extends State<TripContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: BottomSheetHandle(context: context),
-                ),
+                // In a column to calculate the size of the bottom sheet top part
+                Column(
+                  key: _key,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: BottomSheetHandle(context: context),
+                    ),
 
-                TripInfoBar(setSheetWidget: widget.setSheetWidget),
+                    TripInfoBar(setSheetWidget: widget.setSheetWidget),
+                  ],
+                ),
 
                 _nearestPoi != null
                     ? POI(routeContent: _nearestPoi!)
@@ -301,6 +328,7 @@ class _TripInfoBarState extends State<TripInfoBar> {
             onPressed: () async {
               cancel();
               await moveSheetTo(0.9);
+              sheetMinSize = 0.15;
               widget.setSheetWidget(null, false);
             },
             icon: const Icon(Icons.highlight_off),

@@ -214,7 +214,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
   @override
   Widget build(BuildContext context) {
-    Icon currentIcon = Icon(Icons.notifications);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -326,54 +325,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
             ),
           ),
         ),
-
-        // Padding(
-        //   padding: EdgeInsets.only(left: 14, right: 8, top: 8),
-        //   child: Column(
-        //     mainAxisAlignment: MainAxisAlignment.start,
-        //     crossAxisAlignment: CrossAxisAlignment.end,
-        //     spacing: 12,
-        //     children: [
-        //       FloatingActionButton(
-        //         heroTag: UniqueKey(),
-        //         onPressed:
-        //             () => {
-        //               mapViewController.locationDisplay.autoPanMode =
-        //                   LocationDisplayAutoPanMode.navigation,
-        //             },
-        //         child: Icon(Icons.gps_fixed),
-        //       ),
-        //       FloatingActionButton(
-        //         heroTag: UniqueKey(),
-        //         onPressed:
-        //             () => {
-        //               // TODO: Deze noordgericht en volgen maken, of alleen noord gericht (nu is het compass om te checken hoe die werkt vergeleken met navigation)
-        //               mapViewController.setViewpointRotation(angleDegrees: 0.0),
-        //               mapViewController.locationDisplay.autoPanMode =
-        //                   LocationDisplayAutoPanMode.compassNavigation,
-        //             },
-        //         child: Icon(Icons.compass_calibration),
-        //       ),
-        //       FloatingActionButton(
-        //         heroTag: UniqueKey(),
-        //         onPressed:
-        //             () => {
-        //               enabledNotifiation = !enabledNotifiation,
-        //               currentIcon = Icon(Icons.notifications_off),
-        //               mapViewController.locationDisplay.autoPanMode =
-        //                   LocationDisplayAutoPanMode.compassNavigation,
-        //             },
-        //         child: currentIcon,
-        //         //  Icon(
-        //         //   enabledNotifiation
-        //         //       ? Icons.notifications
-        //         //       : Icons.notifications_off,
-        //         // ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        // NavigationButtons(),
       ],
     );
   }

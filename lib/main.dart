@@ -289,7 +289,6 @@ class _NavigationButtonsState extends State<NavigationButtons> {
     subscription = mapViewController.locationDisplay.onAutoPanModeChanged
         .listen((mode) {
           if (mounted) {
-            print('object');
             setState(() {
               mapViewController.locationDisplay.autoPanMode ==
                       LocationDisplayAutoPanMode.off
@@ -341,6 +340,8 @@ class _NavigationButtonsState extends State<NavigationButtons> {
               child: centeredIcon,
             ),
 
+            // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
+            // (verder checken met voorkeur van bijv. Thomas)
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
@@ -379,9 +380,6 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                               enabledNotifiation = !enabledNotifiation;
                             }),
                           },
-
-                        mapViewController.locationDisplay.autoPanMode =
-                            LocationDisplayAutoPanMode.compassNavigation,
                       },
                   child: currentIcon,
                 )
