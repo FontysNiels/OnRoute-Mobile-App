@@ -4,9 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 // Get ArcGIS content from specific file
 Future<http.Response> getArcgisItemData(String routeID) async {
+  var tokenResponse = await _handleToken();
   final response = await http.get(
     Uri.parse(
-      'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/data?f=json',
+      'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/data?f=json&token=$tokenResponse',
       // 'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/d7c2638c697d415584c84166e04565b5/data',
     ),
     headers: <String, String>{
@@ -20,10 +21,10 @@ Future<http.Response> getArcgisItemData(String routeID) async {
 // Get ArcGIS data, like title and description, from specific file
 // Momenteel (28/04) niet in gebruik, doordat titel en description ook in de getall zitten
 Future<http.Response> getArcgisItemInfo(String routeID) async {
-  print('object');
+  var tokenResponse = await _handleToken();
   final response = await http.get(
     Uri.parse(
-      'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/?f=json',
+      'https://bragis-def.maps.arcgis.com/sharing/rest/content/items/$routeID/?f=json&token=$tokenResponse',
     ),
     headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -64,7 +65,9 @@ Future<http.Response> getAllFromFolder() async {
 
 //
 Future<http.Response> getServiceContent(String url) async {
-  String madeUrl = "$url/query?where=1%3D1&outFields=*&f=json";
+  var tokenResponse = await _handleToken();
+  String madeUrl =
+      "$url/query?where=1%3D1&outFields=*&f=json&token=$tokenResponse";
   final response = await http.get(
     Uri.parse(madeUrl),
     headers: <String, String>{
@@ -76,7 +79,8 @@ Future<http.Response> getServiceContent(String url) async {
 
 //
 Future<String> getServiceAssets(String url, int id) async {
-  String madeUrl = "$url/$id/attachments/?f=json";
+  var tokenResponse = await _handleToken();
+  String madeUrl = "$url/$id/attachments/?f=json&token=$tokenResponse";
 
   final response = await http.get(
     Uri.parse(madeUrl),

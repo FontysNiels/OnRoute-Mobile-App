@@ -23,20 +23,21 @@ class _PackageTabsState extends State<PackageTabs>
     widget.setIndex(_tabController.index);
   }
 
-  late final List<Tab> _tabs = widget.isPackage
-      ? [
-          const Tab(text: 'Beschrijving'),
-          const Tab(text: 'POIs'),
-          const Tab(text: 'Routes'),
-        ]
-      : [
-          const Tab(text: 'Beschrijving'),
-          const Tab(text: 'POIs'),
-        ];
+  late final List<Tab> _tabs =
+      widget.isPackage
+          ? [
+            const Tab(text: 'Beschrijving'),
+            const Tab(text: 'POIs'),
+            const Tab(text: 'Routes'),
+          ]
+          : [const Tab(text: 'Beschrijving'), const Tab(text: 'POIs')];
 
   @override
   void initState() {
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(
+      length: widget.isPackage ? 3 : 2,
+      vsync: this,
+    );
     _tabController.addListener(_handleTabSelection);
     super.initState();
   }

@@ -18,7 +18,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
   // The number description the user is on
   int descriptionNum = 0;
   // Condition that shows if user is away from route
-  bool userAwayFromRoute = false;
+  bool userAwayFromRoute = true;
   // The subscription that subscribes the to user's location
   late StreamSubscription<ArcGISLocation> subscription;
 
@@ -154,18 +154,18 @@ class _DirectionsCardState extends State<DirectionsCard> {
               .toList();
 
       if (descriptionNum == 0) {
-        distanceToEveryDirection[descriptionNum] = distanceInMeters.toInt();
+        distanceToEveryDirection.insert(0, distanceInMeters.toInt());
       } else {
         // print(distanceToEveryDirection[descriptionNum - 1]);
         distanceToEveryDirection[descriptionNum - 1] = distanceInMeters.toInt();
         distanceToEveryDirection = distanceToEveryDirection.sublist(
           descriptionNum - 1,
         );
-        var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
+      }
+      var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
 
-        if (disrabceToFinish != totalDistance) {
-          disrabceToFinish = totalDistance;
-        }
+      if (disrabceToFinish != totalDistance) {
+        disrabceToFinish = totalDistance;
       }
 
       setState(() {
@@ -214,6 +214,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
 
   @override
   Widget build(BuildContext context) {
+    Icon currentIcon = Icon(Icons.notifications);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -248,7 +249,8 @@ class _DirectionsCardState extends State<DirectionsCard> {
                       child: Text(
                         directionList.isNotEmpty
                             ? userAwayFromRoute && descriptionNum == 0
-                                ? metersToCurrentDirection > 20
+                                ? metersToCurrentDirection > 20 ||
+                                        metersToCurrentDirection == 0
                                     ? "Ga naar de start van de route"
                                     : directionList[descriptionNum].description
                                 : userAwayFromRoute
@@ -325,50 +327,53 @@ class _DirectionsCardState extends State<DirectionsCard> {
           ),
         ),
 
-        Padding(
-          padding: EdgeInsets.only(left: 14, right: 8, top: 8),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: 12,
-            children: [
-              FloatingActionButton(
-                heroTag: UniqueKey(),
-                onPressed:
-                    () => {
-                      mapViewController.locationDisplay.autoPanMode =
-                          LocationDisplayAutoPanMode.recenter,
-                    },
-                child: Icon(Icons.gps_fixed),
-              ),
-              FloatingActionButton(
-                heroTag: UniqueKey(),
-                onPressed:
-                    () => {
-                      mapViewController.locationDisplay.autoPanMode =
-                          // LocationDisplayAutoPanMode.compassNavigation,
-                          LocationDisplayAutoPanMode.navigation,
-                    },
-                child: Icon(Icons.compass_calibration),
-              ),
-              FloatingActionButton(
-                heroTag: UniqueKey(),
-                onPressed:
-                    () => {
-                      enabledNotifiation = !enabledNotifiation,
-
-                      mapViewController.locationDisplay.autoPanMode =
-                          LocationDisplayAutoPanMode.compassNavigation,
-                    },
-                child: Icon(
-                  enabledNotifiation
-                      ? Icons.notifications
-                      : Icons.notifications_off,
-                ),
-              ),
-            ],
-          ),
-        ),
+        // Padding(
+        //   padding: EdgeInsets.only(left: 14, right: 8, top: 8),
+        //   child: Column(
+        //     mainAxisAlignment: MainAxisAlignment.start,
+        //     crossAxisAlignment: CrossAxisAlignment.end,
+        //     spacing: 12,
+        //     children: [
+        //       FloatingActionButton(
+        //         heroTag: UniqueKey(),
+        //         onPressed:
+        //             () => {
+        //               mapViewController.locationDisplay.autoPanMode =
+        //                   LocationDisplayAutoPanMode.navigation,
+        //             },
+        //         child: Icon(Icons.gps_fixed),
+        //       ),
+        //       FloatingActionButton(
+        //         heroTag: UniqueKey(),
+        //         onPressed:
+        //             () => {
+        //               // TODO: Deze noordgericht en volgen maken, of alleen noord gericht (nu is het compass om te checken hoe die werkt vergeleken met navigation)
+        //               mapViewController.setViewpointRotation(angleDegrees: 0.0),
+        //               mapViewController.locationDisplay.autoPanMode =
+        //                   LocationDisplayAutoPanMode.compassNavigation,
+        //             },
+        //         child: Icon(Icons.compass_calibration),
+        //       ),
+        //       FloatingActionButton(
+        //         heroTag: UniqueKey(),
+        //         onPressed:
+        //             () => {
+        //               enabledNotifiation = !enabledNotifiation,
+        //               currentIcon = Icon(Icons.notifications_off),
+        //               mapViewController.locationDisplay.autoPanMode =
+        //                   LocationDisplayAutoPanMode.compassNavigation,
+        //             },
+        //         child: currentIcon,
+        //         //  Icon(
+        //         //   enabledNotifiation
+        //         //       ? Icons.notifications
+        //         //       : Icons.notifications_off,
+        //         // ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        // NavigationButtons(),
       ],
     );
   }

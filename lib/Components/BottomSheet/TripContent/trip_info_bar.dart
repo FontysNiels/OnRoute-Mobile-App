@@ -67,9 +67,8 @@ class _TripContentState extends State<TripContent> {
         mode,
       ) async {
         // directions = directionsList;
-        if (directions.isEmpty) {
-          widget.setSheetWidget(null, false);
-        } else {
+        if (directions.isNotEmpty) {
+          // widget.setSheetWidget(null, false);
           double distance = 0.0;
           if (userPosition != null) {
             final userLat = userPosition!.y;
@@ -301,9 +300,8 @@ class _TripInfoBarState extends State<TripInfoBar> {
           ElevatedButton.icon(
             onPressed: () async {
               cancel();
-              // directionsList.clear();
-              // graphicsOverlay.graphics.clear();
-              // currenPOI = 0;
+              await moveSheetTo(0.9);
+              widget.setSheetWidget(null, false);
             },
             icon: const Icon(Icons.highlight_off),
             label: Text(
