@@ -270,8 +270,8 @@ class _MainAppState extends State<MainApp> {
   }
 }
 
-Icon centeredIcon = Icon(Icons.gps_fixed);
-Icon currentIcon = Icon(Icons.notifications);
+Icon _centeredIcon = Icon(Icons.gps_fixed);
+Icon _currentIcon = Icon(Icons.notifications);
 late StreamSubscription<LocationDisplayAutoPanMode> subscription;
 
 class NavigationButtons extends StatefulWidget {
@@ -284,7 +284,6 @@ class NavigationButtons extends StatefulWidget {
 class _NavigationButtonsState extends State<NavigationButtons> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     subscription = mapViewController.locationDisplay.onAutoPanModeChanged
         .listen((mode) {
@@ -292,8 +291,8 @@ class _NavigationButtonsState extends State<NavigationButtons> {
             setState(() {
               mapViewController.locationDisplay.autoPanMode ==
                       LocationDisplayAutoPanMode.off
-                  ? centeredIcon = Icon(Icons.gps_not_fixed)
-                  : centeredIcon = Icon(Icons.gps_fixed);
+                  ? _centeredIcon = Icon(Icons.gps_not_fixed)
+                  : _centeredIcon = Icon(Icons.gps_fixed);
             });
           }
         });
@@ -337,7 +336,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                         : mapViewController.locationDisplay.autoPanMode =
                             LocationDisplayAutoPanMode.recenter,
                   },
-              child: centeredIcon,
+              child: _centeredIcon,
             ),
 
             // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
@@ -373,7 +372,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                         if (mounted)
                           {
                             setState(() {
-                              currentIcon =
+                              _currentIcon =
                                   enabledNotifiation
                                       ? Icon(Icons.notifications_off)
                                       : Icon(Icons.notifications);
@@ -381,7 +380,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                             }),
                           },
                       },
-                  child: currentIcon,
+                  child: _currentIcon,
                 )
                 : Container(),
           ],

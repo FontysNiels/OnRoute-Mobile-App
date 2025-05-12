@@ -62,11 +62,9 @@ Future<void> moveSheetTo(double size) async {
 }
 
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
-  
   void setMinheight(double size) {
     setState(() {
       sheetMinSize = size;
-      
     });
   }
 
@@ -137,6 +135,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (sheetMinSize != 0.15) {
+        await moveSheetTo(sheetMinSize);
+      }
+    });
     return Stack(
       children: [
         // Persistent bottom sheet
@@ -150,10 +153,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           // During route:
           // snapSizes: [0.15, 0.5, 0.9],
           snapSizes:
-              _bottomSheetWidgets.length > 1
+              directionList.isNotEmpty
                   ? [sheetMinSize, 0.5, 0.9]
                   : [0.3, 0.5, 0.9],
-          minChildSize: _bottomSheetWidgets.length > 1 ? sheetMinSize : 0.3,
+          minChildSize: directionList.isNotEmpty ? sheetMinSize : 0.3,
           // minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0,
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {

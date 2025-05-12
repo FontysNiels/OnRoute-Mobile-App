@@ -165,7 +165,7 @@ class _DirectionsCardState extends State<DirectionsCard> {
       var totalDistance = distanceToEveryDirection.reduce((a, b) => a + b);
 
       if (disrabceToFinish != totalDistance) {
-        disrabceToFinish = totalDistance;
+        disrabceToFinish = totalDistance.toDouble();
       }
 
       setState(() {

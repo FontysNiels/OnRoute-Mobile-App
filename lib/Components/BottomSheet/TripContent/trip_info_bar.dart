@@ -55,6 +55,11 @@ class _TripContentState extends State<TripContent> {
     // selectedPoi = widget.routeContent.pointsOfInterest.first;
     calculateDistances();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setInfoHeight();
+      }
+    });
   }
 
   void calculateDistances() {
@@ -66,8 +71,6 @@ class _TripContentState extends State<TripContent> {
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) async {
-        await setInfoHeight();
-
         // directions = directionsList;
         if (directions.isNotEmpty) {
           // widget.setSheetWidget(null, false);
@@ -145,23 +148,19 @@ class _TripContentState extends State<TripContent> {
     }
   }
 
-  Future<void> setInfoHeight() async {
-        final RenderBox box =
-        _key.currentContext!.findRenderObject() as RenderBox;
+  void setInfoHeight() {
+    final RenderBox box = _key.currentContext!.findRenderObject() as RenderBox;
     final Size size = box.size;
     final screenSize = MediaQuery.of(context).size;
-    
+
     final navigationBarHeight = MediaQuery.of(context).padding.bottom;
     (size.height + navigationBarHeight) / screenSize.height;
-    
-    if (_nearestPoi == null) {
-      sheetMinSize =
-          (size.height + navigationBarHeight) / screenSize.height;
-      globalSetState(
-        (size.height + navigationBarHeight) / screenSize.height,
-      );
-      await moveSheetTo(sheetMinSize);
-    }
+
+    // if (sheetMinSize == 0.15) {
+    globalSetState((size.height + navigationBarHeight) / screenSize.height);
+    // await moveSheetTo(sheetMinSize);
+
+    // }
   }
 
   Future<void> _inputBasedPoiSetter(int latestPoi) async {
@@ -327,8 +326,8 @@ class _TripInfoBarState extends State<TripInfoBar> {
           ElevatedButton.icon(
             onPressed: () async {
               cancel();
+              globalSetState(0.15);
               await moveSheetTo(0.9);
-              sheetMinSize = 0.15;
               widget.setSheetWidget(null, false);
             },
             icon: const Icon(Icons.highlight_off),

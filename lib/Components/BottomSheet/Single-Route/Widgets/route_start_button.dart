@@ -33,7 +33,7 @@ class RouteStartButton extends StatelessWidget {
           RouteLayerData routeInfo = RouteLayerData.fromJson(storedFile);
           startRoute(routeInfo, routeContent.pointsOfInterest);
           // await addGraphics(routeContent.routeLayer);
-          await moveSheetTo(0.15);
+          // await moveSheetTo(0.15);
 
           setSheetWidget(
             TripContent(
