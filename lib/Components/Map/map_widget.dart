@@ -76,7 +76,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
 
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
-                        if (tappedGraphic.attributes['objectId'] != null) {
+                        if (tappedGraphic.attributes['objectId'] != null && !previewEnabled) {
                           selectPoi(tappedGraphic.attributes['objectId']);
                         }
                       }

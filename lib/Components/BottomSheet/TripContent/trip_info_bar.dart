@@ -46,6 +46,8 @@ class _TripContentState extends State<TripContent> {
     _nearestPoi = null;
     _traveledDistance = 0.0;
     _distanceToNextPoi = 0.0;
+    selectedPOI = 0;
+    currenPOIChanged = false;
     _userNearPoi = false;
     super.dispose();
   }
@@ -53,6 +55,8 @@ class _TripContentState extends State<TripContent> {
   @override
   void initState() {
     // selectedPoi = widget.routeContent.pointsOfInterest.first;
+    selectedPOI = 0;
+    currenPOIChanged = false;
     calculateDistances();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
