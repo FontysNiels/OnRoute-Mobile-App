@@ -25,10 +25,11 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed) {
-      checkLocation();
-      if (_locationDataSource.status == LocationDataSourceStatus.started && dialogActive == true) { 
+      await checkLocation();
+      if (_locationDataSource.status == LocationDataSourceStatus.started &&
+          dialogActive == true) {
         Navigator.of(context, rootNavigator: true).pop();
         dialogActive = false;
       }
@@ -76,7 +77,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
 
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
-                        if (tappedGraphic.attributes['objectId'] != null && !previewEnabled) {
+                        if (tappedGraphic.attributes['objectId'] != null &&
+                            !previewEnabled) {
                           selectPoi(tappedGraphic.attributes['objectId']);
                         }
                       }

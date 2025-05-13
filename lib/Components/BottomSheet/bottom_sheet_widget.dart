@@ -83,7 +83,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         await (Connectivity().checkConnectivity());
 
     if (connectivityResult.contains(ConnectivityResult.mobile) ||
-        connectivityResult.contains(ConnectivityResult.wifi)) {
+        connectivityResult.contains(ConnectivityResult.wifi) ||
+        connectivityResult.contains(ConnectivityResult.ethernet)) {
       allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
     }
 

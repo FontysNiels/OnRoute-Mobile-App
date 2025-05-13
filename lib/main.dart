@@ -17,7 +17,7 @@ import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
-    // print("COOLE SHIT: ${details}");
+    print("COOLE SHIT: ${details}");
   };
   runApp(const MainApp());
 }
