@@ -28,7 +28,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       checkLocation();
-      if (_locationDataSource.status == LocationDataSourceStatus.started) {
+      if (_locationDataSource.status == LocationDataSourceStatus.started && dialogActive == true) { 
         Navigator.of(context, rootNavigator: true).pop();
         dialogActive = false;
       }
@@ -47,7 +47,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   var _ready = false;
   // Create the system location data source.
   final _locationDataSource = SystemLocationDataSource();
-
+  // Bool to check if the dialog is active.
   bool dialogActive = false;
 
   @override
