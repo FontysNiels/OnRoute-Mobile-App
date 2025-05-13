@@ -23,10 +23,19 @@ class PackegImagePreview extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: CachedNetworkImage(
-                      imageUrl: routeContent.availableRoute[0].thumbnail.split("--ONROUTE--")[1],
+                      imageUrl:
+                          routeContent.availableRoute[0].thumbnail.split(
+                            "--ONROUTE--",
+                          )[1],
                       fit: BoxFit.cover,
                       placeholder:
-                          (context, url) => CircularProgressIndicator(),
+                          (context, url) => Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 80.0,
+                              vertical: 20,
+                            ),
+                            child: CircularProgressIndicator(),
+                          ),
                       errorWidget:
                           (context, url, error) => Image.asset(
                             'assets/temp.png',

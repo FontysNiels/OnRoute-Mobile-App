@@ -27,6 +27,7 @@ class TripContent extends StatefulWidget {
   State<TripContent> createState() => _TripContentState();
 }
 
+final GlobalKey _key = GlobalKey();
 // String distanceToFinish = "0.0";
 double _distanceToNextPoi = 0.0;
 double _traveledDistance = 0.0;
@@ -45,6 +46,8 @@ class _TripContentState extends State<TripContent> {
     _nearestPoi = null;
     _traveledDistance = 0.0;
     _distanceToNextPoi = 0.0;
+    selectedPOI = 0;
+    currenPOIChanged = false;
     _userNearPoi = false;
     super.dispose();
   }
@@ -52,24 +55,29 @@ class _TripContentState extends State<TripContent> {
   @override
   void initState() {
     // selectedPoi = widget.routeContent.pointsOfInterest.first;
+    selectedPOI = 0;
+    currenPOIChanged = false;
     calculateDistances();
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        setInfoHeight();
+      }
+    });
   }
 
   void calculateDistances() {
     List<DescriptionPoint> directions = directionList;
     if (directions.isEmpty) {
       // This is just a check for the start, it shouldn't happen, but just in case
-
       widget.setSheetWidget(null, false);
     } else if (directions.isNotEmpty) {
       subscription = controller.locationDisplay.onLocationChanged.listen((
         mode,
       ) async {
         // directions = directionsList;
-        if (directions.isEmpty) {
-          widget.setSheetWidget(null, false);
-        } else {
+        if (directions.isNotEmpty) {
+          // widget.setSheetWidget(null, false);
           double distance = 0.0;
           if (userPosition != null) {
             final userLat = userPosition!.y;
@@ -144,6 +152,21 @@ class _TripContentState extends State<TripContent> {
     }
   }
 
+  void setInfoHeight() {
+    final RenderBox box = _key.currentContext!.findRenderObject() as RenderBox;
+    final Size size = box.size;
+    final screenSize = MediaQuery.of(context).size;
+
+    final navigationBarHeight = MediaQuery.of(context).padding.bottom;
+    (size.height + navigationBarHeight) / screenSize.height;
+
+    // if (sheetMinSize == 0.15) {
+    globalSetState((size.height + navigationBarHeight) / screenSize.height);
+    // await moveSheetTo(sheetMinSize);
+
+    // }
+  }
+
   Future<void> _inputBasedPoiSetter(int latestPoi) async {
     // User selection based
     if (currenPOIChanged) {
@@ -203,12 +226,18 @@ class _TripContentState extends State<TripContent> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: BottomSheetHandle(context: context),
-                ),
+                // In a column to calculate the size of the bottom sheet top part
+                Column(
+                  key: _key,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: BottomSheetHandle(context: context),
+                    ),
 
-                TripInfoBar(setSheetWidget: widget.setSheetWidget),
+                    TripInfoBar(setSheetWidget: widget.setSheetWidget),
+                  ],
+                ),
 
                 _nearestPoi != null
                     ? POI(routeContent: _nearestPoi!)
@@ -301,9 +330,9 @@ class _TripInfoBarState extends State<TripInfoBar> {
           ElevatedButton.icon(
             onPressed: () async {
               cancel();
-              // directionsList.clear();
-              // graphicsOverlay.graphics.clear();
-              // currenPOI = 0;
+              globalSetState(0.15);
+              await moveSheetTo(0.9);
+              widget.setSheetWidget(null, false);
             },
             icon: const Icon(Icons.highlight_off),
             label: Text(

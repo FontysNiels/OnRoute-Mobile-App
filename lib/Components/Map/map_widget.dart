@@ -11,15 +11,28 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
-class _MapWidgetState extends State<MapWidget> {
+class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      checkLocation();
+      if (_locationDataSource.status == LocationDataSourceStatus.started && dialogActive == true) { 
+        Navigator.of(context, rootNavigator: true).pop();
+        dialogActive = false;
+      }
+    }
   }
 
   // Create a GlobalKey for the ArcGISMapView to persist its state.
@@ -34,6 +47,8 @@ class _MapWidgetState extends State<MapWidget> {
   var _ready = false;
   // Create the system location data source.
   final _locationDataSource = SystemLocationDataSource();
+  // Bool to check if the dialog is active.
+  bool dialogActive = false;
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +76,7 @@ class _MapWidgetState extends State<MapWidget> {
 
                       if (result.graphics.isNotEmpty) {
                         final tappedGraphic = result.graphics.first;
-                        if (tappedGraphic.attributes['objectId'] != null) {
+                        if (tappedGraphic.attributes['objectId'] != null && !previewEnabled) {
                           selectPoi(tappedGraphic.attributes['objectId']);
                         }
                       }
@@ -143,16 +158,7 @@ class _MapWidgetState extends State<MapWidget> {
           LocationDisplayAutoPanMode.navigation;
 
       // Attempt to start the location data source (this will prompt the user for permission).
-      try {
-        await _locationDataSource.start();
-      } on ArcGISException catch (e) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            builder: (_) => AlertDialog(content: Text(e.message)),
-          );
-        }
-      }
+      await checkLocation();
 
       // Set the ready state variable to true to enable the UI.
       if (mounted) {
@@ -162,6 +168,44 @@ class _MapWidgetState extends State<MapWidget> {
       }
     } catch (e) {
       print("Error in onMapViewReady: $e");
+    }
+  }
+
+  Future<void> checkLocation() async {
+    try {
+      await _locationDataSource.start();
+      print(_locationDataSource.status);
+    } on ArcGISException catch (e) {
+      if (mounted) {
+        if (!dialogActive) {
+          showDialog(
+            barrierDismissible: false,
+            context: context,
+            // builder: (_) => AlertDialog(content: Text(e.message)),
+            builder:
+                (_) => PopScope(
+                  canPop: false, // 🔒 Prevents back button to close
+                  child: AlertDialog(
+                    content: Column(
+                      mainAxisSize:
+                          MainAxisSize.min, // Use as much height as needed
+                      children: [
+                        Text(
+                          'Geef OnRoute toegang tot uw locatie...',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          'De app heeft toegang nodig tot uw locatie.\n\nGa naar de instellingen van uw telefoon om de app toegang te geven tot uw locatie.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+          );
+        }
+        dialogActive = true;
+      }
     }
   }
 }

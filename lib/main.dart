@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -138,10 +140,6 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
-
-
-  
-
   String test = 'tetst';
   @override
   Widget build(BuildContext context) {
@@ -231,8 +229,13 @@ class _MainAppState extends State<MainApp> {
             // The Map
             MapWidget(selectPoi: selectPoi),
             // Direction card (if the directionsList isn't empty)
-            directionList.isNotEmpty ? DirectionsCard() : NavigationButtons(),
+            Column(
+              children: [
+                directionList.isNotEmpty ? DirectionsCard() : Container(),
 
+                NavigationButtons(),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.all(18.0),
               child: Align(
@@ -267,8 +270,39 @@ class _MainAppState extends State<MainApp> {
   }
 }
 
-class NavigationButtons extends StatelessWidget {
+Icon _centeredIcon = Icon(Icons.gps_fixed);
+Icon _currentIcon = Icon(Icons.notifications);
+late StreamSubscription<LocationDisplayAutoPanMode> subscription;
+
+class NavigationButtons extends StatefulWidget {
   const NavigationButtons({super.key});
+
+  @override
+  State<NavigationButtons> createState() => _NavigationButtonsState();
+}
+
+class _NavigationButtonsState extends State<NavigationButtons> {
+  @override
+  void initState() {
+    super.initState();
+    subscription = mapViewController.locationDisplay.onAutoPanModeChanged
+        .listen((mode) {
+          if (mounted) {
+            setState(() {
+              mapViewController.locationDisplay.autoPanMode ==
+                      LocationDisplayAutoPanMode.off
+                  ? _centeredIcon = Icon(Icons.gps_not_fixed)
+                  : _centeredIcon = Icon(Icons.gps_fixed);
+            });
+          }
+        });
+  }
+
+  @override
+  void dispose() {
+    subscription.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -276,8 +310,11 @@ class NavigationButtons extends StatelessWidget {
       alignment: Alignment.centerRight,
       child: Padding(
         padding: EdgeInsets.only(
-          right: 8.0,
-          top: MediaQuery.of(context).padding.top + 88,
+          right: 12.0,
+          top:
+              directionList.isNotEmpty
+                  ? 8
+                  : MediaQuery.of(context).padding.top + 88,
         ),
         child: Column(
           spacing: 12,
@@ -288,29 +325,64 @@ class NavigationButtons extends StatelessWidget {
               heroTag: UniqueKey(),
               onPressed:
                   () async => {
-                    mapViewController.setViewpointRotation(angleDegrees: 0.0),
-                    mapViewController.locationDisplay.autoPanMode =
-                        LocationDisplayAutoPanMode.recenter,
-
-                    //TODO: work out what exactly stakeholder wants the buttons to do
-
-                    // mapViewController.locationDisplay.autoPanMode =
-                    //     // LocationDisplayAutoPanMode.compassNavigation,
-                    //     LocationDisplayAutoPanMode.navigation,
+                    directionList.isNotEmpty
+                        ? (
+                          mapViewController.setViewpointRotation(
+                            angleDegrees: 0.0,
+                          ),
+                          mapViewController.locationDisplay.autoPanMode =
+                              LocationDisplayAutoPanMode.navigation,
+                        )
+                        : mapViewController.locationDisplay.autoPanMode =
+                            LocationDisplayAutoPanMode.recenter,
                   },
-              child: Icon(Icons.gps_fixed),
+              child: _centeredIcon,
             ),
 
+            // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
+            // (verder checken met voorkeur van bijv. Thomas)
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
                   () => {
-                    mapViewController.locationDisplay.autoPanMode =
-                        // LocationDisplayAutoPanMode.compassNavigation,
-                        LocationDisplayAutoPanMode.navigation,
+                    directionList.isNotEmpty
+                        ? (
+                          mapViewController.setViewpointRotation(
+                            angleDegrees: 0.0,
+                          ),
+                          mapViewController.locationDisplay.autoPanMode =
+                              LocationDisplayAutoPanMode.compassNavigation,
+                        )
+                        :
+                        // mapViewController.locationDisplay.autoPanMode =
+                        //     LocationDisplayAutoPanMode.compassNavigation,
+                        // LocationDisplayAutoPanMode.recenter,
+                        mapViewController.setViewpointRotation(
+                          angleDegrees: 0.0,
+                        ),
                   },
               child: Icon(Icons.compass_calibration),
             ),
+
+            directionList.isNotEmpty
+                ? FloatingActionButton(
+                  heroTag: UniqueKey(),
+                  onPressed:
+                      () => {
+                        if (mounted)
+                          {
+                            setState(() {
+                              _currentIcon =
+                                  enabledNotifiation
+                                      ? Icon(Icons.notifications_off)
+                                      : Icon(Icons.notifications);
+                              enabledNotifiation = !enabledNotifiation;
+                            }),
+                          },
+                      },
+                  child: _currentIcon,
+                )
+                : Container(),
           ],
         ),
       ),

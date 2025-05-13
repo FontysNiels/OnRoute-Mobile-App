@@ -39,6 +39,12 @@ late final DraggableScrollableController _controller;
 
 // Sheet size
 double sheetSize = 0.4;
+
+double sheetMinSize = 0.15;
+
+// Global setState function
+late Function globalSetState;
+
 // Sheet size animator
 
 // TODO: vaste maten maken, ipv variable double
@@ -56,6 +62,12 @@ Future<void> moveSheetTo(double size) async {
 }
 
 class _BottomSheetWidgetState extends State<BottomSheetWidget> {
+  void setMinheight(double size) {
+    setState(() {
+      sheetMinSize = size;
+    });
+  }
+
   // List of all the widgets in the bottom sheet
   final List<Widget> _bottomSheetWidgets = [];
 
@@ -108,6 +120,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   @override
   void initState() {
     super.initState();
+    globalSetState = setMinheight;
     _controller = DraggableScrollableController();
     cancel = widget.cancelRoute;
     preview = widget.enablePreview;
@@ -122,6 +135,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (sheetMinSize != 0.15) {
+        await moveSheetTo(sheetMinSize);
+      }
+    });
     return Stack(
       children: [
         // Persistent bottom sheet
@@ -135,10 +153,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           // During route:
           // snapSizes: [0.15, 0.5, 0.9],
           snapSizes:
-              _bottomSheetWidgets.length > 1
-                  ? [0.15, 0.5, 0.9]
+              directionList.isNotEmpty
+                  ? [sheetMinSize, 0.5, 0.9]
                   : [0.3, 0.5, 0.9],
-          minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0.3,
+          minChildSize: directionList.isNotEmpty ? sheetMinSize : 0.3,
           // minChildSize: _bottomSheetWidgets.length > 1 ? 0.15 : 0,
           maxChildSize: 0.9,
           builder: (BuildContext context, scrollController) {
@@ -152,23 +170,27 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               );
             }
 
-            return !previewEnabled? Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 10.0,
-                    offset: Offset(0, -2),
+            return !previewEnabled
+                ? Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16.0),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10.0,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: _bottomSheetWidgets.last,
-              ),
-            ): Container();
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: _bottomSheetWidgets.last,
+                  ),
+                )
+                : Container();
           },
         ),
       ],
