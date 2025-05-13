@@ -27,7 +27,13 @@ class ImagePOI extends StatelessWidget {
                   //       // fit: BoxFit.cover,
                   //     ),
                   placeholder:
-                      (context, url) => CircularProgressIndicator(),
+                      (context, url) => Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 80.0,
+                          vertical: 20,
+                        ),
+                        child: CircularProgressIndicator(),
+                      ),
                   errorWidget:
                       (context, url, error) => Image.asset(
                         'assets/temp.png',

@@ -8,7 +8,7 @@
     <application
         android:label="onroute_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -37,6 +37,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+            <!-- This uses an older renderer, did this because of some UI errors on older devices. Need to check if it works without -->
             <meta-data
     android:name="io.flutter.embedding.android.EnableImpeller"
     android:value="true" />
