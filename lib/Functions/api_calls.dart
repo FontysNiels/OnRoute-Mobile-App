@@ -96,7 +96,7 @@ Future<String> getServiceAssets(String url, int id) async {
   }
   var attachments = repsonseAttechments['attachmentInfos'][0]['id'];
 
-  String attechmentUrl = "$url/$id/attechments/$attachments";
+  String attechmentUrl = "$url/$id/attechments/$attachments?token=$tokenResponse";
 
   return attechmentUrl;
 }
