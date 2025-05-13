@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Components/BottomSheet/TripContent/trip_info_bar.dart';
-import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 class RouteStartButton extends StatelessWidget {
