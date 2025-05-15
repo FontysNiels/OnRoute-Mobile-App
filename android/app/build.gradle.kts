@@ -8,6 +8,7 @@ plugins {
 android {
     namespace = "com.example.app.onroute_app"
     compileSdk = flutter.compileSdkVersion
+    // compileSdkVersion = "35"
     ndkVersion = "27.0.12077973"
 
     compileOptions {
