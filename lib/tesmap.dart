@@ -1,193 +1,203 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:arcgis_maps/arcgis_maps.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:flutter/material.dart';
+import 'package:onroute_app/Components/Map/map_widget.dart';
+import 'package:onroute_app/main.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-class OfflineMapDownloadExample extends StatefulWidget {
-  const OfflineMapDownloadExample({super.key});
-
-  @override
-  State<OfflineMapDownloadExample> createState() =>
-      _OfflineMapDownloadExampleState();
+class LocationAwareMap extends StatefulWidget {
+@override
+_LocationAwareMapState createState() => _LocationAwareMapState();
 }
 
-class _OfflineMapDownloadExampleState extends State<OfflineMapDownloadExample> {
-  final _mapViewController = ArcGISMapView.createController();
-  final _preplannedMapAreas =
-      <PreplannedMapArea, DownloadPreplannedOfflineMapJob?>{};
-  late OfflineMapTask _offlineMapTask;
-  late ArcGISMap _webMap;
-  Directory? _downloadDirectory;
-  final _mapAreas = <PreplannedMapArea>[];
-  bool _ready = false;
+enum AppPermissionStatus { denied, granted, permanentlyDenied }
 
-  @override
-  void initState() {
-    super.initState();
-    _initMapAndTask();
+class _LocationAwareMapState extends State<LocationAwareMap>
+  with WidgetsBindingObserver {
+final GlobalKey _mapViewKey = GlobalKey();
+// Create a controller for the map view.
+ArcGISMapViewController _mapViewController = mapViewController;
+
+// Create the system location data source.
+late final _locationDataSource = SystemLocationDataSource();
+// A flag for when the map view is ready and controls can be used.
+var _ready = false;
+//Track the app’s location permission state.
+var _locationPermission = AppPermissionStatus.denied;
+var _appSettingOpened = false;
+
+@override
+void initState() {
+  // Add the app lifecycle observer.
+  WidgetsBinding.instance.addObserver(this);
+  if (_locationPermission != AppPermissionStatus.granted) {
+    initLocationPermissions();
   }
 
-  Future<void> _initMapAndTask() async {
-    _downloadDirectory = await _createDownloadDirectory();
+  _mapViewController.locationDisplay.onLocationChanged.listen((mode) async {
+    print(_mapViewController.locationDisplay.location!.position);
+  });
+  super.initState();
+}
 
-    final portal = Portal.arcGISOnline();
-    final portalItem = PortalItem.withPortalAndItemId(
-      portal: portal,
-      itemId: 'acc027394bc84c2fb04d1ed317aac674',
-    );
-
-    _webMap = ArcGISMap.withItem(portalItem);
-    _offlineMapTask = OfflineMapTask.withPortalItem(portalItem);
-    await _offlineMapTask.load();
-
-    final areas = await _offlineMapTask.getPreplannedMapAreas();
-    for (final area in areas) {
-      await area.load();
-      _preplannedMapAreas[area] = null;
-    }
-
-    _mapAreas.addAll(areas);
-    _mapViewController.arcGISMap = _webMap;
-
-    setState(() => _ready = true);
+@override
+void didChangeAppLifecycleState(AppLifecycleState state) {
+  super.didChangeAppLifecycleState(state);
+  if (state == AppLifecycleState.resumed && _appSettingOpened) {
+    // Recheck location permissions only if settings were opened.
+    initLocationPermissions();
   }
+}
 
-  Future<Directory> _createDownloadDirectory() async {
-    final appDir = await getApplicationDocumentsDirectory();
-    final dir = Directory(
-      '${appDir.path}${Platform.pathSeparator}offline_map_areas',
-    );
-    if (!dir.existsSync()) {
-      dir.createSync(recursive: true);
-    }
-    return dir;
+Future<void> initLocationPermissions() async {
+  final status = await Permission.location.status;
+  switch (status) {
+    case PermissionStatus.granted:
+      setState(() {
+        _locationPermission = AppPermissionStatus.granted;
+        _ready = false;
+      });
+      break;
+    case PermissionStatus.permanentlyDenied:
+      setState(
+        () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+      );
+      break;
+    case PermissionStatus.denied:
+    default:
+      setState(() => _locationPermission = AppPermissionStatus.denied);
+      break;
   }
+}
 
-  Future<ArcGISMap?> _downloadOrLoadOfflineMap(
-    PreplannedMapArea mapArea,
-  ) async {
-    final mapDir = Directory(
-      '${_downloadDirectory!.path}${Platform.pathSeparator}${mapArea.portalItem.title}',
-    );
-
-    // final areaDir = Directory(
-    //     '${_downloadDirectory!.path}${Platform.pathSeparator}${area.portalItem.title}',
-    //   );
-    // final areas = await _offlineMapTask.getPreplannedMapAreas();
-
-    // for (var are in areas) {
-    //   print(are);
-    // }
-    // If map already downloaded, track it as such
-
-    // if (mapDir.existsSync()) {
-    //   final params = await _offlineMapTask
-    //       .createDefaultDownloadPreplannedOfflineMapParameters(mapArea);
-    //   params.updateMode = PreplannedUpdateMode.noUpdates;
-
-    //   mapDir.createSync(recursive: true);
-    //   final job = _offlineMapTask.downloadPreplannedOfflineMapWithParameters(
-    //     parameters: params,
-    //     downloadDirectoryUri: mapDir.uri,
-    //   );
-
-    //   _preplannedMapAreas[mapArea] = job;
-
-    //   debugPrint('Found downloaded map: ${mapDir.path}');
-
-    //   await job.run();
-    //   if (job.status == JobStatus.succeeded) {
-    //     return job.result?.offlineMap;
-    //   }
-    //   // _preplannedMapAreas[area] = null;
-    // }
-
-    final params2 = await _offlineMapTask
-        .createDefaultDownloadPreplannedOfflineMapParameters(mapArea);
-    // params2.updateMode = PreplannedUpdateMode.noUpdates;
-
-    final jober = _offlineMapTask.downloadPreplannedOfflineMapWithParameters(
-      parameters: params2,
-      downloadDirectoryUri: mapDir.uri,
-    );
-
-    if (mapDir.existsSync()) {
-      // await jober.run();
-      // if (jober.status == JobStatus.succeeded) {
-      //   return jober.result?.offlineMap;
-      // }
-
-      debugPrint('Map already downloaded at ${mapDir.path}');
-      final job = _preplannedMapAreas[mapArea];
-      final map = job?.result!.offlineMap;
-
-      return map;
-    }
-
-    final params = await _offlineMapTask
-        .createDefaultDownloadPreplannedOfflineMapParameters(mapArea);
-    params.updateMode = PreplannedUpdateMode.noUpdates;
-
-    mapDir.createSync(recursive: true);
-    final job = _offlineMapTask.downloadPreplannedOfflineMapWithParameters(
-      parameters: params,
-      downloadDirectoryUri: mapDir.uri,
-    );
-    setState(() => _preplannedMapAreas[mapArea] = job);
-
-
-
-    await job.run();
-    if (job.status == JobStatus.succeeded) {
-      return job.result?.offlineMap;
-    } else {
-      debugPrint('Download failed: ${job.error?.message}');
-      return null;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Offline Map Download Example')),
-      body: Stack(
-        children: [
-          ArcGISMapView(
-            controllerProvider: () => _mapViewController,
-            onMapViewReady: () => debugPrint('MapView is ready'),
-          ),
-          if (!_ready) const Center(child: CircularProgressIndicator()),
-        ],
+@override
+Widget build(BuildContext context) {
+  // WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     _mapViewController.locationDisplay.onLocationChanged.listen((mode) async {
+  //   print(_mapViewController.locationDisplay.location!.position);
+  // });
+  // });
+  return Scaffold(
+    body: SafeArea(
+      top: false,
+      child: Builder(
+        builder: (_) {
+          switch (_locationPermission) {
+            case AppPermissionStatus.granted:
+              return _buildMapView(); // Widget to show map view
+            case AppPermissionStatus.denied:
+              return _buildRequestLocationButton(); // Widget to request location
+            case AppPermissionStatus.permanentlyDenied:
+              return _buildSettingsWidget(); // Widget to open app settings
+          }
+        },
       ),
-      bottomSheet:
-          _ready
-              ? Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children:
-                      _mapAreas.map((area) {
-                        return ElevatedButton(
-                          child: Text('Load: ${area.portalItem.title}'),
-                          onPressed: () async {
-                            final map = await _downloadOrLoadOfflineMap(area);
-                            if (map != null) {
-                              _mapViewController.arcGISMap = map;
+    ),
+  );
+}
 
-                              final envBuilder = EnvelopeBuilder.fromEnvelope(
-                                map.initialViewpoint!.targetGeometry.extent,
-                              )..expandBy(0.5);
-                              final viewpoint = Viewpoint.fromTargetExtent(
-                                envBuilder.toGeometry(),
-                              );
-                              _mapViewController.setViewpoint(viewpoint);
-                            }
-                          },
-                        );
-                      }).toList(),
-                ),
-              )
-              : null,
-    );
+void _onMapViewReady() async {
+  
+  // Create a map with the Navigation Night basemap style.
+  _mapViewController.arcGISMap = ArcGISMap.withBasemapStyle(
+    BasemapStyle.arcGISNavigationNight,
+  );
+
+  // Set the initial system location data source.
+
+  _mapViewController.locationDisplay.dataSource = _locationDataSource;
+
+  // Set the initial system location auto-pan mode.
+  _mapViewController.locationDisplay.autoPanMode =
+      LocationDisplayAutoPanMode.recenter;
+
+  // Attempt to start the location data source (this will prompt the user for permission).
+  try {
+    await _locationDataSource.start();
+    _mapViewController?.locationDisplay.start();
+  } on ArcGISException catch (e) {
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(content: Text(e.message)),
+      );
+    }
   }
+  if (mapViewController.locationDisplay.location!= null) {
+    print(mapViewController.locationDisplay.location!.position.y);
+  }
+  // Set the ready state variable to true to enable the UI.
+  setState(() => _ready = true);
+}
+
+Widget _buildMapView() => Stack(
+  children: [
+    ArcGISMapView(
+      key: _mapViewKey,
+      controllerProvider: () => _mapViewController,
+      onMapViewReady: _onMapViewReady,
+    ),
+
+    // Display a progress indicator until the map is ready.
+    Visibility(
+      visible: !_ready,
+      child: SizedBox.expand(
+        child: Container(
+          color: Colors.white30,
+          child: const Center(child: CircularProgressIndicator()),
+        ),
+      ),
+    ),
+  ],
+);
+
+Widget _buildRequestLocationButton() => Center(
+  child: ElevatedButton(
+    onPressed: requestLocationPermissions, // Requests permission
+    child: const Text('Enable Location'),
+  ),
+);
+
+Future<void> requestLocationPermissions() async {
+  final requestPermission = await Permission.location.request();
+  if (requestPermission.isGranted) {
+    setState(() {
+      _locationPermission = AppPermissionStatus.granted;
+      _ready = false;
+    });
+  } else if (requestPermission.isPermanentlyDenied) {
+    setState(
+      () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+    );
+  } else {
+    setState(() => _locationPermission = AppPermissionStatus.denied);
+  }
+}
+
+Widget _buildSettingsWidget() => const Center(
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        'App location permission is denied. Go to settings and enable location to use the app.',
+        textAlign: TextAlign.center,
+      ),
+      SizedBox(height: 15),
+      ElevatedButton(
+        onPressed: openAppSettings, // Opens app settings to change permission
+        child: Text('Open App Settings'),
+      ),
+    ],
+  ),
+);
+
+@override
+void dispose() {
+  // Remove the app lifecycle observer.
+  WidgetsBinding.instance.removeObserver(this);
+  // Stop location updates when the widget is disposed.
+  _locationDataSource.stop();
+  _mapViewController.dispose();
+  super.dispose();
+}
 }

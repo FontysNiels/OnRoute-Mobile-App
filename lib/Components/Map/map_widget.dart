@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/main.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapWidget extends StatefulWidget {
   final Function selectPoi;
@@ -11,11 +12,53 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
+enum AppPermissionStatus { denied, granted, permanentlyDenied }
+
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _locationDataSource.onStatusChanged.listen((status) {
+      print('status changed: $status');
+      if (status == LocationDataSourceStatus.started) {
+        print('shit started');
+        _mapViewController.locationDisplay.dataSource = _locationDataSource;
+      }
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && dialogActive) {
+      initLocationPermissions();
+    }
+  }
+
+  Future<void> initLocationPermissions() async {
+    final status = await Permission.location.status;
+    print(status);
+    switch (status) {
+      case PermissionStatus.granted:
+        await checkLocation();
+        Navigator.of(context, rootNavigator: true).pop();
+        setState(() {
+          _locationPermission = AppPermissionStatus.granted;
+          dialogActive = false;
+          _ready = true;
+        });
+        break;
+      case PermissionStatus.permanentlyDenied:
+        setState(
+          () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+        );
+        break;
+      case PermissionStatus.denied:
+      default:
+        setState(() => _locationPermission = AppPermissionStatus.denied);
+        break;
+    }
   }
 
   @override
@@ -24,17 +67,20 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      await checkLocation();
-      if (_locationDataSource.status == LocationDataSourceStatus.started &&
-          dialogActive == true) {
-        Navigator.of(context, rootNavigator: true).pop();
-        dialogActive = false;
-      }
-    }
-  }
+  // @override
+  // Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+  //   if (state == AppLifecycleState.resumed) {
+  //     var test = await checkLocation();
+  //     setState(() {
+  //       test;
+  //     });
+  //     if (_locationDataSource.status == LocationDataSourceStatus.started &&
+  //         dialogActive == true) {
+  //       Navigator.of(context, rootNavigator: true).pop();
+  //       dialogActive = false;
+  //     }
+  //   }
+  // }
 
   // Create a GlobalKey for the ArcGISMapView to persist its state.
   final GlobalKey _mapViewKey = GlobalKey();
@@ -50,6 +96,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   final _locationDataSource = SystemLocationDataSource();
   // Bool to check if the dialog is active.
   bool dialogActive = false;
+
+  var _locationPermission = AppPermissionStatus.denied;
 
   @override
   Widget build(BuildContext context) {
@@ -152,18 +200,18 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
 
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
-
+      await checkLocation();
       _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
       _mapViewController.locationDisplay.autoPanMode =
-          LocationDisplayAutoPanMode.navigation;
+          LocationDisplayAutoPanMode.recenter;
 
       // Attempt to start the location data source (this will prompt the user for permission).
-      await checkLocation();
 
       // Set the ready state variable to true to enable the UI.
-      if (mounted) {
+      if (mounted &&
+          _locationDataSource.status == LocationDataSourceStatus.started) {
         setState(() {
           _ready = true;
         });
@@ -176,6 +224,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   Future<void> checkLocation() async {
     try {
       await _locationDataSource.start();
+
       print(_locationDataSource.status);
     } on ArcGISException catch (e) {
       if (mounted) {
@@ -200,6 +249,19 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                           'De app heeft toegang nodig tot uw locatie.\n\nGa naar de instellingen van uw telefoon om de app toegang te geven tot uw locatie.',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
+                        Builder(
+                          builder: (_) {
+                            switch (_locationPermission) {
+                              case AppPermissionStatus.granted:
+                                return Container(); // Widget to show map view
+                              case AppPermissionStatus.denied:
+                                requestLocationPermissions();
+                                return _buildSettingsWidget(); // Widget to request location
+                              case AppPermissionStatus.permanentlyDenied:
+                                return _buildSettingsWidget(); // Widget to open app settings
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -210,4 +272,33 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       }
     }
   }
+
+  void requestLocationPermissions() async {
+    final requestPermission = await Permission.location.request();
+    if (requestPermission.isGranted) {
+      setState(() {
+        _locationPermission = AppPermissionStatus.granted;
+        _ready = false;
+      });
+    } else if (requestPermission.isPermanentlyDenied) {
+      setState(
+        () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+      );
+    } else {
+      setState(() => _locationPermission = AppPermissionStatus.denied);
+    }
+  }
+
+  Widget _buildSettingsWidget() => const Center(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: openAppSettings, // Opens app settings to change permission
+          child: Text('Open Instellingen'),
+        ),
+      ],
+    ),
+  );
 }

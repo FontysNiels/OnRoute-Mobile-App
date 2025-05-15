@@ -2,10 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-<key>NSLocationWhenInUseUsageDescription</key>
-<string>This app requires access to your location.</string>
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>This app requires access to your location even in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>We need your location to display maps and provide location-based services.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We need your location to display maps and provide location-based services.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+<string>Location access is required at all times (optional if not using background location).</string>
 
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
