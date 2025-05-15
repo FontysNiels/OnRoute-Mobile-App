@@ -19,13 +19,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _locationDataSource.onStatusChanged.listen((status) {
-      print('status changed: $status');
-      if (status == LocationDataSourceStatus.started) {
-        print('shit started');
-        _mapViewController.locationDisplay.dataSource = _locationDataSource;
-      }
-    });
   }
 
   @override
@@ -38,10 +31,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
 
   Future<void> initLocationPermissions() async {
     final status = await Permission.location.status;
-    print(status);
     switch (status) {
       case PermissionStatus.granted:
-        await checkLocation();
         Navigator.of(context, rootNavigator: true).pop();
         setState(() {
           _locationPermission = AppPermissionStatus.granted;
@@ -66,21 +57,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
-
-  // @override
-  // Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-  //   if (state == AppLifecycleState.resumed) {
-  //     var test = await checkLocation();
-  //     setState(() {
-  //       test;
-  //     });
-  //     if (_locationDataSource.status == LocationDataSourceStatus.started &&
-  //         dialogActive == true) {
-  //       Navigator.of(context, rootNavigator: true).pop();
-  //       dialogActive = false;
-  //     }
-  //   }
-  // }
 
   // Create a GlobalKey for the ArcGISMapView to persist its state.
   final GlobalKey _mapViewKey = GlobalKey();
@@ -224,8 +200,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   Future<void> checkLocation() async {
     try {
       await _locationDataSource.start();
-
-      print(_locationDataSource.status);
     } on ArcGISException catch (e) {
       if (mounted) {
         if (!dialogActive) {
@@ -255,7 +229,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                               case AppPermissionStatus.granted:
                                 return Container(); // Widget to show map view
                               case AppPermissionStatus.denied:
-                                requestLocationPermissions();
+                                // requestLocationPermissions();
                                 return _buildSettingsWidget(); // Widget to request location
                               case AppPermissionStatus.permanentlyDenied:
                                 return _buildSettingsWidget(); // Widget to open app settings
