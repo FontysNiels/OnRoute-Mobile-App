@@ -33,6 +33,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
     final status = await Permission.location.status;
     switch (status) {
       case PermissionStatus.granted:
+        await checkLocation();
         Navigator.of(context, rootNavigator: true).pop();
         setState(() {
           _locationPermission = AppPermissionStatus.granted;
