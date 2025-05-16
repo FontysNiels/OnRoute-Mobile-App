@@ -124,7 +124,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(
       webMapCollection.availableRoute.add(
         AvailableRoutes(
           routeID: layer['itemId'],
-          title: layer['title'],
+          title: matchingRoute['title'] ?? layer['title'],
           description: matchingRoute['description'] ?? '...',
           locally: false,
           // thumbnail: matchingRoute['thumbnail'],

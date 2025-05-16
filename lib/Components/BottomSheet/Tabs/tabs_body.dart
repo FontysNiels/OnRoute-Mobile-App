@@ -6,28 +6,37 @@ import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description
 class TabsBody extends StatelessWidget {
   final WebMapCollection currentRoute;
   final ScrollController scroller;
-    final Function setSheetWidget;
+  final Function setSheetWidget;
   const TabsBody({
     super.key,
     required this.selectedIndex,
     required this.routeDescription,
-    required this.currentRoute, required this.scroller, required this.setSheetWidget,
+    required this.currentRoute,
+    required this.scroller,
+    required this.setSheetWidget,
   });
   final int selectedIndex;
   final String routeDescription;
   @override
   Widget build(BuildContext context) {
-
     List<Widget> textWidgets = [
       //Bescrhijving
-      DescriptionBlock(description: routeDescription),
+      DescriptionBlock(
+        description: routeDescription,
+        currentRoute: currentRoute, setSheetWidget: setSheetWidget,
+      ),
       // POIs
       ListView.builder(
         shrinkWrap: true,
         physics: NeverScrollableScrollPhysics(),
         itemCount: currentRoute.pointsOfInterest.length,
         itemBuilder: (context, index) {
-          return POICard(currentPoi: currentRoute.pointsOfInterest[index], scroller: scroller, setSheetWidget: setSheetWidget, currentRoute: currentRoute,);
+          return POICard(
+            currentPoi: currentRoute.pointsOfInterest[index],
+            scroller: scroller,
+            setSheetWidget: setSheetWidget,
+            currentRoute: currentRoute,
+          );
         },
       ),
 

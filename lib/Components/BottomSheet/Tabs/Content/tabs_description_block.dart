@@ -1,9 +1,21 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
+import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
+import 'package:onroute_app/Functions/file_storage.dart';
 
 class DescriptionBlock extends StatelessWidget {
   final String description;
-  const DescriptionBlock({super.key, required this.description});
+  final WebMapCollection currentRoute;
+  final Function setSheetWidget;
+  const DescriptionBlock({
+    super.key,
+    required this.description,
+    required this.currentRoute,
+    required this.setSheetWidget,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +124,6 @@ class DescriptionBlock extends StatelessWidget {
             ),
           );
         } else if (part != '') {
-         
           if (part.contains('BREAKLINE')) {
             part = part.replaceAll('BREAKLINE', '');
           }
@@ -127,13 +138,58 @@ class DescriptionBlock extends StatelessWidget {
       return widgets;
     }
 
+    // Makes a list of widgets with text
+    List<Widget> descriptionTabContent = parseStringToWidgets(
+      stripHtmlTags(replaceImageDivs(description)),
+    );
+
+    if (currentRoute.locally) {
+      descriptionTabContent.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Divider(),
+        ),
+      );
+      descriptionTabContent.add(
+        Wrap(
+          spacing: 4,
+          children: [
+            FilledButton.icon(
+              onPressed: () async {},
+              icon: const Icon(Icons.update),
+              label: Text(
+                'Bijwerken Route',
+                style: Theme.of(
+                  context,
+                ).textTheme.labelLarge!.copyWith(color: Colors.white),
+              ),
+              iconAlignment: IconAlignment.start,
+            ),
+
+            TextButton.icon(
+              onPressed: () async {
+                await deleteRouteInfo(currentRoute.webmapId);
+                await moveSheetTo(0.5);
+
+                await setSheetWidget(null, true);
+              },
+              icon: const Icon(Icons.delete),
+              label: Text(
+                'Verwijder Route',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
+              iconAlignment: IconAlignment.start,
+            ),
+          ],
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: parseStringToWidgets(
-          stripHtmlTags(replaceImageDivs(description)),
-        ),
+        children: descriptionTabContent,
 
         // Pretitle
         // Padding(

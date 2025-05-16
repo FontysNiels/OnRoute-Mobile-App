@@ -112,6 +112,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                   ),
             ),
           );
+          // Remove routes from receivedRoutes where .locally == true and not present in localItems
+          receivedRoutes.removeWhere(
+            (route) =>
+                route.locally == true &&
+                !localItems.any(
+                  (localItem) => localItem.webmapId == route.webmapId,
+                ),
+          );
         }
         _bottomSheetWidgets.removeLast();
       }

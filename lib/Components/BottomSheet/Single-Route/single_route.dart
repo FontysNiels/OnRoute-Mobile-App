@@ -75,7 +75,7 @@ class _SingleRouteState extends State<SingleRoute> {
                 PackegImagePreview(routeContent: widget.routeContent),
 
                 // Download Button
-                Row(
+                Wrap(
                   children: [
                     !widget.routeContent.locally
                         ? RouteDownloadButton(

@@ -108,6 +108,8 @@ class _MainAppState extends State<MainApp> {
           angle: element.attributes['Azimuth'].toDouble(),
         ),
       );
+      mapViewController.locationDisplay.autoPanMode =
+          LocationDisplayAutoPanMode.compassNavigation;
     }
 
     // Setting the routeInfo and directionPoints (refreshing the state)
@@ -236,23 +238,23 @@ class _MainAppState extends State<MainApp> {
                 NavigationButtons(),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: Text("Files Deleten"),
-                      onPressed: () {
-                        deleteAllSavedFiles();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.all(18.0),
+            //   child: Align(
+            //     alignment: Alignment.centerLeft,
+            //     child: Row(
+            //       crossAxisAlignment: CrossAxisAlignment.end,
+            //       children: [
+            //         TextButton(
+            //           child: Text("Files Deleten"),
+            //           onPressed: () {
+            //             deleteAllSavedFiles();
+            //           },
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
             // Bottomsheet, with loader wrapped over it (so when it downloads a route the user can't fuck it up)
             LoaderOverlay(
               child: BottomSheetWidget(
@@ -331,7 +333,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                             angleDegrees: 0.0,
                           ),
                           mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.navigation,
+                              LocationDisplayAutoPanMode.compassNavigation,
                         )
                         : mapViewController.locationDisplay.autoPanMode =
                             LocationDisplayAutoPanMode.recenter,
@@ -350,14 +352,8 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                           mapViewController.setViewpointRotation(
                             angleDegrees: 0.0,
                           ),
-                          mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.compassNavigation,
                         )
-                        :
-                        // mapViewController.locationDisplay.autoPanMode =
-                        //     LocationDisplayAutoPanMode.compassNavigation,
-                        // LocationDisplayAutoPanMode.recenter,
-                        mapViewController.setViewpointRotation(
+                        : mapViewController.setViewpointRotation(
                           angleDegrees: 0.0,
                         ),
                   },
