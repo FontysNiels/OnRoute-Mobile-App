@@ -50,6 +50,8 @@ bool currenPOIChanged = false;
 // Condition to show appbar (to close preview)
 bool previewEnabled = false;
 
+final markerOverlay = GraphicsOverlay();
+
 /// Global Functions ///
 ///  --------------- ///
 // Initialzes the ArcGIS API key
@@ -85,7 +87,7 @@ class _MainAppState extends State<MainApp> {
     // Add the generated route lines
     graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
     // Add the generated POI points
-    graphicsOverlay.graphics.addAll(generatePoiGraphics(pois));
+    graphicsOverlay.graphics.addAll(await generatePoiGraphics(pois));
     // The list which will be filled with descriptionPoints
     List<DescriptionPoint> routeDirections = [];
     // Loop that loops through all the descriptions

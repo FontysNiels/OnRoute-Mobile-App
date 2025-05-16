@@ -143,7 +143,7 @@ class RoutePreviewButton extends StatelessWidget {
             );
             // Add the generated POI points
             graphicsOverlay.graphics.addAll(
-              generatePoiGraphics(widget.routeContent.pointsOfInterest),
+              await generatePoiGraphics(widget.routeContent.pointsOfInterest),
             );
             // Enable the preview overlay
             preview();
@@ -167,7 +167,7 @@ class RoutePreviewButton extends StatelessWidget {
             );
             // Add the generated POI points
             graphicsOverlay.graphics.addAll(
-              generatePoiGraphics(widget.routeContent.pointsOfInterest),
+              await generatePoiGraphics(widget.routeContent.pointsOfInterest),
             );
             // Enable the preview overlay
             preview();

@@ -41,8 +41,5 @@ flutter:
 
   assets:
     - .env
-    - assets/temp.png
-    - assets/beep.mp3
-    - assets/temp-vertical.png
-    - assets/gisdata.json
-    - assets/bragis_onroute.png
+    - assets/
+  
