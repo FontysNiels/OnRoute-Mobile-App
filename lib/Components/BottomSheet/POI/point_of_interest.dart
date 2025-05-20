@@ -84,6 +84,21 @@ class PoiButtons extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () async {
                 // Handle email button press
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => AlertDialog(
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Email: ${routeContent.mail}',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                );
               },
               icon: const Icon(Icons.mail),
               label: Text(
@@ -96,7 +111,21 @@ class PoiButtons extends StatelessWidget {
           if (routeContent.phone != null)
             ElevatedButton.icon(
               onPressed: () async {
-                // Handle phone button press
+                showDialog(
+                  context: context,
+                  builder:
+                      (_) => AlertDialog(
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Telefoonnummer: ${routeContent.phone}',
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
+                        ),
+                      ),
+                );
               },
               icon: const Icon(Icons.phone),
               label: Text(
