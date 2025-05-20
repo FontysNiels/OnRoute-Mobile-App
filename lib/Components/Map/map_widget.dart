@@ -97,7 +97,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                             _graphicsOverlay,
                             screenPoint: screenPoint,
                             tolerance:
-                                10.0, // tolerance in screen points TODO: test for optimal size
+                                20.0, // tolerance in screen points TODO: test for optimal size
                           );
 
                       if (result.graphics.isNotEmpty) {

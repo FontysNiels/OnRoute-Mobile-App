@@ -2,7 +2,6 @@ import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
-import 'package:onroute_app/main.dart';
 
 Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
   List<Graphic> graphics = [];
@@ -63,11 +62,11 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
         spatialReference: SpatialReference.webMercator,
       );
 
-      final routeStartCircleSymbol = SimpleMarkerSymbol(
-        style: SimpleMarkerSymbolStyle.circle,
-        color: const Color.fromARGB(255, 255, 0, 0),
-        size: 20.0,
-      );
+      // final routeStartCircleSymbol = SimpleMarkerSymbol(
+      //   style: SimpleMarkerSymbolStyle.circle,
+      //   color: const Color.fromARGB(255, 255, 0, 0),
+      //   size: 20.0,
+      // );
 
       graphics.add(
         Graphic(

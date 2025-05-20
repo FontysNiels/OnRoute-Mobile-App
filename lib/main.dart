@@ -49,8 +49,8 @@ int selectedPOI = 0;
 bool currenPOIChanged = false;
 // Condition to show appbar (to close preview)
 bool previewEnabled = false;
-
-final markerOverlay = GraphicsOverlay();
+// Value used to check update in POI faster, need to remove 'currenPOIChanged' variable
+ValueNotifier<bool> currentPOIChanged = ValueNotifier<bool>(false);
 
 /// Global Functions ///
 ///  --------------- ///
@@ -67,11 +67,15 @@ Future<void> initialize() async {
 void selectPoi(int selectedPoiObjectId) {
   selectedPOI = selectedPoiObjectId;
   currenPOIChanged = true;
+  currentPOIChanged.value = currenPOIChanged;
 }
+
+// late Function selectPoi;
 
 class _MainAppState extends State<MainApp> {
   @override
   void initState() {
+    // Initialize the ArcGIS API key
     initialize();
     // Locks Orientation
     WidgetsFlutterBinding.ensureInitialized();
@@ -79,6 +83,7 @@ class _MainAppState extends State<MainApp> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
     super.initState();
   }
 
@@ -144,7 +149,6 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
-  String test = 'tetst';
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)

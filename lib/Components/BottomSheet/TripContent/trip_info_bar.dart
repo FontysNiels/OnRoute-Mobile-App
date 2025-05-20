@@ -38,10 +38,9 @@ bool _userNearPoi = false;
 class _TripContentState extends State<TripContent> {
   ArcGISMapViewController controller = mapViewController;
   late StreamSubscription<ArcGISLocation> subscription;
-  // late StreamSubscription<ArcGISLocation> locationSubscription;
+
   @override
   void dispose() {
-    // controller.locationDisplay.onLocationChanged.drain();
     subscription.cancel();
     _nearestPoi = null;
     _traveledDistance = 0.0;
@@ -54,7 +53,6 @@ class _TripContentState extends State<TripContent> {
 
   @override
   void initState() {
-    // selectedPoi = widget.routeContent.pointsOfInterest.first;
     selectedPOI = 0;
     currenPOIChanged = false;
     calculateDistances();
@@ -91,8 +89,6 @@ class _TripContentState extends State<TripContent> {
                   pow(currentLat - userLat, 2) + pow(currentLng - userLng, 2),
                 ) *
                 metersPerDegree;
-
-            // print(distance);
           }
           userPosition = controller.locationDisplay.location!.position;
 
@@ -101,10 +97,6 @@ class _TripContentState extends State<TripContent> {
           Poi? closestPoi;
 
           // Sets the closest POI and distance to it
-
-          //This just overwrites itself over and over, untill reaching the closests
-          // make a list of poi + distance, update that, so we can see which one is getting closer and which one isnt
-          // or just make a check that says, already visited, so it wont open again....
           for (var poi in widget.routeContent.pointsOfInterest) {
             final poiPosition = convertToLatLng(
               poi.geometry.x!,
@@ -128,20 +120,19 @@ class _TripContentState extends State<TripContent> {
 
           // basically checks if distance has been calculated
           if (closestPoi != null) {
-            int latestPoi = selectedPOI;
+            // int latestPoi = selectedPOI;
 
             // Distance based
             await _distanceBasedPoiSetter(closestDistance, closestPoi);
 
             // User selection based
-            await _inputBasedPoiSetter(latestPoi);
+            // await _inputBasedPoiSetter(latestPoi);
           }
 
           if (_distanceToNextPoi != closestDistance) {
             // List with alreadypassed?
             // or
             // check which one user is walking away from and which oen is getting closer
-
             setState(() {
               _distanceToNextPoi = closestDistance;
               _traveledDistance += distance;
@@ -160,11 +151,7 @@ class _TripContentState extends State<TripContent> {
     final navigationBarHeight = MediaQuery.of(context).padding.bottom;
     (size.height + navigationBarHeight) / screenSize.height;
 
-    // if (sheetMinSize == 0.15) {
     globalSetState((size.height + navigationBarHeight) / screenSize.height);
-    // await moveSheetTo(sheetMinSize);
-
-    // }
   }
 
   Future<void> _inputBasedPoiSetter(int latestPoi) async {
@@ -216,6 +203,12 @@ class _TripContentState extends State<TripContent> {
 
   @override
   Widget build(BuildContext context) {
+    currentPOIChanged.addListener(() async {
+      if (currentPOIChanged.value == true) {
+        currentPOIChanged.value = false;
+        await _inputBasedPoiSetter(selectedPOI);
+      }
+    });
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,
