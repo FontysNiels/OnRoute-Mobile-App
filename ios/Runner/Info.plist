@@ -9,6 +9,11 @@
 	<key>NSLocationAlwaysUsageDescription</key>
 <string>Location access is required at all times (optional if not using background location).</string>
 
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>https</string>
+</array>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
