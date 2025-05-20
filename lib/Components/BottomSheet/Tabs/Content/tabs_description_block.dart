@@ -1,7 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
+import 'package:onroute_app/Classes/poi.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
+import 'package:onroute_app/Functions/api_calls.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 class DescriptionBlock extends StatelessWidget {
@@ -148,12 +157,106 @@ class DescriptionBlock extends StatelessWidget {
           child: Divider(),
         ),
       );
+
       descriptionTabContent.add(
         Wrap(
           spacing: 4,
           children: [
             FilledButton.icon(
-              onPressed: () async {},
+              onPressed: () async {
+                final List<ConnectivityResult> connectivityResult =
+                    await (Connectivity().checkConnectivity());
+
+                if (connectivityResult.contains(ConnectivityResult.mobile) ||
+                    connectivityResult.contains(ConnectivityResult.wifi) ||
+                    connectivityResult.contains(ConnectivityResult.ethernet)) {
+                  List<WebMapCollection> receivedRoutes = await futureRoutes;
+
+                  if (receivedRoutes.any(
+                    (test) => test.webmapId == currentRoute.webmapId,
+                  )) {
+                    context.loaderOverlay.show();
+                    var route = receivedRoutes.firstWhere(
+                      (test) =>
+                          test.webmapId == currentRoute.webmapId &&
+                          test.locally == false,
+                    );
+
+                    receivedRoutes.removeWhere(
+                      (test) =>
+                          test.webmapId == currentRoute.webmapId &&
+                          test.locally == true,
+                    );
+
+                    // TODO: van de download funcitonaliteit een functie maken
+
+                    // Get ArcGIS route layer data JSON
+                    var routeResponse = await getArcgisItemData(
+                      route.availableRoute[0].routeID,
+                    );
+
+                    // Clean it up
+                    RouteLayerData routeInfo = filterRouteInfo(
+                      routeResponse,
+                      route.availableRoute[0],
+                    );
+
+                    Map<String, dynamic> allPoiJSON = {'points': []};
+                    for (Poi point in route.pointsOfInterest) {
+                      var poiAsJSON = point.toJson();
+                      (allPoiJSON['points'] as List).add(poiAsJSON);
+                    }
+
+                    var folderContent = await getRouteFolders();
+                    if (folderContent.isEmpty) {
+                      var encodeRoute = jsonEncode(routeInfo.toJson());
+
+                      await writeFile(
+                        encodeRoute,
+                        'route-${route.availableRoute[0].routeID}.json',
+                        route.webmapId,
+                      );
+
+                      var encodePoi = jsonEncode(allPoiJSON);
+                      await writeFile(
+                        encodePoi,
+                        'pois-${route.webmapId}.json',
+                        route.webmapId,
+                      );
+                    } else {
+                      // TODO: iets van check toevoegen of de route al bestaat in een folder (voor als er een route 2x gebruikt wordt of package)
+                      var encodeRoute = jsonEncode(routeInfo.toJson());
+                      await writeFile(
+                        encodeRoute,
+                        'route-${route.availableRoute[0].routeID}.json',
+                        route.webmapId,
+                      );
+
+                      var encodePoi = jsonEncode(allPoiJSON);
+                      await writeFile(
+                        encodePoi,
+                        'pois-${route.webmapId}.json',
+                        route.webmapId,
+                      );
+                    }
+
+                    for (var poi in route.pointsOfInterest) {
+                      if (poi.asset != '') {
+                        final imageProvider = CachedNetworkImageProvider(
+                          poi.asset!,
+                        );
+                        await precacheImage(imageProvider, context);
+                      }
+                    }
+
+                    context.loaderOverlay.hide();
+                    //LOADING INDICATOR
+                    await moveSheetTo(0.5);
+
+                    await setSheetWidget(null, true);
+                  }
+                }
+              },
               icon: const Icon(Icons.update),
               label: Text(
                 'Bijwerken Route',
