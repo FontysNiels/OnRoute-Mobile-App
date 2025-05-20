@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/main.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -137,23 +138,34 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
         Viewpoint.withLatLongScale(
           latitude: 51.598289,
           longitude: 5.528469,
-          scale: 25000,
+          scale: 10000, // A typical scale for city-level zoom
         ),
       );
 
-      PortalConnection connection = PortalConnection.anonymous;
-      final portalItem = PortalItem.withPortalAndItemId(
-        // portal: portal,
-        portal: Portal(
-          Uri.parse('https://gisportal.bragis.nl/arcgis'),
-          connection: connection,
-        ),
-        itemId: '50dd5ef186644d91902c2e77ddd7c414',
-      );
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
 
-      _webMap = ArcGISMap.withItem(portalItem);
-      _mapViewController.arcGISMap = _webMap;
+      if (connectivityResult.contains(ConnectivityResult.mobile) ||
+          connectivityResult.contains(ConnectivityResult.wifi) ||
+          connectivityResult.contains(ConnectivityResult.ethernet)) {
+        PortalConnection connection = PortalConnection.anonymous;
+        final portalItem = PortalItem.withPortalAndItemId(
+          // portal: portal,
+          portal: Portal(
+            Uri.parse('https://gisportal.bragis.nl/arcgis'),
+            connection: connection,
+          ),
+          itemId: '50dd5ef186644d91902c2e77ddd7c414',
+        );
 
+        _webMap = ArcGISMap.withItem(portalItem);
+        // _webMap =  ArcGISMap.withBasemapStyle(BasemapStyle.arcGISImagery);
+        _mapViewController.arcGISMap = _webMap;
+      } else {
+        await addMMPK();
+      }
+
+      /// Old MMPK code, this downloads the MMPK file from the server and loads it into the map view.
       // await downloadSampleData(['5f52e970830a4140bec9d69317d1399f']);
       // // await downloadSampleData(['b75f95c720204d78b1eed8f98ccbe0d9']);
       // final appDir = await getApplicationDocumentsDirectory();

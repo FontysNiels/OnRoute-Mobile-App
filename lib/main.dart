@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/services.dart';
@@ -54,6 +55,7 @@ ValueNotifier<bool> currentPOIChanged = ValueNotifier<bool>(false);
 
 /// Global Functions ///
 ///  --------------- ///
+
 // Initialzes the ArcGIS API key
 Future<void> initialize() async {
   await dotenv.load(fileName: ".env");
@@ -70,7 +72,36 @@ void selectPoi(int selectedPoiObjectId) {
   currentPOIChanged.value = currenPOIChanged;
 }
 
-// late Function selectPoi;
+// Function to copy the asset to a file and use it as map
+Future<void> addMMPK() async {
+  File file = await copyAssetToFile('assets/MMP.mmpk', 'MMP.mmpk');
+  // Load the local mobile map package File.
+  final mmpk = MobileMapPackage.withFileUri(file.uri);
+  // Load the mobile map package.
+  await mmpk.load();
+
+  // Check if the mobile map package has loaded successfully.
+  if (mmpk.maps.isNotEmpty) {
+    // Use only MMPK, this is used when there is no map set (aka when offline)
+    if (mapViewController.arcGISMap == null) {
+      mapViewController.arcGISMap = mmpk.maps.first;
+      mapViewController
+          .arcGISMap
+          ?.initialViewpoint = Viewpoint.withLatLongScale(
+        latitude: 51.598289,
+        longitude: 5.528469,
+        scale: 10000,
+      );
+    }
+    // Overlay the MMPK on the map view
+    else {
+      final map = mmpk.maps.first;
+      mapViewController.arcGISMap?.operationalLayers.addAll(
+        map.operationalLayers,
+      );
+    }
+  }
+}
 
 class _MainAppState extends State<MainApp> {
   @override
@@ -152,8 +183,8 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
-    const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
     const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
+    const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
     const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
     return MaterialApp(

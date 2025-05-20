@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
@@ -118,6 +119,41 @@ Future<String> readFile(File name) async {
   } catch (e) {
     // If encountering an error, return an empty string
     return '';
+  }
+}
+
+Future<File> copyAssetToFile(String assetPath, String filename) async {
+  // Load asset as ByteData
+  final byteData = await rootBundle.load(assetPath);
+
+  // Get device directory to store the file
+  final dir = await getApplicationDocumentsDirectory();
+  final file = File('${dir.path}/$filename');
+
+  // Write bytes to file
+  await file.writeAsBytes(byteData.buffer.asUint8List());
+
+  return file; // Now you can use File() on this path
+}
+
+Future<void> clearMMPKStorage() async {
+  final appDir = await getApplicationDocumentsDirectory();
+
+  // Do this when the route stops or smtn
+  final directory = Directory(appDir.path);
+  final List<FileSystemEntity> entities = directory.listSync(recursive: true);
+  for (var entity in entities) {
+    // print(entity.path);
+    if (entity.path.contains('MMP.mmpk')) {
+      try {
+        await entity.delete(recursive: true);
+        // print('Deleted: ${entity.path}');
+      } catch (e) {
+        // print('Error deleting ${entity.path}: $e');
+      }
+    } else {
+      print(entity.path);
+    }
   }
 }
 

@@ -10,6 +10,7 @@ import 'package:onroute_app/Components/BottomSheet/POI/point_of_interest.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/conversions.dart';
+import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/main.dart';
 
 class TripContent extends StatefulWidget {
@@ -324,6 +325,8 @@ class _TripInfoBarState extends State<TripInfoBar> {
             onPressed: () async {
               cancel();
               globalSetState(0.15);
+              mapViewController.arcGISMap?.operationalLayers.clear();
+              await clearMMPKStorage();
               await moveSheetTo(0.9);
               widget.setSheetWidget(null, false);
             },
