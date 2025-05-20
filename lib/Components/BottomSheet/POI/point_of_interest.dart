@@ -3,6 +3,7 @@ import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/description_poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/image_poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/title_poi.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class POI extends StatelessWidget {
   final Poi routeContent;
@@ -67,6 +68,9 @@ class PoiButtons extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: () async {
                 // Handle website button press
+                if (!await launchUrl(Uri.parse(routeContent.website!))) {
+                  // throw Exception('Could not launch $_url');
+                }
               },
               icon: const Icon(Icons.language),
               label: Text(
