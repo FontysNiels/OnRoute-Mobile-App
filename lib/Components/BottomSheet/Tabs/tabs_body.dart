@@ -41,13 +41,6 @@ class TabsBody extends StatelessWidget {
       ),
 
       Container(),
-
-      // Routes
-      // FutureBuilder zodat er meerdere gegeveneerd worden, of iets in die richting
-      // ^ deze exporten naar Widgets/Tabs/Content
-
-      // deze vullen routeID, based op de routes in the package
-      // RouteCard(startRoute: () {}, routeID: ''),
     ];
     return textWidgets[selectedIndex];
   }

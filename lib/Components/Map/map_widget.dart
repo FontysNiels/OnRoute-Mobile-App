@@ -213,7 +213,9 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   Future<void> checkLocation() async {
     try {
       await _locationDataSource.start();
-    } on ArcGISException catch (e) {
+    }
+    //  } on ArcGISException catch (e) {
+    on ArcGISException {
       if (mounted) {
         if (!dialogActive) {
           showDialog(

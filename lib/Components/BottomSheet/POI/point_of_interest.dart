@@ -4,7 +4,6 @@ import 'package:onroute_app/Components/BottomSheet/POI/Widgets/description_poi.d
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/image_poi.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/poi_buttons.dart';
 import 'package:onroute_app/Components/BottomSheet/POI/Widgets/title_poi.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class POI extends StatelessWidget {
   final Poi routeContent;
