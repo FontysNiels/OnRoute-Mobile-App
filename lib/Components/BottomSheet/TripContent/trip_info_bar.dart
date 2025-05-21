@@ -325,8 +325,12 @@ class _TripInfoBarState extends State<TripInfoBar> {
             onPressed: () async {
               cancel();
               globalSetState(0.15);
-              mapViewController.arcGISMap?.operationalLayers.clear();
-              await clearMMPKStorage();
+              // TODO: die kaart ID global maken, is voor dit beter en voor customization
+              if (mapViewController.arcGISMap?.item?.itemId ==
+                  "50dd5ef186644d91902c2e77ddd7c414") {
+                mapViewController.arcGISMap?.operationalLayers.clear();
+                await clearMMPKStorage();
+              }
               await moveSheetTo(0.9);
               widget.setSheetWidget(null, false);
             },

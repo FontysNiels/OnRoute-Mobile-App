@@ -79,7 +79,6 @@ Future<void> addMMPK() async {
   final mmpk = MobileMapPackage.withFileUri(file.uri);
   // Load the mobile map package.
   await mmpk.load();
-
   // Check if the mobile map package has loaded successfully.
   if (mmpk.maps.isNotEmpty) {
     // Use only MMPK, this is used when there is no map set (aka when offline)
@@ -94,7 +93,8 @@ Future<void> addMMPK() async {
       );
     }
     // Overlay the MMPK on the map view
-    else {
+    else if (mapViewController.arcGISMap?.item?.itemId !=
+        mmpk.maps.first.item?.itemId) {
       final map = mmpk.maps.first;
       mapViewController.arcGISMap?.operationalLayers.addAll(
         map.operationalLayers,
@@ -108,6 +108,8 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     // Initialize the ArcGIS API key
     initialize();
+    // Clears the MMPK in case it is still loaded
+    clearMMPKStorage();
     // Locks Orientation
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([
@@ -340,6 +342,8 @@ class _NavigationButtonsState extends State<NavigationButtons> {
   @override
   void dispose() {
     subscription.cancel();
+    // Clears the MMPK in case it is still loaded
+    clearMMPKStorage();
     super.dispose();
   }
 

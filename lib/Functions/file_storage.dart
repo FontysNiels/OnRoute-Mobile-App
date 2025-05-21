@@ -152,7 +152,7 @@ Future<void> clearMMPKStorage() async {
         // print('Error deleting ${entity.path}: $e');
       }
     } else {
-      print(entity.path);
+      // print(entity.path);
     }
   }
 }
