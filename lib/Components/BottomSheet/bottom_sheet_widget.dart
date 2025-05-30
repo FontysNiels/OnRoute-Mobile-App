@@ -71,13 +71,15 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   // List of all the widgets in the bottom sheet
   final List<Widget> _bottomSheetWidgets = [];
 
+  /// TODO: ipv dit als 1 functie, allebei los in initstate en dan .add ipv =
+  /// op deze manier kunnen ze ook op andere plekken gezet worden, zonder extra code (behavle een remove, om dubbele te voorkomen)
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
     List<File> localFiles = await getRouteFiles();
 
     List<WebMapCollection> allAvailableRoutes = [];
 
-    allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
+    allAvailableRoutes.addAll(await fetchLocalItems());
 
     final List<ConnectivityResult> connectivityResult =
         await (Connectivity().checkConnectivity());
@@ -85,7 +87,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (connectivityResult.contains(ConnectivityResult.mobile) ||
         connectivityResult.contains(ConnectivityResult.wifi) ||
         connectivityResult.contains(ConnectivityResult.ethernet)) {
-      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
+      allAvailableRoutes.addAll(await fetchOnlineItems(context));
     }
 
     return allAvailableRoutes;
@@ -93,9 +95,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
-    List<File> localFiles = await getRouteFiles();
-    List<WebMapCollection> receivedRoutes = await futureRoutes;
-    List<WebMapCollection> localItems = await fetchLocalItems(localFiles);
+    List<File> localFiles = [];
+    List<WebMapCollection> receivedRoutes = [];
+    List<WebMapCollection> localItems = [];
+    if (reload == true) {
+      localFiles = await getRouteFiles();
+      receivedRoutes = await futureRoutes;
+      localItems = await fetchLocalItems();
+    }
 
     setState(() {
       if (widget != null) {

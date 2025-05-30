@@ -8,6 +8,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Components/navigation_buttons.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
@@ -63,6 +64,10 @@ Future<void> initialize() async {
   String apiKey = dotenv.env['API_KEY'] ?? 'default_api_key';
   // sets the API key for the ArcGIS environment
   ArcGISEnvironment.apiKey = apiKey;
+
+  ArcGISEnvironment.setLicenseUsingKey(
+    'runtimelite,1000,rud8789963649,none,KGE60RFLTFK2J9HSX228',
+  );
 }
 
 // Set the selectedPOI and its changed condition
@@ -311,118 +316,3 @@ class _MainAppState extends State<MainApp> {
   }
 }
 
-Icon _centeredIcon = Icon(Icons.gps_fixed);
-Icon _currentIcon = Icon(Icons.notifications);
-late StreamSubscription<LocationDisplayAutoPanMode> subscription;
-
-class NavigationButtons extends StatefulWidget {
-  const NavigationButtons({super.key});
-
-  @override
-  State<NavigationButtons> createState() => _NavigationButtonsState();
-}
-
-class _NavigationButtonsState extends State<NavigationButtons> {
-  @override
-  void initState() {
-    super.initState();
-    subscription = mapViewController.locationDisplay.onAutoPanModeChanged
-        .listen((mode) {
-          if (mounted) {
-            setState(() {
-              mapViewController.locationDisplay.autoPanMode ==
-                      LocationDisplayAutoPanMode.off
-                  ? _centeredIcon = Icon(Icons.gps_not_fixed)
-                  : _centeredIcon = Icon(Icons.gps_fixed);
-            });
-          }
-        });
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    // Clears the MMPK in case it is still loaded
-    clearMMPKStorage();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Padding(
-        padding: EdgeInsets.only(
-          right: 12.0,
-          top:
-              directionList.isNotEmpty
-                  ? 8
-                  : MediaQuery.of(context).padding.top + 88,
-        ),
-        child: Column(
-          spacing: 12,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              heroTag: UniqueKey(),
-              onPressed:
-                  () async => {
-                    directionList.isNotEmpty
-                        ? (
-                          mapViewController.setViewpointRotation(
-                            angleDegrees: 0.0,
-                          ),
-                          mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.compassNavigation,
-                        )
-                        : mapViewController.locationDisplay.autoPanMode =
-                            LocationDisplayAutoPanMode.recenter,
-                  },
-              child: _centeredIcon,
-            ),
-
-            // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
-            // (verder checken met voorkeur van bijv. Thomas)
-            FloatingActionButton(
-              heroTag: UniqueKey(),
-              onPressed:
-                  () => {
-                    directionList.isNotEmpty
-                        ? (
-                          mapViewController.setViewpointRotation(
-                            angleDegrees: 0.0,
-                          ),
-                        )
-                        : mapViewController.setViewpointRotation(
-                          angleDegrees: 0.0,
-                        ),
-                  },
-              child: Icon(Icons.compass_calibration),
-            ),
-
-            directionList.isNotEmpty
-                ? FloatingActionButton(
-                  heroTag: UniqueKey(),
-                  onPressed:
-                      () => {
-                        if (mounted)
-                          {
-                            setState(() {
-                              _currentIcon =
-                                  enabledNotifiation
-                                      ? Icon(Icons.notifications_off)
-                                      : Icon(Icons.notifications);
-                              enabledNotifiation = !enabledNotifiation;
-                            }),
-                          },
-                      },
-                  child: _currentIcon,
-                )
-                : Container(),
-          ],
-        ),
-      ),
-    );
-  }
-}

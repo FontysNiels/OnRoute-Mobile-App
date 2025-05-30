@@ -10,7 +10,7 @@ import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
 // Fetches local ROUTES ONLY, NO PACKAGES that are already downloaded
-Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
+Future<List<WebMapCollection>> fetchLocalItems() async {
   List<dynamic> localFilesWithFolders = await getRouteFolders();
 
   // TODO: make it so when a package is downlaoded it doesnt show the package, but all the seperate routes.
@@ -66,22 +66,13 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
 }
 
 // Fetches online routes that are not already downloaded
-Future<List<WebMapCollection>> fetchOnlineItems(
-  List<File> localFiles,
-  BuildContext context,
-) async {
+Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   // Get all items from the OnRoute folder
   var responseAll = await getAllFromFolder();
   var content = jsonDecode(responseAll.body);
   // Turn it into a list
   List filteredRouteIDs = content['items'];
-
-  //TODO: (IDFK what I meant with this) it now always gets and converts the routes, even if they are already downloaded
-  // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo) (ookal als die offline beschikbaaar is)
-
   List<WebMapCollection> webMapCollectionList = [];
-
-  // Create and fill a list with all the POIs (from 1 POI file)
   List<Poi> allPoisList = [];
   await getAllPoi(filteredRouteIDs, allPoisList);
 
