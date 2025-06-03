@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
-import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/main.dart';
 
 class BottomSheetWidget extends StatefulWidget {
@@ -75,8 +72,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   /// op deze manier kunnen ze ook op andere plekken gezet worden, zonder extra code (behavle een remove, om dubbele te voorkomen)
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
-    List<File> localFiles = await getRouteFiles();
-
     List<WebMapCollection> allAvailableRoutes = [];
 
     allAvailableRoutes.addAll(await fetchLocalItems());
@@ -95,11 +90,9 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
-    List<File> localFiles = [];
     List<WebMapCollection> receivedRoutes = [];
     List<WebMapCollection> localItems = [];
     if (reload == true) {
-      localFiles = await getRouteFiles();
       receivedRoutes = await futureRoutes;
       localItems = await fetchLocalItems();
     }

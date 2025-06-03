@@ -6,7 +6,6 @@ class AvailableRoutes {
   final bool locally;
   List<String>? tags;
   dynamic viewpoint;
-  // probably will change when POIs are added to the route
 
   AvailableRoutes({
     required this.routeID,

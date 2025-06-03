@@ -34,6 +34,8 @@ Future<http.Response> getArcgisItemInfo(String routeID) async {
 // Gets all files in a folder
 Future<http.Response> getAllFromFolder() async {
   var tokenResponse = await _handleToken();
+  print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$tokenResponse');
+
   final response = await http.get(
     Uri.parse(
       // 'https://gisportal.bragis.nl/arcgis/sharing/rest/content/users/bragis_stagiair/c792879e301c4fdd94dcf6cbf4874bc5?f=pjson&token=$routeID',
@@ -52,7 +54,6 @@ Future<http.Response> getAllFromFolder() async {
     }
   }
   var enresponse = jsonEncode(tempDecodedResponse);
-  // print('https://bragis-def.maps.arcgis.com/sharing/rest/content/users/bragis99/6589f0d7e389471685a90e98029a4fb2?f=pjson&token=$generatedToken');
   return http.Response(
     enresponse,
     response.statusCode,

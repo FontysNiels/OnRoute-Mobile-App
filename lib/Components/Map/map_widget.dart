@@ -165,28 +165,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
         await addMMPK();
       }
 
-      /// Old MMPK code, this downloads the MMPK file from the server and loads it into the map view.
-      // await downloadSampleData(['5f52e970830a4140bec9d69317d1399f']);
-      // // await downloadSampleData(['b75f95c720204d78b1eed8f98ccbe0d9']);
-      // final appDir = await getApplicationDocumentsDirectory();
-
-      // // Load the local mobile map package.
-      // final mmpkFile = File('${appDir.absolute.path}/offlinemap.mmpk');
-      // // final mmpkFile = File('${appDir.absolute.path}/MMP.mmpk');
-      // final mmpk = MobileMapPackage.withFileUri(mmpkFile.uri);
-      // await mmpk.load();
-
-      // if (mmpk.maps.isNotEmpty) {
-      //   // Get the first map in the mobile map package and set to the map view.
-
-      //   _mapViewController.arcGISMap = mmpk.maps.first;
-      // }
-
-      // _mapViewController.onScaleChanged.listen((scale) {
-      //   _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
-
-      // });
-
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
       await checkLocation();

@@ -1,7 +1,7 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
-import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/main.dart';
 
 Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
   List<Graphic> graphics = [];
@@ -87,9 +87,10 @@ Future<List<Graphic>> generateLinesAndPoints(RouteLayerData routeID) async {
   for (var element in routeID.layers[1].featureSet.features) {
     late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
-      color: Color(
-        (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000)).toInt(),
-      ).withOpacity(1.0),
+      // color: Color(
+      //   (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000)).toInt(),
+      // ).withOpacity(1.0),
+      color: primaryAppColor,
       width: 4,
     );
 

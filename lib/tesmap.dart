@@ -1,6 +1,5 @@
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/material.dart';
-import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:onroute_app/main.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -113,7 +112,7 @@ void _onMapViewReady() async {
   // Attempt to start the location data source (this will prompt the user for permission).
   try {
     await _locationDataSource.start();
-    _mapViewController?.locationDisplay.start();
+    _mapViewController.locationDisplay.start();
   } on ArcGISException catch (e) {
     if (mounted) {
       showDialog(

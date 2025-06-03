@@ -6,7 +6,6 @@ class Poi {
   final String? mail;
   final String? phone;
   final String? website;
-  // final DateTime? openingHours;
   final String? openingHours;
   final String? address;
   final String? asset;

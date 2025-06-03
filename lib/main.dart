@@ -31,6 +31,10 @@ class MainApp extends StatefulWidget {
   State<MainApp> createState() => _MainAppState();
 }
 
+const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
+const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
+const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
+
 /// Global Variables ///
 ///  --------------- ///
 // Graphics which go on the map
@@ -190,9 +194,6 @@ class _MainAppState extends State<MainApp> {
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
-    const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
-    const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
-    const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
     return MaterialApp(
       // theme: AppTheme,
@@ -282,23 +283,6 @@ class _MainAppState extends State<MainApp> {
                 NavigationButtons(),
               ],
             ),
-            // Padding(
-            //   padding: const EdgeInsets.all(18.0),
-            //   child: Align(
-            //     alignment: Alignment.centerLeft,
-            //     child: Row(
-            //       crossAxisAlignment: CrossAxisAlignment.end,
-            //       children: [
-            //         TextButton(
-            //           child: Text("Files Deleten"),
-            //           onPressed: () async {
-            //             // deleteAllSavedFiles();
-            //           },
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            // ),
             // Bottomsheet, with loader wrapped over it (so when it downloads a route the user can't fuck it up)
             LoaderOverlay(
               child: BottomSheetWidget(
@@ -315,4 +299,3 @@ class _MainAppState extends State<MainApp> {
     );
   }
 }
-
