@@ -44,7 +44,7 @@ late Function globalSetState;
 
 // Sheet size animator
 
-// TODO: vaste maten maken, ipv variable double
+
 // Function that animates the sheet to a certain size
 Future<void> moveSheetTo(double size) async {
   while (!_controller.isAttached) {
@@ -68,8 +68,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
   // List of all the widgets in the bottom sheet
   final List<Widget> _bottomSheetWidgets = [];
 
-  /// TODO: ipv dit als 1 functie, allebei los in initstate en dan .add ipv =
-  /// op deze manier kunnen ze ook op andere plekken gezet worden, zonder extra code (behavle een remove, om dubbele te voorkomen)
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
     List<WebMapCollection> allAvailableRoutes = [];
@@ -156,7 +154,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           controller: _controller,
           initialChildSize: sheetSize,
           snap: true,
-          // TODO: bespreken hoe of wat
           // snapSizes: [0.2, 0.4, 0.6, 0.9],
           // minChildSize: 0.2,
           // During route:

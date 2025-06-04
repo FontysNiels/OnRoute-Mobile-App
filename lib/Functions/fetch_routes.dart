@@ -8,13 +8,11 @@ import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
+import 'package:onroute_app/main.dart';
 
 // Fetches local ROUTES ONLY, NO PACKAGES that are already downloaded
 Future<List<WebMapCollection>> fetchLocalItems() async {
   List<dynamic> localFilesWithFolders = await getRouteFolders();
-
-  // TODO: make it so when a package is downlaoded it doesnt show the package, but all the seperate routes.
-  // Possibly already doing so....
 
   List<File> localRouteFiles =
       localFilesWithFolders
@@ -139,10 +137,9 @@ Future<void> getAllPoi(
   List<dynamic> filteredRouteIDs,
   List<Poi> allPoisList,
 ) async {
-  // TODO: make this work for any poi bestand
   // ID omdat momenteel er meerdere bestaan (is TEMP)
   var specificRoute = filteredRouteIDs.firstWhere(
-    (route) => route['id'] == '1c049e864f1643bda530ae45fd1591cf',
+    (route) => route['id'] == poiItemId,
     orElse: () => null,
   );
 

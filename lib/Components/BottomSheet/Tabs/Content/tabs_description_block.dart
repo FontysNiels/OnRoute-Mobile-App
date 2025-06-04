@@ -1,13 +1,9 @@
-import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:onroute_app/Classes/poi.dart';
-import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
-import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 
@@ -168,12 +164,18 @@ class DescriptionBlock extends StatelessWidget {
                 if (connectivityResult.contains(ConnectivityResult.mobile) ||
                     connectivityResult.contains(ConnectivityResult.wifi) ||
                     connectivityResult.contains(ConnectivityResult.ethernet)) {
-                  List<WebMapCollection> receivedRoutes = await futureRoutes;
+                  // Fetch online items and add them to receivedRoutes, avoiding duplicates
+                  List<WebMapCollection> receivedRoutes =
+                      await fetchOnlineItems(context);
 
+                  // Check if the route still exists
                   if (receivedRoutes.any(
                     (test) => test.webmapId == currentRoute.webmapId,
                   )) {
+                    // If so, start the loading
                     context.loaderOverlay.show();
+
+                    // Get the online version of the route (only one in there...)
                     var route = receivedRoutes.firstWhere(
                       (test) =>
                           test.webmapId == currentRoute.webmapId &&
@@ -186,66 +188,15 @@ class DescriptionBlock extends StatelessWidget {
                           test.locally == true,
                     );
 
-                    // TODO: van de download funcitonaliteit een functie maken
-
                     // Get ArcGIS route layer data JSON
-                    var routeResponse = await getArcgisItemData(
-                      route.availableRoute[0].routeID,
+                    await downloadRouteLayer(route, context);
+
+                    List<WebMapCollection> receivedRoutes2 = await futureRoutes;
+                    // Fetch online items and add them to receivedRoutes, avoiding duplicates
+                    receivedRoutes2.removeWhere(
+                      (localItem) => localItem.webmapId == route.webmapId,
                     );
-
-                    // Clean it up
-                    RouteLayerData routeInfo = filterRouteInfo(
-                      routeResponse,
-                      route.availableRoute[0],
-                    );
-
-                    Map<String, dynamic> allPoiJSON = {'points': []};
-                    for (Poi point in route.pointsOfInterest) {
-                      var poiAsJSON = point.toJson();
-                      (allPoiJSON['points'] as List).add(poiAsJSON);
-                    }
-
-                    var folderContent = await getRouteFolders();
-                    if (folderContent.isEmpty) {
-                      var encodeRoute = jsonEncode(routeInfo.toJson());
-
-                      await writeFile(
-                        encodeRoute,
-                        'route-${route.availableRoute[0].routeID}.json',
-                        route.webmapId,
-                      );
-
-                      var encodePoi = jsonEncode(allPoiJSON);
-                      await writeFile(
-                        encodePoi,
-                        'pois-${route.webmapId}.json',
-                        route.webmapId,
-                      );
-                    } else {
-                      // TODO: iets van check toevoegen of de route al bestaat in een folder (voor als er een route 2x gebruikt wordt of package)
-                      var encodeRoute = jsonEncode(routeInfo.toJson());
-                      await writeFile(
-                        encodeRoute,
-                        'route-${route.availableRoute[0].routeID}.json',
-                        route.webmapId,
-                      );
-
-                      var encodePoi = jsonEncode(allPoiJSON);
-                      await writeFile(
-                        encodePoi,
-                        'pois-${route.webmapId}.json',
-                        route.webmapId,
-                      );
-                    }
-
-                    for (var poi in route.pointsOfInterest) {
-                      if (poi.asset != '') {
-                        final imageProvider = CachedNetworkImageProvider(
-                          poi.asset!,
-                        );
-                        await precacheImage(imageProvider, context);
-                      }
-                    }
+                    receivedRoutes2.add(route);
 
                     context.loaderOverlay.hide();
                     //LOADING INDICATOR
@@ -307,3 +258,5 @@ class DescriptionBlock extends StatelessWidget {
     );
   }
 }
+
+

@@ -57,6 +57,12 @@ bool currenPOIChanged = false;
 bool previewEnabled = false;
 // Value used to check update in POI faster, need to remove 'currenPOIChanged' variable
 ValueNotifier<bool> currentPOIChanged = ValueNotifier<bool>(false);
+// ItemID of ArcGIS map
+const mapItemId = '50dd5ef186644d91902c2e77ddd7c414';
+// ItemID of POI file
+const poiItemId = '1c049e864f1643bda530ae45fd1591cf';
+
+
 
 /// Global Functions ///
 ///  --------------- ///

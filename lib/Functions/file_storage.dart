@@ -1,8 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:http/http.dart';
+import 'package:onroute_app/Classes/poi.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
+import 'package:onroute_app/Functions/api_calls.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:path_provider/path_provider.dart';
 
 // Gets the directory
@@ -156,6 +164,60 @@ Future<void> clearMMPKStorage() async {
     }
   }
 }
+
+Future<void> downloadRouteLayer(
+  WebMapCollection route,
+  BuildContext context,
+) async {
+  // Get ArcGIS route layer data JSON
+  var routeResponse = await getArcgisItemData(route.availableRoute[0].routeID);
+
+  // Clean it up
+  RouteLayerData routeInfo = filterRouteInfo(
+    routeResponse,
+    route.availableRoute[0],
+  );
+
+  Map<String, dynamic> allPoiJSON = {'points': []};
+  for (Poi point in route.pointsOfInterest) {
+    var poiAsJSON = point.toJson();
+    (allPoiJSON['points'] as List).add(poiAsJSON);
+  }
+
+  var folderContent = await getRouteFolders();
+  if (folderContent.isEmpty) {
+    var encodeRoute = jsonEncode(routeInfo.toJson());
+
+    await writeFile(
+      encodeRoute,
+      'route-${route.availableRoute[0].routeID}.json',
+      route.webmapId,
+    );
+
+    var encodePoi = jsonEncode(allPoiJSON);
+    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
+  } else {
+    // (als package) iets van check toevoegen of de route al bestaat in een folder (voor als er een route 2x gebruikt wordt of package)
+    var encodeRoute = jsonEncode(routeInfo.toJson());
+    await writeFile(
+      encodeRoute,
+      'route-${route.availableRoute[0].routeID}.json',
+      route.webmapId,
+    );
+
+    var encodePoi = jsonEncode(allPoiJSON);
+    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
+  }
+
+  for (var poi in route.pointsOfInterest) {
+    if (poi.asset != '') {
+      final imageProvider = CachedNetworkImageProvider(poi.asset!);
+      await precacheImage(imageProvider, context);
+    }
+  }
+}
+
+///////////////////////////// OLD MMPK DOWNLOAD CODE ///////////////////////////////////////////////////////////////
 
 Future<void> downloadSampleData(List<String> portalItemIds) async {
   // var token = await generateToken();

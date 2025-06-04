@@ -12,7 +12,6 @@ class NavigationButtons extends StatefulWidget {
   State<NavigationButtons> createState() => _NavigationButtonsState();
 }
 
-
 Icon _centeredIcon = Icon(Icons.gps_fixed);
 Icon _currentIcon = Icon(Icons.notifications);
 late StreamSubscription<LocationDisplayAutoPanMode> subscription;
@@ -59,6 +58,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Center button (also follows)
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
@@ -76,9 +76,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                   },
               child: _centeredIcon,
             ),
-
-            // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
-            // (verder checken met voorkeur van bijv. Thomas)
+            // North button
             FloatingActionButton(
               heroTag: UniqueKey(),
               onPressed:
@@ -95,7 +93,7 @@ class _NavigationButtonsState extends State<NavigationButtons> {
                   },
               child: Icon(Icons.compass_calibration),
             ),
-
+            // Notification button
             directionList.isNotEmpty
                 ? FloatingActionButton(
                   heroTag: UniqueKey(),
@@ -121,4 +119,3 @@ class _NavigationButtonsState extends State<NavigationButtons> {
     );
   }
 }
-

@@ -98,7 +98,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                             _graphicsOverlay,
                             screenPoint: screenPoint,
                             tolerance:
-                                20.0, // tolerance in screen points TODO: test for optimal size
+                                20.0, // tolerance in screen points
                           );
 
                       if (result.graphics.isNotEmpty) {
@@ -155,7 +155,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
             Uri.parse('https://gisportal.bragis.nl/arcgis'),
             connection: connection,
           ),
-          itemId: '50dd5ef186644d91902c2e77ddd7c414',
+          itemId: mapItemId,
         );
 
         _webMap = ArcGISMap.withItem(portalItem);
