@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -6,6 +6,8 @@ import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
+
+
 
 class DescriptionBlock extends StatelessWidget {
   final String description;
@@ -20,88 +22,6 @@ class DescriptionBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String> getImageSources() {
-      List<String> listOfItems = description.split(' ');
-      final List<String> sources =
-          listOfItems
-              .where((word) => word.contains('src'))
-              .map(
-                (word) =>
-                    word.replaceAll('src=', '').replaceAll("'", '').trim(),
-              )
-              .toList();
-      return sources;
-    }
-
-    String replaceImageDivs(String htmlString) {
-      List<String> imageSources = getImageSources();
-      int index = 0;
-
-      final String updatedHtml = htmlString.replaceAllMapped(
-        RegExp(r'(?:<div>)?<img[^>]*>(?:</div>)?', caseSensitive: true),
-        // RegExp(r'<div>*<img[^>]*></div>*', caseSensitive: true),
-        (match) {
-          // return imageSources[0];
-          if (index < imageSources.length) {
-            return imageSources[index++];
-          }
-          return '';
-        },
-      );
-
-      return updatedHtml;
-    }
-
-    String stripHtmlTags(String htmlString) {
-      // RegExp to remove all HTML tags
-      final RegExp exp = RegExp(
-        r'<[^>]*>',
-        multiLine: true,
-        caseSensitive: true,
-      );
-      // htmlString.replaceAll("<div>", '');
-      // htmlString.replaceAll("</div>", '\n');
-      // htmlString.replaceAll("<br />", '\n');
-      // Replace <br/> tags with new lines
-
-      htmlString = htmlString.replaceAllMapped(
-        RegExp(r'<br\s*/?>', multiLine: true, caseSensitive: true),
-        (match) {
-          if (match.group(0)!.contains('src=')) {
-            return match.group(0)!; // Keep the src attribute intact
-          }
-          return 'BREAKLINE'; // Replace other matches with a newline
-        },
-      );
-      htmlString = htmlString.replaceAllMapped(
-        RegExp(r'<()([^>]*)>', multiLine: true, caseSensitive: true),
-        (match) {
-          if (match.group(0)!.contains('src=')) {
-            return match.group(0)!; // Keep the src attribute intact
-          }
-          return '\n'; // Replace other matches with a newline
-        },
-      );
-
-      final String cleaned = htmlString.replaceAll(exp, '');
-
-      // Replace HTML entities if needed
-      final Map<String, String> htmlEntities = {
-        '&quot;': '"',
-        '&amp;': '&',
-        '&nbsp;': ' ',
-        // Add more if necessary
-      };
-
-      String decoded = cleaned;
-      htmlEntities.forEach((key, value) {
-        decoded = decoded.replaceAll(key, value);
-      });
-
-      // Optionally, trim extra whitespace
-      return decoded.trim();
-    }
-
     List<Widget> parseStringToWidgets(String inputString) {
       List<Widget> widgets = [];
       // Split the string based on the newline characters '\n'
@@ -110,18 +30,23 @@ class DescriptionBlock extends StatelessWidget {
       String lastItem = "";
       for (var part in parts) {
         // Check if the part is a URL by simple pattern matching
+
         if (part.startsWith('https://') || part.startsWith('http://')) {
           widgets.add(
-            CachedNetworkImage(
-              imageUrl: part,
+            Image.network(
+              part,
+              // height: MediaQuery.of(context).size.height * 0.2,
               fit: BoxFit.cover,
-              placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget:
-                  (context, url, error) => Image.asset(
-                    'assets/temp.png',
-                    height: MediaQuery.of(context).size.height * 0.2,
-                    fit: BoxFit.cover,
-                  ),
+              // fit: BoxFit.cover,
+            ),
+          );
+        } else if (part.startsWith('IMAGE/')) {
+          widgets.add(
+            Image.file(
+              File(part.replaceFirst('IMAGE/', '')),
+              // height: MediaQuery.of(context).size.height * 0.2,
+              fit: BoxFit.cover,
+              // fit: BoxFit.cover,
             ),
           );
         } else if (part != '') {
@@ -164,6 +89,7 @@ class DescriptionBlock extends StatelessWidget {
                 if (connectivityResult.contains(ConnectivityResult.mobile) ||
                     connectivityResult.contains(ConnectivityResult.wifi) ||
                     connectivityResult.contains(ConnectivityResult.ethernet)) {
+                  context.loaderOverlay.show();
                   // Fetch online items and add them to receivedRoutes, avoiding duplicates
                   List<WebMapCollection> receivedRoutes =
                       await fetchOnlineItems(context);
@@ -173,7 +99,6 @@ class DescriptionBlock extends StatelessWidget {
                     (test) => test.webmapId == currentRoute.webmapId,
                   )) {
                     // If so, start the loading
-                    context.loaderOverlay.show();
 
                     // Get the online version of the route (only one in there...)
                     var route = receivedRoutes.firstWhere(
@@ -260,3 +185,78 @@ class DescriptionBlock extends StatelessWidget {
 }
 
 
+
+List<String> getImageSources(String description) {
+  List<String> listOfItems = description.split(' ');
+  final List<String> sources =
+      listOfItems
+          .where((word) => word.contains('src'))
+          .map((word) => word.replaceAll('src=', '').replaceAll("'", '').trim())
+          .toList();
+  return sources;
+}
+
+String replaceImageDivs(String htmlString) {
+  List<String> imageSources = getImageSources(htmlString);
+  int index = 0;
+
+  final String updatedHtml = htmlString.replaceAllMapped(
+    RegExp(r'(?:<div>)?<img[^>]*>(?:</div>)?', caseSensitive: true),
+    // RegExp(r'<div>*<img[^>]*></div>*', caseSensitive: true),
+    (match) {
+      // return imageSources[0];
+      if (index < imageSources.length) {
+        return imageSources[index++];
+      }
+      return '';
+    },
+  );
+
+  return updatedHtml;
+}
+
+String stripHtmlTags(String htmlString) {
+  // RegExp to remove all HTML tags
+  final RegExp exp = RegExp(r'<[^>]*>', multiLine: true, caseSensitive: true);
+  // htmlString.replaceAll("<div>", '');
+  // htmlString.replaceAll("</div>", '\n');
+  // htmlString.replaceAll("<br />", '\n');
+  // Replace <br/> tags with new lines
+
+  htmlString = htmlString.replaceAllMapped(
+    RegExp(r'<br\s*/?>', multiLine: true, caseSensitive: true),
+    (match) {
+      if (match.group(0)!.contains('src=')) {
+        return match.group(0)!; // Keep the src attribute intact
+      }
+      return 'BREAKLINE'; // Replace other matches with a newline
+    },
+  );
+  htmlString = htmlString.replaceAllMapped(
+    RegExp(r'<()([^>]*)>', multiLine: true, caseSensitive: true),
+    (match) {
+      if (match.group(0)!.contains('src=')) {
+        return match.group(0)!; // Keep the src attribute intact
+      }
+      return '\n'; // Replace other matches with a newline
+    },
+  );
+
+  final String cleaned = htmlString.replaceAll(exp, '');
+
+  // Replace HTML entities if needed
+  final Map<String, String> htmlEntities = {
+    '&quot;': '"',
+    '&amp;': '&',
+    '&nbsp;': ' ',
+    // Add more if necessary
+  };
+
+  String decoded = cleaned;
+  htmlEntities.forEach((key, value) {
+    decoded = decoded.replaceAll(key, value);
+  });
+
+  // Optionally, trim extra whitespace
+  return decoded.trim();
+}

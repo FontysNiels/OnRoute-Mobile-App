@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +14,6 @@ import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
-// import 'package:onroute_app/theme.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -62,8 +60,6 @@ const mapItemId = '50dd5ef186644d91902c2e77ddd7c414';
 // ItemID of POI file
 const poiItemId = '1c049e864f1643bda530ae45fd1591cf';
 
-
-
 /// Global Functions ///
 ///  --------------- ///
 
@@ -99,13 +95,9 @@ Future<void> addMMPK() async {
     // Use only MMPK, this is used when there is no map set (aka when offline)
     if (mapViewController.arcGISMap == null) {
       mapViewController.arcGISMap = mmpk.maps.first;
-      mapViewController
-          .arcGISMap
-          ?.initialViewpoint = Viewpoint.withLatLongScale(
-        latitude: 51.598289,
-        longitude: 5.528469,
-        scale: 10000,
-      );
+      mapViewController.arcGISMap?.initialViewpoint =
+          mmpk.maps.first.initialViewpoint;
+      await mapViewController.setViewpointScale(20000);
     }
     // Overlay the MMPK on the map view
     else if (mapViewController.arcGISMap?.item?.itemId !=
@@ -202,7 +194,6 @@ class _MainAppState extends State<MainApp> {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
 
     return MaterialApp(
-      // theme: AppTheme,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // Makes the app use Material Design 3

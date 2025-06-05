@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
@@ -56,19 +56,37 @@ class RouteCard extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: CachedNetworkImage(
-                          height: 56,
-                          width: 56,
-                          imageUrl:
-                              // "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
-                              routeContent.availableRoute[0].thumbnail.split("--ONROUTE--")[0],
-                          // placeholder:
-                          //     (context, url) => CircularProgressIndicator(),
-                          errorWidget:
-                              (context, url, error) => Icon(Icons.error),
-                        ),
+                        child:
+                            routeContent.locally
+                                ? Image.file(
+                                  File(routeContent.thumbnail),
+                                  height: 56,
+                                  width: 56,
+                                  // fit: BoxFit.cover,
+                                )
+                                : Image.network(
+                                  routeContent.thumbnail,
+                                  height: 56,
+                                  width: 56,
+                                  // fit: BoxFit.cover,
+                                ),
                       ),
 
+                      //   child: CachedNetworkImage(
+                      //     // fit: BoxFit.cover,
+                      //     height: 56,
+                      //     width: 56,
+                      //     imageUrl:
+                      //         // "https://bragis.nl/wp-content/uploads/2024/01/bragis_onroute.webp",
+                      //         routeContent.availableRoute[0].thumbnail.split(
+                      //           "--ONROUTE--",
+                      //         )[0],
+                      //     // placeholder:
+                      //     //     (context, url) => CircularProgressIndicator(),
+                      //     errorWidget:
+                      //         (context, url, error) => Icon(Icons.error),
+                      //   ),
+                      // ),
                       cardImageButton(routeContent: routeContent),
                     ],
                   ),

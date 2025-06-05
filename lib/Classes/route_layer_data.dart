@@ -6,6 +6,7 @@ class RouteLayerData {
   final String title;
   final String description;
   final String thumbnail;
+  final String titleImage;
   final List<String> tags;
   dynamic viewpoint;
 
@@ -16,6 +17,7 @@ class RouteLayerData {
     required this.visibleLayers,
     required this.title,
     required this.thumbnail,
+    required this.titleImage,
     required this.description,
     required this.tags,
     required this.viewpoint,
@@ -33,6 +35,7 @@ class RouteLayerData {
       title: json['title'],
       description: json['description'],
       thumbnail: json['thumbnail'],
+      titleImage: json['titleImage'],
       tags:
           (json['tags'] as List<dynamic>).map((tag) => tag.toString()).toList(),
       viewpoint: json['viewpoint'],
@@ -44,6 +47,7 @@ class RouteLayerData {
     'visibleLayers': visibleLayers,
     'title': title,
     'thumbnail': thumbnail,
+    'titleImage': titleImage,
     'description': description,
     'tags': tags,
     'viewpoint': viewpoint,

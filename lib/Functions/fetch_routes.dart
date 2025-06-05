@@ -6,6 +6,7 @@ import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description_block.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/main.dart';
@@ -48,13 +49,14 @@ Future<List<WebMapCollection>> fetchLocalItems() async {
           title: routeInfo.title,
           description: routeInfo.description,
           locally: true,
-          thumbnail: routeInfo.thumbnail,
+          thumbnail: routeInfo.titleImage,
           tags: routeInfo.tags,
         ),
       ],
       locally: true,
       title: routeInfo.title,
       description: routeInfo.description,
+      thumbnail: routeInfo.thumbnail,
       webmapId: webMapId,
     );
     webMapCollectionList.add(webMapCollection);
@@ -88,6 +90,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
       locally: false,
       title: webMap['title'],
       description: webMap['description'] ?? '...',
+      thumbnail: webMap['thumbnail'],
       webmapId: webMap['id'],
       viewpoint: jsonDecode(publishedRoute.body)['initialState']['viewpoint'],
     );
@@ -108,7 +111,6 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
       var matchingRoute = filteredRouteIDs.firstWhere(
         (r) => r['id'] == layer['itemId'],
       );
-
       // Add the data into the route (matchingRoute, is the info from the OnRoute folder since that contains more info)
       webMapCollection.availableRoute.add(
         AvailableRoutes(
@@ -117,8 +119,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
           description: matchingRoute['description'] ?? '...',
           locally: false,
           // thumbnail: matchingRoute['thumbnail'],
-          thumbnail:
-              '${webMap['thumbnail']}--ONROUTE--${matchingRoute['thumbnail']}',
+          thumbnail: matchingRoute['thumbnail'] ?? '',
           tags:
               (matchingRoute['tags'] as List<dynamic>)
                   .map((tag) => tag.toString())
@@ -163,23 +164,57 @@ Future<void> getAllPoi(
   }
 }
 
-// Filters the route-JSON so that only the necessary data is returned
-RouteLayerData filterRouteInfo(
+// Filters the route-JSON so that only the necessary data is returned (mainly used in download function)
+Future<RouteLayerData> filterRouteInfo(
   Response routeResponse,
-  AvailableRoutes layerInfo,
-) {
+  WebMapCollection layerInfo,
+  bool isRouteRefresh,
+) async {
   var lastding =
       (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
               as List)
           .last;
 
   var modifiedResponse = jsonDecode(routeResponse.body);
-  modifiedResponse['title'] = layerInfo.title;
-  modifiedResponse['description'] = layerInfo.description;
-  modifiedResponse['thumbnail'] = layerInfo.thumbnail;
-  modifiedResponse['tags'] = layerInfo.tags!;
-  modifiedResponse['viewpoint'] = layerInfo.viewpoint;
+  modifiedResponse['title'] = layerInfo.availableRoute[0].title;
+  modifiedResponse['tags'] = layerInfo.availableRoute[0].tags!;
+  modifiedResponse['viewpoint'] = layerInfo.availableRoute[0].viewpoint;
 
+  // Only do this when the route is downloaded or refresh
+  if (isRouteRefresh) {
+    String description = layerInfo.availableRoute[0].description;
+
+    List<String> parts = stripHtmlTags(
+      replaceImageDivs(description),
+    ).split('\n');
+
+    int descriptionImageNum = 0;
+    List<String> editedList = [];
+    for (var part in parts) {
+      // Check if the part is a URL by simple pattern matching
+      if (part.startsWith('https://') || part.startsWith('http://')) {
+        part =
+            "IMAGE/${await saveImageFromUrl(part, layerInfo.webmapId + layerInfo.availableRoute[0].routeID + descriptionImageNum.toString(), layerInfo.webmapId)}";
+        descriptionImageNum++;
+      }
+      editedList.add(part);
+    }
+
+    modifiedResponse['description'] = editedList.join('\n');
+    modifiedResponse['titleImage'] = await saveImageFromUrl(
+      layerInfo.availableRoute[0].thumbnail,
+      "${layerInfo.webmapId}${layerInfo.availableRoute[0].routeID}thumbnail",
+      layerInfo.webmapId,
+    );
+
+    modifiedResponse['thumbnail'] = await saveImageFromUrl(
+      layerInfo.thumbnail,
+      layerInfo.webmapId + layerInfo.availableRoute[0].routeID,
+      layerInfo.webmapId,
+    );
+  }
+
+  // Places all the values (ArcGIS and custom) inside of a RouteLayerData
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
         ..['layers'][2]['featureSet']['features'] =

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_archive/flutter_archive.dart';
@@ -78,6 +77,7 @@ Future<List<File>> getRouteFiles() async {
   }
 }
 
+// Gets all Folders
 Future<List> getRouteFolders() async {
   try {
     final path = await _localPath;
@@ -130,6 +130,7 @@ Future<String> readFile(File name) async {
   }
 }
 
+// Turns a Flutter Asset into a File
 Future<File> copyAssetToFile(String assetPath, String filename) async {
   // Load asset as ByteData
   final byteData = await rootBundle.load(assetPath);
@@ -144,9 +145,9 @@ Future<File> copyAssetToFile(String assetPath, String filename) async {
   return file; // Now you can use File() on this path
 }
 
+//Clears the MMPK data when it isn't used
 Future<void> clearMMPKStorage() async {
   final appDir = await getApplicationDocumentsDirectory();
-
   // Do this when the route stops or smtn
   final directory = Directory(appDir.path);
   final List<FileSystemEntity> entities = directory.listSync(recursive: true);
@@ -165,55 +166,81 @@ Future<void> clearMMPKStorage() async {
   }
 }
 
+// Download function for the route-download
 Future<void> downloadRouteLayer(
   WebMapCollection route,
   BuildContext context,
 ) async {
   // Get ArcGIS route layer data JSON
   var routeResponse = await getArcgisItemData(route.availableRoute[0].routeID);
-
+  
   // Clean it up
-  RouteLayerData routeInfo = filterRouteInfo(
+  RouteLayerData routeInfo = await filterRouteInfo(
     routeResponse,
-    route.availableRoute[0],
+    route,
+    true
   );
 
   Map<String, dynamic> allPoiJSON = {'points': []};
   for (Poi point in route.pointsOfInterest) {
+    // Turning the Poi into JSON
     var poiAsJSON = point.toJson();
+    // Save the image, ad set its path in the JSON
+    if (poiAsJSON['asset'] != '') {
+      poiAsJSON['asset'] = await saveImageFromUrl(
+        poiAsJSON['asset'],
+        route.webmapId + poiAsJSON['objectId'].toString(),
+        route.webmapId,
+      );
+    }
+    // add the POI to the list of POIs
     (allPoiJSON['points'] as List).add(poiAsJSON);
   }
 
-  var folderContent = await getRouteFolders();
-  if (folderContent.isEmpty) {
-    var encodeRoute = jsonEncode(routeInfo.toJson());
+  // used to be used for the potential package check, to see if the route was already downloaded
+  // var folderContent = await getRouteFolders();
 
-    await writeFile(
-      encodeRoute,
-      'route-${route.availableRoute[0].routeID}.json',
-      route.webmapId,
-    );
+  var encodeRoute = jsonEncode(routeInfo.toJson());
 
-    var encodePoi = jsonEncode(allPoiJSON);
-    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
-  } else {
-    // (als package) iets van check toevoegen of de route al bestaat in een folder (voor als er een route 2x gebruikt wordt of package)
-    var encodeRoute = jsonEncode(routeInfo.toJson());
-    await writeFile(
-      encodeRoute,
-      'route-${route.availableRoute[0].routeID}.json',
-      route.webmapId,
-    );
+  await writeFile(
+    encodeRoute,
+    'route-${route.availableRoute[0].routeID}.json',
+    route.webmapId,
+  );
 
-    var encodePoi = jsonEncode(allPoiJSON);
-    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
-  }
+  var encodePoi = jsonEncode(allPoiJSON);
 
-  for (var poi in route.pointsOfInterest) {
-    if (poi.asset != '') {
-      final imageProvider = CachedNetworkImageProvider(poi.asset!);
-      await precacheImage(imageProvider, context);
+  await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
+}
+
+// Save a image to the device
+Future<String> saveImageFromUrl(
+  String imageUrl,
+  String fileName,
+  String webId,
+) async {
+  try {
+    final response = await get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      final path = await _localPath;
+      final directory = Directory('$path/routes/$webId');
+
+      // Create the directory if it doesn't exist
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final file = File('${directory.path}/$fileName');
+
+      // Write the image bytes to the file
+      await file.writeAsBytes(response.bodyBytes);
+      return file.path;
+    } else {
+      throw Exception('Failed to download image: ${response.statusCode}');
     }
+  } catch (e) {
+    print('Error saving image: $e');
+    rethrow;
   }
 }
 

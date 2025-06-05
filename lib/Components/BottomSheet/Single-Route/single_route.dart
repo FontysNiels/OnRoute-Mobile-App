@@ -157,17 +157,18 @@ class RoutePreviewButton extends StatelessWidget {
               widget.routeContent.availableRoute[0].routeID,
             );
             // Clean it up
-            RouteLayerData routeInfo = filterRouteInfo(
+            RouteLayerData routeInfo = await filterRouteInfo(
               routeResponse,
-              widget.routeContent.availableRoute[0],
-            );
-            // create Lines
-            graphicsOverlay.graphics.addAll(
-              await generateLinesAndPoints(routeInfo),
+              widget.routeContent,
+              false,
             );
             // Add the generated POI points
             graphicsOverlay.graphics.addAll(
               await generatePoiGraphics(widget.routeContent.pointsOfInterest),
+            );
+            // create Lines
+            graphicsOverlay.graphics.addAll(
+              await generateLinesAndPoints(routeInfo),
             );
             // Enable the preview overlay
             preview();

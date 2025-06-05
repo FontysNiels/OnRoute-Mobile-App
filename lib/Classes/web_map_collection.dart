@@ -9,6 +9,7 @@ class WebMapCollection {
   String title;
   String description;
   dynamic viewpoint;
+  String thumbnail;
 
   WebMapCollection({
     required this.webmapId,
@@ -17,6 +18,7 @@ class WebMapCollection {
     required this.locally,
     required this.title,
     required this.description,
+    required this.thumbnail,
     this.viewpoint
   });
 
