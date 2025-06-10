@@ -73,8 +73,8 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   // Turn it into a list
   List filteredRouteIDs = content['items'];
   List<WebMapCollection> webMapCollectionList = [];
-  List<Poi> allPoisList = [];
-  await getAllPoi(filteredRouteIDs, allPoisList);
+  List<Poi> allPoisList = await getAllPoi(filteredRouteIDs);
+
 
   // Fill the list of WebMapCollections
   for (var webMap in filteredRouteIDs.where((r) => r['type'] == 'Web Map')) {
@@ -134,11 +134,9 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   return webMapCollectionList;
 }
 
-Future<void> getAllPoi(
-  List<dynamic> filteredRouteIDs,
-  List<Poi> allPoisList,
-) async {
-  // ID omdat momenteel er meerdere bestaan (is TEMP)
+Future<List<Poi>> getAllPoi(List<dynamic> filteredRouteIDs) async {
+  List<Poi> allPoisList = [];
+  // ...
   var specificRoute = filteredRouteIDs.firstWhere(
     (route) => route['id'] == poiItemId,
     orElse: () => null,
@@ -162,6 +160,7 @@ Future<void> getAllPoi(
       allPoisList.add(parsedPoi);
     }
   }
+  return allPoisList;
 }
 
 // Filters the route-JSON so that only the necessary data is returned (mainly used in download function)

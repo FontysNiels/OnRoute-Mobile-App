@@ -97,8 +97,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                           .identifyGraphicsOverlay(
                             _graphicsOverlay,
                             screenPoint: screenPoint,
-                            tolerance:
-                                20.0, // tolerance in screen points
+                            tolerance: 20.0, // tolerance in screen points
                           );
 
                       if (result.graphics.isNotEmpty) {
@@ -131,14 +130,13 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 
   Future<void> onMapViewReady() async {
-    // print("onMapViewReady called");
     try {
       // set the map to the map view controller
       _mapViewController.setViewpoint(
         Viewpoint.withLatLongScale(
           latitude: 51.598289,
           longitude: 5.528469,
-          scale: 10000, // A typical scale for city-level zoom
+          scale: 10000,
         ),
       );
 
@@ -150,7 +148,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
           connectivityResult.contains(ConnectivityResult.ethernet)) {
         PortalConnection connection = PortalConnection.anonymous;
         final portalItem = PortalItem.withPortalAndItemId(
-          // portal: portal,
           portal: Portal(
             Uri.parse('https://gisportal.bragis.nl/arcgis'),
             connection: connection,
@@ -173,8 +170,6 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
       _mapViewController.locationDisplay.autoPanMode =
           LocationDisplayAutoPanMode.recenter;
-
-      // Attempt to start the location data source (this will prompt the user for permission).
 
       // Set the ready state variable to true to enable the UI.
       if (mounted &&

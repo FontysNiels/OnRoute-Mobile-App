@@ -19,13 +19,18 @@ class ImagePOI extends StatelessWidget {
               child: AspectRatio(
                 aspectRatio: 16 / 9,
                 child:
-                    poiList.asset != ''
-                        ? Image.file(
-                          File(poiList.asset!),
+                    poiList.asset == ''
+                        ? Image.asset(
+                          'assets/temp.png',
                           height: MediaQuery.of(context).size.height * 0.2,
                         )
-                        : Image.asset(
-                          'assets/temp.png',
+                        : poiList.asset!.contains('https')
+                        ? Image.network(
+                          poiList.asset!,
+                          height: MediaQuery.of(context).size.height * 0.2,
+                        )
+                        : Image.file(
+                          File(poiList.asset!),
                           height: MediaQuery.of(context).size.height * 0.2,
                         ),
               ),
