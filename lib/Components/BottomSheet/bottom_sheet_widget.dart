@@ -176,27 +176,29 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               );
             }
 
-            return !previewEnabled
-                ? Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(16.0),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        offset: Offset(0, -2),
+            return SafeArea(
+              child: !previewEnabled
+                  ? Container(
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16.0),
                       ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: _bottomSheetWidgets.last,
-                  ),
-                )
-                : Container();
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 10.0,
+                          offset: Offset(0, -2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: _bottomSheetWidgets.last,
+                    ),
+                  )
+                  : Container(),
+            );
           },
         ),
       ],
