@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 
-class PackegImagePreview extends StatelessWidget {
+class RouteImagePreview extends StatelessWidget {
   final WebMapCollection routeContent;
-  const PackegImagePreview({super.key, required this.routeContent});
+  const RouteImagePreview({super.key, required this.routeContent});
 
   @override
   Widget build(BuildContext context) {
