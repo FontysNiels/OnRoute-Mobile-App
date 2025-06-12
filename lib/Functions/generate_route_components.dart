@@ -7,23 +7,27 @@ Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
   List<Graphic> graphics = [];
 
   // Load the image once and reuse the symbol
-  final image = await ArcGISImage.fromAsset('assets/finish.png');
-  final pictureMarkerSymbol =
-      PictureMarkerSymbol.withImage(image)
-        ..width = 35
-        ..height = 35
-        ..offsetY = 17.5; // half the height
+  final finish = await ArcGISImage.fromAsset('assets/finish.png');
+  final start = await ArcGISImage.fromAsset('assets/start.png');
 
   for (var element in routeInfo.layers[2].featureSet.features) {
     // Only add graphics for the first and last element
     int index = routeInfo.layers[2].featureSet.features.indexOf(element);
+
     if ((index == 0 ||
             index == routeInfo.layers[2].featureSet.features.length - 1) &&
         element.geometry.x != null &&
         element.geometry.y != null) {
+      // Flag to determine if the point is start or finish
+      final pictureMarker =
+          PictureMarkerSymbol.withImage(index == 0 ? start : finish)
+            ..width = 35
+            ..height = 35
+            ..offsetY = 17.5;
+      // Position of the marker
       final parsedX = element.geometry.x!;
       final parsedY = element.geometry.y!;
-
+      
       final startPoint = ArcGISPoint(
         x: parsedX,
         y: parsedY,
@@ -33,7 +37,7 @@ Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
       // Create graphic with picture marker symbol instead of blue dot
       final graphic = Graphic(
         geometry: startPoint,
-        symbol: pictureMarkerSymbol,
+        symbol: pictureMarker,
       );
 
       graphics.add(graphic);
