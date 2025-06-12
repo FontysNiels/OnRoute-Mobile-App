@@ -47,7 +47,7 @@ class RouteCard extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
+                horizontal: 12.0,
                 vertical: 12,
               ),
               child: Row(
@@ -55,7 +55,7 @@ class RouteCard extends StatelessWidget {
                   Stack(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(8),
                         child:
                             routeContent.locally
                                 ? Image.file(
@@ -94,7 +94,7 @@ class RouteCard extends StatelessWidget {
                       //         (context, url, error) => Icon(Icons.error),
                       //   ),
                       // ),
-                      cardImageButton(routeContent: routeContent),
+                      CardImageButton(routeContent: routeContent),
                     ],
                   ),
                   Expanded(
