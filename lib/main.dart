@@ -85,7 +85,7 @@ void selectPoi(int selectedPoiObjectId) {
 
 // Function to copy the asset to a file and use it as map
 Future<void> addMMPK() async {
-  File file = await copyAssetToFile('assets/MMP.mmpk', 'MMP.mmpk');
+  File file = await copyAssetToFile('assets/MMPK.mmpk', 'MMPK.mmpk');
   // Load the local mobile map package File.
   final mmpk = MobileMapPackage.withFileUri(file.uri);
   // Load the mobile map package.

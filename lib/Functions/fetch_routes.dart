@@ -75,7 +75,6 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   List<WebMapCollection> webMapCollectionList = [];
   List<Poi> allPoisList = await getAllPoi(filteredRouteIDs);
 
-
   // Fill the list of WebMapCollections
   for (var webMap in filteredRouteIDs.where((r) => r['type'] == 'Web Map')) {
     // Get data from Web Map
@@ -175,6 +174,7 @@ Future<RouteLayerData> filterRouteInfo(
           .last;
 
   var modifiedResponse = jsonDecode(routeResponse.body);
+  //These get set like this always (so they dont have to be included in the if else check)
   modifiedResponse['title'] = layerInfo.availableRoute[0].title;
   modifiedResponse['tags'] = layerInfo.availableRoute[0].tags!;
   modifiedResponse['viewpoint'] = layerInfo.availableRoute[0].viewpoint;
@@ -211,6 +211,10 @@ Future<RouteLayerData> filterRouteInfo(
       layerInfo.webmapId + layerInfo.availableRoute[0].routeID,
       layerInfo.webmapId,
     );
+  } else {
+    modifiedResponse['description'] = layerInfo.availableRoute[0].description;
+    modifiedResponse['titleImage'] = layerInfo.availableRoute[0].thumbnail;
+    modifiedResponse['thumbnail'] = layerInfo.thumbnail;
   }
 
   // Places all the values (ArcGIS and custom) inside of a RouteLayerData

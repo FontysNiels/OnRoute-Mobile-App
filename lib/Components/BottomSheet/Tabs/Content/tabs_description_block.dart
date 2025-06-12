@@ -3,11 +3,10 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
+import 'package:onroute_app/Components/BottomSheet/Widgets/no_internet_dialog.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
-
-
 
 class DescriptionBlock extends StatelessWidget {
   final String description;
@@ -35,9 +34,19 @@ class DescriptionBlock extends StatelessWidget {
           widgets.add(
             Image.network(
               part,
-              // height: MediaQuery.of(context).size.height * 0.2,
               fit: BoxFit.cover,
-              // fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                    decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 197, 197, 197),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(26.0),
+                    child: Icon(Icons.wifi_off, size: 25, color: Colors.grey),
+                  ),
+                );
+              },
             ),
           );
         } else if (part.startsWith('IMAGE/')) {
@@ -130,6 +139,9 @@ class DescriptionBlock extends StatelessWidget {
                     await setSheetWidget(null, true);
                   }
                 }
+                else{
+                 noInternetDialog(context);
+                }
               },
               icon: const Icon(Icons.update),
               label: Text(
@@ -183,8 +195,6 @@ class DescriptionBlock extends StatelessWidget {
     );
   }
 }
-
-
 
 List<String> getImageSources(String description) {
   List<String> listOfItems = description.split(' ');

@@ -28,6 +28,13 @@ class ImagePOI extends StatelessWidget {
                         ? Image.network(
                           poiList.asset!,
                           height: MediaQuery.of(context).size.height * 0.2,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.wifi_off,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
                         )
                         : Image.file(
                           File(poiList.asset!),

@@ -37,10 +37,6 @@ class Poi {
       mail: json['attributes']['email'],
       phone: json['attributes']['phone'],
       website: json['attributes']['web'],
-      // openingHours:
-      //     json['attributes']['openingstijden'] != null
-      //         ? DateTime.parse(json['attributes']['openingHours'])
-      //         : null,
       openingHours: json['attributes']['openingstijden'],
       address: json['attributes']['adres'],
       asset: json['attributes']['asset'],
@@ -59,10 +55,6 @@ class Poi {
       mail: json['mail'],
       phone: json['phone'],
       website: json['website'],
-      // openingHours:
-      //     json['attributes']['openingstijden'] != null
-      //         ? DateTime.parse(json['attributes']['openingHours'])
-      //         : null,
       openingHours: json['openingHours'],
       address: json['address'],
       asset: json['asset'],

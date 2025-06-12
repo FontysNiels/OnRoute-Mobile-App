@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:icon_decoration/icon_decoration.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/card_image_button.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
@@ -62,13 +62,20 @@ class RouteCard extends StatelessWidget {
                                   File(routeContent.thumbnail),
                                   height: 56,
                                   width: 56,
-                                  // fit: BoxFit.cover,
+                                  fit: BoxFit.cover,
                                 )
                                 : Image.network(
                                   routeContent.thumbnail,
                                   height: 56,
                                   width: 56,
-                                  // fit: BoxFit.cover,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Icon(
+                                      Icons.wifi_off,
+                                      size: 25,
+                                      color: Colors.grey,
+                                    );
+                                  },
                                 ),
                       ),
 
@@ -99,16 +106,11 @@ class RouteCard extends StatelessWidget {
                         children: [
                           Text(
                             style: Theme.of(context).textTheme.bodyLarge,
-                            // "Bergsebosfietsen - Genieten over heuvelrug en kromme rijn gebied",
                             routeContent.availableRoute[0].title,
                             overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
                           ),
-                          Text(
-                            // "${(routeContent.routeLayer.layers[0].featureSet.features[0].attributes['TotalMeters'] / 1000).toStringAsFixed(1).toString()} km",
-                            "GEEN KM MEER",
-                            style: Theme.of(context).textTheme.bodyMedium!
-                                .copyWith(fontStyle: FontStyle.italic),
-                          ),
+
                           Text(
                             routeContent.locally
                                 ? "Gedownload"
@@ -127,40 +129,5 @@ class RouteCard extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class cardImageButton extends StatelessWidget {
-  const cardImageButton({super.key, required this.routeContent});
-
-  final WebMapCollection routeContent;
-
-  @override
-  Widget build(BuildContext context) {
-    return routeContent.availableRoute[0].tags!.contains("Fiets")
-        ? Positioned(
-          bottom: 0,
-          right: 0,
-          child: DecoratedIcon(
-            icon: Icon(
-              Icons.directions_bike,
-              color: const Color.fromARGB(255, 0, 0, 0),
-            ),
-            decoration: IconDecoration(border: IconBorder(color: Colors.white)),
-          ),
-        )
-        : routeContent.availableRoute[0].tags!.contains("Wandel")
-        ? Positioned(
-          bottom: 0,
-          right: 0,
-          child: DecoratedIcon(
-            icon: Icon(
-              Icons.directions_walk,
-              color: const Color.fromARGB(255, 0, 0, 0),
-            ),
-            decoration: IconDecoration(border: IconBorder(color: Colors.white)),
-          ),
-        )
-        : Container();
   }
 }

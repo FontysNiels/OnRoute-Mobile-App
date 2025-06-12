@@ -39,6 +39,13 @@ class PackegImagePreview extends StatelessWidget {
                               routeContent.availableRoute[0].thumbnail,
                               height: MediaQuery.of(context).size.height * 0.2,
                               fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.wifi_off,
+                                  size: 50,
+                                  color: Colors.grey,
+                                );
+                              },
                             ),
                   ),
                 ),

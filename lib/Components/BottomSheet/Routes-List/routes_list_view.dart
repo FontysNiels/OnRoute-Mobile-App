@@ -189,7 +189,7 @@ class _RoutesListViewState extends State<RoutesListView> {
             padding: const EdgeInsets.all(8.0),
             child: IconButton.filled(
               onPressed: () async {
-                _initializeConnectivity();
+                connectivityResult = await Connectivity().checkConnectivity();
                 if (!connectivityResult.contains(ConnectivityResult.none)) {
                   // Show loaing indicator
                   context.loaderOverlay.show();
