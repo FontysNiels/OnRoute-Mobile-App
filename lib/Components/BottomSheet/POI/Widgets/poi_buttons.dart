@@ -37,14 +37,26 @@ class PoiButtons extends StatelessWidget {
                   context: context,
                   builder:
                       (_) => AlertDialog(
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Email: ${routeContent.mail}',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
+                        content: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Email:',
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                routeContent.mail!,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       ),
                 );
@@ -64,14 +76,26 @@ class PoiButtons extends StatelessWidget {
                   context: context,
                   builder:
                       (_) => AlertDialog(
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Telefoonnummer: ${routeContent.phone}',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            ),
-                          ],
+                        content: Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Telefoonnummer:',
+                                style: Theme.of(context).textTheme.bodyLarge
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                routeContent.phone!,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                              ),
+                            ],
+                          ),
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
                         ),
                       ),
                 );

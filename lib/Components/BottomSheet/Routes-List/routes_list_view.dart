@@ -4,6 +4,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/Widgets/list_divider.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/route_card.dart';
+import 'package:onroute_app/Components/BottomSheet/Widgets/no_internet_dialog.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_handle.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
@@ -211,6 +212,8 @@ class _RoutesListViewState extends State<RoutesListView> {
                   widget.setSheetWidget(null, true);
                   // Hide the loading indicator
                   context.loaderOverlay.hide();
+                }else{
+                  noInternetDialog(context);
                 }
               }, // Add refresh logic if needed
               icon: const Icon(Icons.refresh),

@@ -18,7 +18,7 @@ Future<dynamic> noInternetDialog(BuildContext context) {
                   ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  'Controleer je internetverbinding en probeer het opnieuw.',
+                  'Controleer de internetverbinding en probeer het opnieuw.',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
