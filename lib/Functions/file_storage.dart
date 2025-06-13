@@ -15,7 +15,6 @@ import 'package:path_provider/path_provider.dart';
 // Gets the directory
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
-
   return directory.path;
 }
 
@@ -35,6 +34,7 @@ Future<File> writeFile(String content, String name, String folder) async {
   return file.writeAsString('$content');
 }
 
+// Deletes all files in the routes folder
 Future<void> deleteAllSavedFiles() async {
   try {
     final path = await _localPath;
@@ -49,6 +49,7 @@ Future<void> deleteAllSavedFiles() async {
   }
 }
 
+// Deletes the route info for a specific webId (this includes images)
 Future<void> deleteRouteInfo(String webId) async {
   try {
     final path = await _localPath;
@@ -85,7 +86,9 @@ Future<List> getRouteFolders() async {
 
     // Recursively process files and directories
     List<dynamic> processDirectory(Directory dir) {
+      // List all entities in the directory
       final entities = dir.listSync();
+      // If the directory is empty, return an empty list
       return entities
           .map((entity) {
             if (entity is File) {
@@ -99,9 +102,13 @@ Future<List> getRouteFolders() async {
           .toList();
     }
 
+    // Process the directory and return a list of files and folders
     List<dynamic> result = processDirectory(directory);
+    // Convert the result to a List of dynamic type
     for (var i = 0; i < result.length; i++) {
+      // If the result is a List, it means it's a folder with files
       if (result[i] is List) {
+        // Get the folder name from the first file's parent path
         final folderName =
             (result[i] as List).isNotEmpty
                 ? (result[i] as List).first.parent.path.split('/').last
@@ -111,7 +118,7 @@ Future<List> getRouteFolders() async {
         };
       }
     }
-
+    // Return the processed list of files and folders
     return result;
   } catch (e) {
     // If encountering an error, return an empty list
@@ -173,13 +180,9 @@ Future<void> downloadRouteLayer(
 ) async {
   // Get ArcGIS route layer data JSON
   var routeResponse = await getArcgisItemData(route.availableRoute[0].routeID);
-  
+
   // Clean it up
-  RouteLayerData routeInfo = await filterRouteInfo(
-    routeResponse,
-    route,
-    true
-  );
+  RouteLayerData routeInfo = await filterRouteInfo(routeResponse, route, true);
 
   Map<String, dynamic> allPoiJSON = {'points': []};
   for (Poi point in route.pointsOfInterest) {
@@ -200,16 +203,17 @@ Future<void> downloadRouteLayer(
   // used to be used for the potential package check, to see if the route was already downloaded
   // var folderContent = await getRouteFolders();
 
+  // Encode the routeInfo so it can be saved as a JSON file
   var encodeRoute = jsonEncode(routeInfo.toJson());
-
+  // Save the route info as a JSON file
   await writeFile(
     encodeRoute,
     'route-${route.availableRoute[0].routeID}.json',
     route.webmapId,
   );
-
+  // Encode the poi info so it can be saved as a JSON file
   var encodePoi = jsonEncode(allPoiJSON);
-
+  // Save the POI info as a JSON file
   await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
 }
 
@@ -239,7 +243,7 @@ Future<String> saveImageFromUrl(
       throw Exception('Failed to download image: ${response.statusCode}');
     }
   } catch (e) {
-    print('Error saving image: $e');
+    // print('Error saving image: $e');
     rethrow;
   }
 }

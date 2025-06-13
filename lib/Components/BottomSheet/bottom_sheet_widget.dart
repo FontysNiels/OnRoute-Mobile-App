@@ -44,7 +44,7 @@ late Function globalSetState;
 
 // Sheet size animator
 
-
+// TODO: vaste maten maken, ipv variable double
 // Function that animates the sheet to a certain size
 Future<void> moveSheetTo(double size) async {
   while (!_controller.isAttached) {
@@ -70,6 +70,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
+
+
     List<WebMapCollection> allAvailableRoutes = [];
 
     allAvailableRoutes.addAll(await fetchLocalItems());
@@ -80,7 +82,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (connectivityResult.contains(ConnectivityResult.mobile) ||
         connectivityResult.contains(ConnectivityResult.wifi) ||
         connectivityResult.contains(ConnectivityResult.ethernet)) {
-      allAvailableRoutes.addAll(await fetchOnlineItems(context));
+      allAvailableRoutes.addAll(await fetchOnlineItems( context));
     }
 
     return allAvailableRoutes;
@@ -88,12 +90,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
-    List<WebMapCollection> receivedRoutes = [];
-    List<WebMapCollection> localItems = [];
-    if (reload == true) {
-      receivedRoutes = await futureRoutes;
-      localItems = await fetchLocalItems();
-    }
+    List<WebMapCollection> receivedRoutes = await futureRoutes;
+    List<WebMapCollection> localItems = await fetchLocalItems();
 
     setState(() {
       if (widget != null) {
@@ -154,6 +152,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
           controller: _controller,
           initialChildSize: sheetSize,
           snap: true,
+          // TODO: bespreken hoe of wat
           // snapSizes: [0.2, 0.4, 0.6, 0.9],
           // minChildSize: 0.2,
           // During route:
@@ -176,29 +175,27 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
               );
             }
 
-            return SafeArea(
-              child: !previewEnabled
-                  ? Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(16.0),
+            return !previewEnabled
+                ? Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16.0),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10.0,
+                        offset: Offset(0, -2),
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          blurRadius: 10.0,
-                          offset: Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: _bottomSheetWidgets.last,
-                    ),
-                  )
-                  : Container(),
-            );
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: _bottomSheetWidgets.last,
+                  ),
+                )
+                : Container();
           },
         ),
       ],

@@ -39,6 +39,12 @@ bool _userNearPoi = false;
 class _TripContentState extends State<TripContent> {
   ArcGISMapViewController controller = mapViewController;
   late StreamSubscription<ArcGISLocation> subscription;
+  listner() async {
+    if (currentPOIChanged.value == true) {
+      currentPOIChanged.value = false;
+      await _inputBasedPoiSetter(selectedPOI);
+    }
+  }
 
   @override
   void dispose() {
@@ -49,6 +55,7 @@ class _TripContentState extends State<TripContent> {
     selectedPOI = 0;
     currenPOIChanged = false;
     _userNearPoi = false;
+    currentPOIChanged.removeListener(listner);
     super.dispose();
   }
 
@@ -56,6 +63,7 @@ class _TripContentState extends State<TripContent> {
   void initState() {
     selectedPOI = 0;
     currenPOIChanged = false;
+    currentPOIChanged.addListener(listner);
     calculateDistances();
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -204,12 +212,6 @@ class _TripContentState extends State<TripContent> {
 
   @override
   Widget build(BuildContext context) {
-    currentPOIChanged.addListener(() async {
-      if (currentPOIChanged.value == true) {
-        currentPOIChanged.value = false;
-        await _inputBasedPoiSetter(selectedPOI);
-      }
-    });
     return MediaQuery.removePadding(
       context: context,
       removeTop: true,

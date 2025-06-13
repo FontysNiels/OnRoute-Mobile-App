@@ -28,7 +28,6 @@ class Poi {
   });
 
   factory Poi.fromJsonOnline(Map<String, dynamic> json) {
-    // print(json['attributes']['openingHours']);
     return Poi(
       objectId: json['attributes']['OBJECTID'],
       title: json['attributes']['naam'],
@@ -45,8 +44,7 @@ class Poi {
     );
   }
 
-    factory Poi.fromJsonLocal(Map<String, dynamic> json) {
-    // print(json['attributes']['openingHours']);
+  factory Poi.fromJsonLocal(Map<String, dynamic> json) {
     return Poi(
       objectId: json['objectId'],
       title: json['title'],

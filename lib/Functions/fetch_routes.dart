@@ -11,7 +11,7 @@ import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/main.dart';
 
-// Fetches local ROUTES ONLY, NO PACKAGES that are already downloaded
+// Fetches LOCAL routes only that are already downloaded (NO PACKAGES)
 Future<List<WebMapCollection>> fetchLocalItems() async {
   List<dynamic> localFilesWithFolders = await getRouteFolders();
 
@@ -71,12 +71,12 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   var responseAll = await getAllFromFolder();
   var content = jsonDecode(responseAll.body);
   // Turn it into a list
-  List filteredRouteIDs = content['items'];
+  List allFolderItems = content['items'];
   List<WebMapCollection> webMapCollectionList = [];
-  List<Poi> allPoisList = await getAllPoi(filteredRouteIDs);
+  List<Poi> allPoisList = await getAllPoi(allFolderItems);
 
   // Fill the list of WebMapCollections
-  for (var webMap in filteredRouteIDs.where((r) => r['type'] == 'Web Map')) {
+  for (var webMap in allFolderItems.where((r) => r['type'] == 'Web Map')) {
     // Get data from Web Map
     var publishedRoute = await getArcgisItemData(webMap['id']);
     var responseBodyPublished =
@@ -107,7 +107,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
       webMapCollection.pointsOfInterest.addAll(matchingPois);
 
       // Checks if the route is the same as the one from the OnRoute Folder
-      var matchingRoute = filteredRouteIDs.firstWhere(
+      var matchingRoute = allFolderItems.firstWhere(
         (r) => r['id'] == layer['itemId'],
       );
       // Add the data into the route (matchingRoute, is the info from the OnRoute folder since that contains more info)
@@ -133,14 +133,15 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   return webMapCollectionList;
 }
 
-Future<List<Poi>> getAllPoi(List<dynamic> filteredRouteIDs) async {
+// Gets all POIs from the online routes
+Future<List<Poi>> getAllPoi(List<dynamic> allFolderItems) async {
   List<Poi> allPoisList = [];
-  // ...
-  var specificRoute = filteredRouteIDs.firstWhere(
+  // Get the POI file based on the POI item ID
+  var specificRoute = allFolderItems.firstWhere(
     (route) => route['id'] == poiItemId,
     orElse: () => null,
   );
-
+  // Check if the specific route is not null and has a valid URL
   if (specificRoute != null &&
       specificRoute['url'] != null &&
       specificRoute['type'] == "Feature Service") {
@@ -168,11 +169,13 @@ Future<RouteLayerData> filterRouteInfo(
   WebMapCollection layerInfo,
   bool isRouteRefresh,
 ) async {
+  // Split off the directions
   var lastding =
       (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
               as List)
           .last;
 
+  // Changing and or adding values to the response
   var modifiedResponse = jsonDecode(routeResponse.body);
   //These get set like this always (so they dont have to be included in the if else check)
   modifiedResponse['title'] = layerInfo.availableRoute[0].title;
@@ -182,36 +185,41 @@ Future<RouteLayerData> filterRouteInfo(
   // Only do this when the route is downloaded or refresh
   if (isRouteRefresh) {
     String description = layerInfo.availableRoute[0].description;
-
+    // Replace image divs with URLs and strip HTML tags
     List<String> parts = stripHtmlTags(
       replaceImageDivs(description),
     ).split('\n');
-
+    // Initialize a counter for images in the description
     int descriptionImageNum = 0;
+    // Create a new list to hold the edited parts
     List<String> editedList = [];
     for (var part in parts) {
       // Check if the part is a URL by simple pattern matching
       if (part.startsWith('https://') || part.startsWith('http://')) {
+        // If it is a URL, save the image and replace the URL with the IMAGE tag
         part =
             "IMAGE/${await saveImageFromUrl(part, layerInfo.webmapId + layerInfo.availableRoute[0].routeID + descriptionImageNum.toString(), layerInfo.webmapId)}";
         descriptionImageNum++;
       }
+      // Add the edited part to the list
       editedList.add(part);
     }
-
+    // Join the edited parts back into a single string
     modifiedResponse['description'] = editedList.join('\n');
+    // Save the thumbnail and title image from the URLs
     modifiedResponse['titleImage'] = await saveImageFromUrl(
       layerInfo.availableRoute[0].thumbnail,
       "${layerInfo.webmapId}${layerInfo.availableRoute[0].routeID}thumbnail",
       layerInfo.webmapId,
     );
-
+    // Save the thumbnail from the URL
     modifiedResponse['thumbnail'] = await saveImageFromUrl(
       layerInfo.thumbnail,
       layerInfo.webmapId + layerInfo.availableRoute[0].routeID,
       layerInfo.webmapId,
     );
   } else {
+    // If the route is not downloaded or refreshed, just set the description and images as they are online
     modifiedResponse['description'] = layerInfo.availableRoute[0].description;
     modifiedResponse['titleImage'] = layerInfo.availableRoute[0].thumbnail;
     modifiedResponse['thumbnail'] = layerInfo.thumbnail;
@@ -226,6 +234,6 @@ Future<RouteLayerData> filterRouteInfo(
                 .toList())
       ..['layers'][2]['featureSet']['features'].add(lastding),
   );
-
+  // Return the RouteLayerData object
   return routeInfo;
 }

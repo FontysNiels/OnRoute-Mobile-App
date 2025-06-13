@@ -3,6 +3,7 @@ import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
 import 'package:onroute_app/main.dart';
 
+// Generates graphics for the start and finish points of a route
 Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
   List<Graphic> graphics = [];
 
@@ -27,7 +28,7 @@ Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
       // Position of the marker
       final parsedX = element.geometry.x!;
       final parsedY = element.geometry.y!;
-      
+
       final startPoint = ArcGISPoint(
         x: parsedX,
         y: parsedY,
@@ -35,18 +36,16 @@ Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
       );
 
       // Create graphic with picture marker symbol instead of blue dot
-      final graphic = Graphic(
-        geometry: startPoint,
-        symbol: pictureMarker,
-      );
+      final graphic = Graphic(geometry: startPoint, symbol: pictureMarker);
 
       graphics.add(graphic);
     }
   }
-
+  // Return a list of graphics for the start and finish points.
   return graphics;
 }
 
+// Generates graphics for POIs along the route
 Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
   List<Graphic> graphics = [];
   final image = await ArcGISImage.fromAsset('assets/pin_circle_red.png');
@@ -54,7 +53,8 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
       PictureMarkerSymbol.withImage(image)
         ..width = 35
         ..height = 35
-        ..offsetY = 17.5; // half the height
+        ..offsetY = 17.5;
+  // Loop through each POI in the routeInfo
   for (var element in routeInfo) {
     if (element.geometry.x != null) {
       final parsedX = element.geometry.x;
@@ -65,13 +65,7 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
         y: parsedY!,
         spatialReference: SpatialReference.webMercator,
       );
-
-      // final routeStartCircleSymbol = SimpleMarkerSymbol(
-      //   style: SimpleMarkerSymbolStyle.circle,
-      //   color: const Color.fromARGB(255, 255, 0, 0),
-      //   size: 20.0,
-      // );
-
+      // Create a graphic for the POI with the picture marker symbol
       graphics.add(
         Graphic(
           geometry: startPoint,
@@ -82,18 +76,17 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
       );
     }
   }
+  // Return a list of graphics for each POI.
   return graphics;
 }
 
+// Generates graphics for lines and points of a route
 Future<List<Graphic>> generateLinesAndPoints(RouteLayerData routeID) async {
   // Generate Lines
   List<Graphic> graphics = [];
   for (var element in routeID.layers[1].featureSet.features) {
     late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,
-      // color: Color(
-      //   (0xFF000000 + (0x00FFFFFF * (element.hashCode % 1000) / 1000)).toInt(),
-      // ).withOpacity(1.0),
       color: primaryAppColor,
       width: 4,
     );

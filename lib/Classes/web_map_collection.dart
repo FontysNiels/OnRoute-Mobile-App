@@ -19,7 +19,7 @@ class WebMapCollection {
     required this.title,
     required this.description,
     required this.thumbnail,
-    this.viewpoint
+    this.viewpoint,
   });
 
   Map<String, dynamic> toJson() => {

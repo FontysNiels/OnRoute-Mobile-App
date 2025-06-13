@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:arcgis_maps/arcgis_maps.dart';
 
+// Converts latitude and longitude to ArcGISPoint
 ArcGISPoint convertToArcGISPoint(double latitude, double longitude) {
   // Earth's radius in meters for Web Mercator projection
   const double earthRadius = 6378137.0;
@@ -22,6 +23,7 @@ ArcGISPoint convertToArcGISPoint(double latitude, double longitude) {
   );
 }
 
+// Converts (ArcGISPoint) Web Mercator coordinates (EPSG:3857) to latitude and longitude
 List convertToLatLng(double x, double y) {
   // Earth's radius in meters for Web Mercator projection
   const double earthRadius = 6378137.0;
