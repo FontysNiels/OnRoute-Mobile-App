@@ -233,15 +233,44 @@ class _DirectionsCardState extends State<DirectionsCard> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/temp.png',
-                      height: 56,
-                      width: 56,
-                      fit: BoxFit.cover,
+                  Container(
+                    height: 56,
+                    width: 56,
+                    decoration: BoxDecoration(
+                      color: Colors.white, // Background color
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      color: primaryTextColor,
+                      size: 30,
+                      directionList.isNotEmpty &&
+                              directionList[descriptionNum].description
+                                  .toLowerCase()
+                                  .contains("links")
+                          ? Icons.arrow_back
+                          : directionList[descriptionNum].description
+                              .toLowerCase()
+                              .contains("rechts")
+                          ? Icons.arrow_forward
+                          : directionList[descriptionNum].description
+                                  .toLowerCase()
+                                  .contains("rechtdoor") ||
+                              directionList[descriptionNum].description
+                                  .toLowerCase()
+                                  .contains("volg")
+                          ? Icons.arrow_upward
+                          : Icons.arrow_upward,
                     ),
                   ),
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(16),
+                  //   child: Image.asset(
+                  //     'assets/temp.png',
+                  //     height: 56,
+                  //     width: 56,
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
                   Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -259,12 +288,10 @@ class _DirectionsCardState extends State<DirectionsCard> {
                       ),
                     ),
                   ),
-
-                  // Text('$metersToNextDirection Meter'),
                   Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(12.0)),
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(
@@ -290,34 +317,6 @@ class _DirectionsCardState extends State<DirectionsCard> {
                           ),
                         ],
                       ),
-
-                      //  child: Column(
-                      //   mainAxisSize: MainAxisSize.min,
-                      //   children: [
-                      //     Text(
-                      //     '${metersToCurrentDirection}',
-                      //     style: Theme.of(
-                      //       context,
-                      //     ).textTheme.titleLarge?.copyWith(
-                      //         height: 1.0,
-                      //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
-                      //           ? Colors.black
-                      //           : Colors.white,
-                      //       ),
-                      //     ),
-                      //     Text(
-                      //     'Meter',
-                      //     style: Theme.of(
-                      //       context,
-                      //     ).textTheme.bodyMedium?.copyWith(
-                      //         height: 1.2,
-                      //         color: Theme.of(context).primaryColor.computeLuminance() > 0.5
-                      //           ? Colors.black
-                      //           : Colors.white,
-                      //       ),
-                      //     ),
-                      //   ],
-                      // ),
                     ),
                   ),
                 ],

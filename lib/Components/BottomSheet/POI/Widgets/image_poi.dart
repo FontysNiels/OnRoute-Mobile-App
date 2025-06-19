@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/poi.dart';
 
@@ -18,29 +18,28 @@ class ImagePOI extends StatelessWidget {
               ),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl: poiList.asset ?? '',
-                  // placeholder:
-                  //     (context, url) => Image.asset(
-                  //       'assets/temp.png',
-                  //       height: MediaQuery.of(context).size.height * 0.2,
-                  //       // fit: BoxFit.cover,
-                  //     ),
-                  placeholder:
-                      (context, url) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 80.0,
-                          vertical: 20,
+                child:
+                    poiList.asset == ''
+                        ? Image.asset(
+                          'assets/temp.png',
+                          height: MediaQuery.of(context).size.height * 0.2,
+                        )
+                        : poiList.asset!.contains('https')
+                        ? Image.network(
+                          poiList.asset!,
+                          height: MediaQuery.of(context).size.height * 0.2,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(
+                              Icons.wifi_off,
+                              size: 50,
+                              color: Colors.grey,
+                            );
+                          },
+                        )
+                        : Image.file(
+                          File(poiList.asset!),
+                          height: MediaQuery.of(context).size.height * 0.2,
                         ),
-                        child: CircularProgressIndicator(),
-                      ),
-                  errorWidget:
-                      (context, url, error) => Image.asset(
-                        'assets/temp.png',
-                        height: MediaQuery.of(context).size.height * 0.2,
-                        // fit: BoxFit.cover,
-                      ),
-                ),
               ),
             ),
           ],

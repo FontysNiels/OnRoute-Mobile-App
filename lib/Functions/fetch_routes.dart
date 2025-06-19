@@ -6,15 +6,14 @@ import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Classes/available_routes.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Components/BottomSheet/Tabs/Content/tabs_description_block.dart';
 import 'package:onroute_app/Functions/api_calls.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
+import 'package:onroute_app/main.dart';
 
-// Fetches local ROUTES ONLY, NO PACKAGES that are already downloaded
-Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
+// Fetches LOCAL routes only that are already downloaded (NO PACKAGES)
+Future<List<WebMapCollection>> fetchLocalItems() async {
   List<dynamic> localFilesWithFolders = await getRouteFolders();
-
-  // TODO: make it so when a package is downlaoded it doesnt show the package, but all the seperate routes.
-  // Possibly already doing so....
 
   List<File> localRouteFiles =
       localFilesWithFolders
@@ -50,13 +49,14 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
           title: routeInfo.title,
           description: routeInfo.description,
           locally: true,
-          thumbnail: routeInfo.thumbnail,
+          thumbnail: routeInfo.titleImage,
           tags: routeInfo.tags,
         ),
       ],
       locally: true,
       title: routeInfo.title,
       description: routeInfo.description,
+      thumbnail: routeInfo.thumbnail,
       webmapId: webMapId,
     );
     webMapCollectionList.add(webMapCollection);
@@ -66,29 +66,25 @@ Future<List<WebMapCollection>> fetchLocalItems(List<File> localFiles) async {
 }
 
 // Fetches online routes that are not already downloaded
-Future<List<WebMapCollection>> fetchOnlineItems(
-  List<File> localFiles,
-  BuildContext context,
-) async {
+Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   // Get all items from the OnRoute folder
-  var responseAll = await getAllFromFolder();
+  Response responseAll = await getAllFromFolder();
+  if (responseAll.statusCode != 200) {
+    return [];
+  }
   var content = jsonDecode(responseAll.body);
   // Turn it into a list
-  List filteredRouteIDs = content['items'];
-
-  //TODO: (IDFK what I meant with this) it now always gets and converts the routes, even if they are already downloaded
-  // denk dat hij alles ophaalt, en dan alsnog de data bekijkt (zoals titel enzo) (ookal als die offline beschikbaaar is)
-
+  List allFolderItems = content['items'];
   List<WebMapCollection> webMapCollectionList = [];
-
-  // Create and fill a list with all the POIs (from 1 POI file)
-  List<Poi> allPoisList = [];
-  await getAllPoi(filteredRouteIDs, allPoisList);
+  List<Poi> allPoisList = await getAllPoi(allFolderItems);
 
   // Fill the list of WebMapCollections
-  for (var webMap in filteredRouteIDs.where((r) => r['type'] == 'Web Map')) {
+  for (var webMap in allFolderItems.where((r) => r['type'] == 'Web Map')) {
     // Get data from Web Map
     var publishedRoute = await getArcgisItemData(webMap['id']);
+    if (publishedRoute.statusCode != 200) {
+      continue;
+    }
     var responseBodyPublished =
         jsonDecode(publishedRoute.body)['operationalLayers'];
 
@@ -99,6 +95,7 @@ Future<List<WebMapCollection>> fetchOnlineItems(
       locally: false,
       title: webMap['title'],
       description: webMap['description'] ?? '...',
+      thumbnail: webMap['thumbnail'],
       webmapId: webMap['id'],
       viewpoint: jsonDecode(publishedRoute.body)['initialState']['viewpoint'],
     );
@@ -116,20 +113,18 @@ Future<List<WebMapCollection>> fetchOnlineItems(
       webMapCollection.pointsOfInterest.addAll(matchingPois);
 
       // Checks if the route is the same as the one from the OnRoute Folder
-      var matchingRoute = filteredRouteIDs.firstWhere(
+      var matchingRoute = allFolderItems.firstWhere(
         (r) => r['id'] == layer['itemId'],
       );
-
       // Add the data into the route (matchingRoute, is the info from the OnRoute folder since that contains more info)
       webMapCollection.availableRoute.add(
         AvailableRoutes(
           routeID: layer['itemId'],
-          title: layer['title'],
+          title: matchingRoute['title'] ?? layer['title'],
           description: matchingRoute['description'] ?? '...',
           locally: false,
           // thumbnail: matchingRoute['thumbnail'],
-          thumbnail:
-              '${webMap['thumbnail']}--ONROUTE--${matchingRoute['thumbnail']}',
+          thumbnail: matchingRoute['thumbnail'] ?? '',
           tags:
               (matchingRoute['tags'] as List<dynamic>)
                   .map((tag) => tag.toString())
@@ -144,21 +139,23 @@ Future<List<WebMapCollection>> fetchOnlineItems(
   return webMapCollectionList;
 }
 
-Future<void> getAllPoi(
-  List<dynamic> filteredRouteIDs,
-  List<Poi> allPoisList,
-) async {
-  // TODO: make this work for any poi bestand
-  // ID omdat momenteel er meerdere bestaan (is TEMP)
-  var specificRoute = filteredRouteIDs.firstWhere(
-    (route) => route['id'] == '1c049e864f1643bda530ae45fd1591cf',
+// Gets all POIs from the online routes
+Future<List<Poi>> getAllPoi(List<dynamic> allFolderItems) async {
+  List<Poi> allPoisList = [];
+  // Get the POI file based on the POI item ID
+  var specificRoute = allFolderItems.firstWhere(
+    (route) => route['id'] == poiItemId,
     orElse: () => null,
   );
-
+  // Check if the specific route is not null and has a valid URL
   if (specificRoute != null &&
       specificRoute['url'] != null &&
       specificRoute['type'] == "Feature Service") {
     var poiResponse = await getServiceContent('${specificRoute['url']}/0');
+    if (poiResponse.statusCode != 200) {
+      print('gang3');
+      return [];
+    }
     var poiResponseBody = jsonDecode(poiResponse.body)['features'];
 
     // create POIs per feature-layer
@@ -173,25 +170,95 @@ Future<void> getAllPoi(
       allPoisList.add(parsedPoi);
     }
   }
+  return allPoisList;
 }
 
-// Filters the route-JSON so that only the necessary data is returned
-RouteLayerData filterRouteInfo(
+// Filters the route-JSON so that only the necessary data is returned (mainly used in download function)
+Future<RouteLayerData> filterRouteInfo(
   Response routeResponse,
-  AvailableRoutes layerInfo,
-) {
+  WebMapCollection layerInfo,
+  bool isRouteRefresh,
+) async {
+  // Split off the directions
   var lastding =
       (jsonDecode(routeResponse.body)['layers'][2]['featureSet']['features']
               as List)
           .last;
 
+  // Changing and or adding values to the response
   var modifiedResponse = jsonDecode(routeResponse.body);
-  modifiedResponse['title'] = layerInfo.title;
-  modifiedResponse['description'] = layerInfo.description;
-  modifiedResponse['thumbnail'] = layerInfo.thumbnail;
-  modifiedResponse['tags'] = layerInfo.tags!;
-  modifiedResponse['viewpoint'] = layerInfo.viewpoint;
+  //These get set like this always (so they dont have to be included in the if else check)
+  modifiedResponse['title'] = layerInfo.availableRoute[0].title;
+  modifiedResponse['tags'] = layerInfo.availableRoute[0].tags!;
+  modifiedResponse['viewpoint'] = layerInfo.availableRoute[0].viewpoint;
 
+  // Only do this when the route is downloaded or refresh
+  if (isRouteRefresh) {
+    String description = layerInfo.availableRoute[0].description;
+    // Replace image divs with URLs and strip HTML tags
+    List<String> parts = stripHtmlTags(
+      replaceImageDivs(description),
+    ).split('\n');
+    // Initialize a counter for images in the description
+    int descriptionImageNum = 0;
+    // Create a new list to hold the edited parts
+    List<String> editedList = [];
+    for (var part in parts) {
+      // Check if the part is a URL by simple pattern matching
+      if (part.startsWith('https://') || part.startsWith('http://')) {
+        // If it is a URL, save the image and replace the URL with the IMAGE tag
+        String imagePath = await saveImageFromUrl(
+          part,
+          layerInfo.webmapId +
+              layerInfo.availableRoute[0].routeID +
+              descriptionImageNum.toString(),
+          layerInfo.webmapId,
+        );
+        if (imagePath == "ERROR") {
+          // If there was an error saving the image, skip this part
+          continue;
+        }
+        part = "IMAGE/$imagePath";
+        descriptionImageNum++;
+      }
+      // Add the edited part to the list
+      editedList.add(part);
+    }
+    // Join the edited parts back into a single string
+    modifiedResponse['description'] = editedList.join('\n');
+    // Save the thumbnail and title image from the URLs
+
+    String imagePath = await saveImageFromUrl(
+      layerInfo.availableRoute[0].thumbnail,
+      "${layerInfo.webmapId}${layerInfo.availableRoute[0].routeID}thumbnail",
+      layerInfo.webmapId,
+    );
+    if (imagePath != "ERROR") {
+      // Save the thumbnail from the URL
+      modifiedResponse['titleImage'] = imagePath;
+    } else {
+      modifiedResponse['titleImage'] = layerInfo.availableRoute[0].thumbnail;
+    }
+
+    String imagePath2 = await saveImageFromUrl(
+      layerInfo.thumbnail,
+      layerInfo.webmapId + layerInfo.availableRoute[0].routeID,
+      layerInfo.webmapId,
+    );
+    if (imagePath2 != "ERROR") {
+      // Save the thumbnail from the URL
+      modifiedResponse['thumbnail'] = imagePath2;
+    } else {
+      modifiedResponse['thumbnail'] = layerInfo.thumbnail;
+    }
+  } else {
+    // If the route is not downloaded or refreshed, just set the description and images as they are online
+    modifiedResponse['description'] = layerInfo.availableRoute[0].description;
+    modifiedResponse['titleImage'] = layerInfo.availableRoute[0].thumbnail;
+    modifiedResponse['thumbnail'] = layerInfo.thumbnail;
+  }
+
+  // Places all the values (ArcGIS and custom) inside of a RouteLayerData
   RouteLayerData routeInfo = RouteLayerData.fromJson(
     (modifiedResponse
         ..['layers'][2]['featureSet']['features'] =
@@ -200,6 +267,6 @@ RouteLayerData filterRouteInfo(
                 .toList())
       ..['layers'][2]['featureSet']['features'].add(lastding),
   );
-
+  // Return the RouteLayerData object
   return routeInfo;
 }

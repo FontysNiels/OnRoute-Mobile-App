@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_download_button.dart';
-import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_image_preview.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_title.dart';
 
 
@@ -11,7 +10,7 @@ class RoutePackage extends StatefulWidget {
   State<RoutePackage> createState() => _RoutePackageState();
 }
 
-int _selectedIndex = 0;
+// int _selectedIndex = 0;
 
 class _RoutePackageState extends State<RoutePackage> {
   @override
@@ -21,11 +20,11 @@ class _RoutePackageState extends State<RoutePackage> {
 
   @override
   Widget build(BuildContext context) {
-    void setIndex(int index) {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
+    // void setIndex(int index) {
+    //   setState(() {
+    //     _selectedIndex = index;
+    //   });
+    // }
 
     return Scaffold(
       appBar: AppBar(

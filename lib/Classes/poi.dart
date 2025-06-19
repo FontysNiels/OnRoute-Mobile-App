@@ -6,7 +6,6 @@ class Poi {
   final String? mail;
   final String? phone;
   final String? website;
-  // final DateTime? openingHours;
   final String? openingHours;
   final String? address;
   final String? asset;
@@ -29,7 +28,6 @@ class Poi {
   });
 
   factory Poi.fromJsonOnline(Map<String, dynamic> json) {
-    // print(json['attributes']['openingHours']);
     return Poi(
       objectId: json['attributes']['OBJECTID'],
       title: json['attributes']['naam'],
@@ -38,10 +36,6 @@ class Poi {
       mail: json['attributes']['email'],
       phone: json['attributes']['phone'],
       website: json['attributes']['web'],
-      // openingHours:
-      //     json['attributes']['openingstijden'] != null
-      //         ? DateTime.parse(json['attributes']['openingHours'])
-      //         : null,
       openingHours: json['attributes']['openingstijden'],
       address: json['attributes']['adres'],
       asset: json['attributes']['asset'],
@@ -50,8 +44,7 @@ class Poi {
     );
   }
 
-    factory Poi.fromJsonLocal(Map<String, dynamic> json) {
-    // print(json['attributes']['openingHours']);
+  factory Poi.fromJsonLocal(Map<String, dynamic> json) {
     return Poi(
       objectId: json['objectId'],
       title: json['title'],
@@ -60,10 +53,6 @@ class Poi {
       mail: json['mail'],
       phone: json['phone'],
       website: json['website'],
-      // openingHours:
-      //     json['attributes']['openingstijden'] != null
-      //         ? DateTime.parse(json['attributes']['openingHours'])
-      //         : null,
       openingHours: json['openingHours'],
       address: json['address'],
       asset: json['asset'],

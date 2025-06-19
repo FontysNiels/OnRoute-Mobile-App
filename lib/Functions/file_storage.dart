@@ -1,13 +1,20 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:http/http.dart';
+import 'package:onroute_app/Classes/poi.dart';
+import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Classes/web_map_collection.dart';
+import 'package:onroute_app/Functions/api_calls.dart';
+import 'package:onroute_app/Functions/fetch_routes.dart';
 import 'package:path_provider/path_provider.dart';
 
 // Gets the directory
 Future<String> get _localPath async {
   final directory = await getApplicationDocumentsDirectory();
-
   return directory.path;
 }
 
@@ -27,10 +34,26 @@ Future<File> writeFile(String content, String name, String folder) async {
   return file.writeAsString('$content');
 }
 
+// Deletes all files in the routes folder
 Future<void> deleteAllSavedFiles() async {
   try {
     final path = await _localPath;
     final directory = Directory('$path/routes');
+
+    if (await directory.exists()) {
+      await directory.delete(recursive: true);
+    }
+  } catch (e) {
+    // Handle any errors if needed
+    print('Error deleting files: $e');
+  }
+}
+
+// Deletes the route info for a specific webId (this includes images)
+Future<void> deleteRouteInfo(String webId) async {
+  try {
+    final path = await _localPath;
+    final directory = Directory('$path/routes/$webId');
 
     if (await directory.exists()) {
       await directory.delete(recursive: true);
@@ -55,6 +78,7 @@ Future<List<File>> getRouteFiles() async {
   }
 }
 
+// Gets all Folders
 Future<List> getRouteFolders() async {
   try {
     final path = await _localPath;
@@ -62,7 +86,9 @@ Future<List> getRouteFolders() async {
 
     // Recursively process files and directories
     List<dynamic> processDirectory(Directory dir) {
+      // List all entities in the directory
       final entities = dir.listSync();
+      // If the directory is empty, return an empty list
       return entities
           .map((entity) {
             if (entity is File) {
@@ -76,9 +102,13 @@ Future<List> getRouteFolders() async {
           .toList();
     }
 
+    // Process the directory and return a list of files and folders
     List<dynamic> result = processDirectory(directory);
+    // Convert the result to a List of dynamic type
     for (var i = 0; i < result.length; i++) {
+      // If the result is a List, it means it's a folder with files
       if (result[i] is List) {
+        // Get the folder name from the first file's parent path
         final folderName =
             (result[i] as List).isNotEmpty
                 ? (result[i] as List).first.parent.path.split('/').last
@@ -88,7 +118,7 @@ Future<List> getRouteFolders() async {
         };
       }
     }
-
+    // Return the processed list of files and folders
     return result;
   } catch (e) {
     // If encountering an error, return an empty list
@@ -106,6 +136,134 @@ Future<String> readFile(File name) async {
     return '';
   }
 }
+
+// Turns a Flutter Asset into a File
+Future<File> copyAssetToFile(String assetPath, String filename) async {
+  // Load asset as ByteData
+  final byteData = await rootBundle.load(assetPath);
+
+  // Get device directory to store the file
+  final dir = await getApplicationDocumentsDirectory();
+  final file = File('${dir.path}/$filename');
+
+  // Write bytes to file
+  await file.writeAsBytes(byteData.buffer.asUint8List());
+
+  return file; // Now you can use File() on this path
+}
+
+//Clears the MMPK data when it isn't used
+Future<void> clearMMPKStorage() async {
+  final appDir = await getApplicationDocumentsDirectory();
+  // Do this when the route stops or smtn
+  final directory = Directory(appDir.path);
+  final List<FileSystemEntity> entities = directory.listSync(recursive: true);
+  for (var entity in entities) {
+    // print(entity.path);
+    if (entity.path.contains('MMP.mmpk')) {
+      try {
+        await entity.delete(recursive: true);
+        // print('Deleted: ${entity.path}');
+      } catch (e) {
+        // print('Error deleting ${entity.path}: $e');
+      }
+    } else {
+      // print(entity.path);
+    }
+  }
+}
+
+// Download function for the route-download
+Future<void> downloadRouteLayer(
+  WebMapCollection route,
+  BuildContext context,
+) async {
+  // Get ArcGIS route layer data JSON
+  var routeResponse = await getArcgisItemData(route.availableRoute[0].routeID);
+  if (routeResponse.statusCode == 200) {
+    // Clean it up
+    RouteLayerData routeInfo = await filterRouteInfo(
+      routeResponse,
+      route,
+      true,
+    );
+
+
+    // Make sure the images inside are actually saved as files
+    if (['description', 'thumbnail', 'titleImage'].any(
+      (field) => routeInfo.toJson()[field].contains(RegExp(r'https?://')),
+    )) {
+      // If not, the user probably doesn't have internet, so return and don't save the route
+      return;
+    }
+
+    Map<String, dynamic> allPoiJSON = {'points': []};
+    for (Poi point in route.pointsOfInterest) {
+      // Turning the Poi into JSON
+      var poiAsJSON = point.toJson();
+      // Save the image, ad set its path in the JSON
+      if (poiAsJSON['asset'] != '') {
+        poiAsJSON['asset'] = await saveImageFromUrl(
+          poiAsJSON['asset'],
+          route.webmapId + poiAsJSON['objectId'].toString(),
+          route.webmapId,
+        );
+        if (poiAsJSON['asset'] == "ERROR") return;
+      }
+      // add the POI to the list of POIs
+      (allPoiJSON['points'] as List).add(poiAsJSON);
+    }
+
+    // used to be used for the potential package check, to see if the route was already downloaded
+    // var folderContent = await getRouteFolders();
+
+    // Encode the routeInfo so it can be saved as a JSON file
+    var encodeRoute = jsonEncode(routeInfo.toJson());
+    // Save the route info as a JSON file
+    await writeFile(
+      encodeRoute,
+      'route-${route.availableRoute[0].routeID}.json',
+      route.webmapId,
+    );
+    // Encode the poi info so it can be saved as a JSON file
+    var encodePoi = jsonEncode(allPoiJSON);
+    // Save the POI info as a JSON file
+    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
+  }
+}
+
+// Save a image to the device
+Future<String> saveImageFromUrl(
+  String imageUrl,
+  String fileName,
+  String webId,
+) async {
+  try {
+    final response = await get(Uri.parse(imageUrl));
+    if (response.statusCode == 200) {
+      final path = await _localPath;
+      final directory = Directory('$path/routes/$webId');
+
+      // Create the directory if it doesn't exist
+      if (!await directory.exists()) {
+        await directory.create(recursive: true);
+      }
+
+      final file = File('${directory.path}/$fileName');
+
+      // Write the image bytes to the file
+      await file.writeAsBytes(response.bodyBytes);
+      return file.path;
+    } else {
+      throw Exception('Failed to download image: ${response.statusCode}');
+    }
+  } catch (e) {
+    // print('Error saving image: $e');
+    return 'ERROR';
+  }
+}
+
+///////////////////////////// OLD MMPK DOWNLOAD CODE ///////////////////////////////////////////////////////////////
 
 Future<void> downloadSampleData(List<String> portalItemIds) async {
   // var token = await generateToken();

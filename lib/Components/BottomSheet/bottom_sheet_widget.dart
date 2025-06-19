@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 import 'package:onroute_app/Components/BottomSheet/Routes-List/routes_list_view.dart';
 import 'package:onroute_app/Functions/fetch_routes.dart';
-import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/main.dart';
 
 class BottomSheetWidget extends StatefulWidget {
@@ -73,11 +70,11 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Function that gets and sets the future routeList
   Future<List<WebMapCollection>> getRouteList() async {
-    List<File> localFiles = await getRouteFiles();
+
 
     List<WebMapCollection> allAvailableRoutes = [];
 
-    allAvailableRoutes.addAll(await fetchLocalItems(localFiles));
+    allAvailableRoutes.addAll(await fetchLocalItems());
 
     final List<ConnectivityResult> connectivityResult =
         await (Connectivity().checkConnectivity());
@@ -85,7 +82,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (connectivityResult.contains(ConnectivityResult.mobile) ||
         connectivityResult.contains(ConnectivityResult.wifi) ||
         connectivityResult.contains(ConnectivityResult.ethernet)) {
-      allAvailableRoutes.addAll(await fetchOnlineItems(localFiles, context));
+      allAvailableRoutes.addAll(await fetchOnlineItems( context));
     }
 
     return allAvailableRoutes;
@@ -93,9 +90,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
   // Changes the current widget, and has the ability to reload the list of routes
   Future<void> setSheetWidget(Widget? widget, bool? reload) async {
-    List<File> localFiles = await getRouteFiles();
     List<WebMapCollection> receivedRoutes = await futureRoutes;
-    List<WebMapCollection> localItems = await fetchLocalItems(localFiles);
+    List<WebMapCollection> localItems = await fetchLocalItems();
 
     setState(() {
       if (widget != null) {
@@ -111,6 +107,14 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                         route.locally == localItem.locally,
                   ),
             ),
+          );
+          // Remove routes from receivedRoutes where .locally == true and not present in localItems
+          receivedRoutes.removeWhere(
+            (route) =>
+                route.locally == true &&
+                !localItems.any(
+                  (localItem) => localItem.webmapId == route.webmapId,
+                ),
           );
         }
         _bottomSheetWidgets.removeLast();

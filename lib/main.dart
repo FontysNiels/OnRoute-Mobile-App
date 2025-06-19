@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:arcgis_maps/arcgis_maps.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -7,13 +7,13 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:onroute_app/Classes/description_point.dart';
 import 'package:onroute_app/Classes/poi.dart';
 import 'package:onroute_app/Classes/route_layer_data.dart';
+import 'package:onroute_app/Components/navigation_buttons.dart';
 import 'package:onroute_app/Functions/file_storage.dart';
 import 'package:onroute_app/Functions/generate_route_components.dart';
 import 'package:onroute_app/Components/Map/directions_card.dart';
 import 'package:onroute_app/Components/Map/map_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
-// import 'package:onroute_app/theme.dart';
 
 void main() {
   FlutterError.onError = (FlutterErrorDetails details) {
@@ -28,6 +28,10 @@ class MainApp extends StatefulWidget {
   @override
   State<MainApp> createState() => _MainAppState();
 }
+
+const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
+const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
+const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
 /// Global Variables ///
 ///  --------------- ///
@@ -49,9 +53,16 @@ int selectedPOI = 0;
 bool currenPOIChanged = false;
 // Condition to show appbar (to close preview)
 bool previewEnabled = false;
+// Value used to check update in POI faster, need to remove 'currenPOIChanged' variable
+ValueNotifier<bool> currentPOIChanged = ValueNotifier<bool>(false);
+// ItemID of ArcGIS map
+const mapItemId = '50dd5ef186644d91902c2e77ddd7c414';
+// ItemID of POI file
+const poiItemId = '1c049e864f1643bda530ae45fd1591cf';
 
 /// Global Functions ///
 ///  --------------- ///
+
 // Initialzes the ArcGIS API key
 Future<void> initialize() async {
   await dotenv.load(fileName: ".env");
@@ -59,24 +70,60 @@ Future<void> initialize() async {
   String apiKey = dotenv.env['API_KEY'] ?? 'default_api_key';
   // sets the API key for the ArcGIS environment
   ArcGISEnvironment.apiKey = apiKey;
+
+  ArcGISEnvironment.setLicenseUsingKey(
+    'runtimelite,1000,rud8789963649,none,KGE60RFLTFK2J9HSX228',
+  );
 }
 
 // Set the selectedPOI and its changed condition
 void selectPoi(int selectedPoiObjectId) {
   selectedPOI = selectedPoiObjectId;
   currenPOIChanged = true;
+  currentPOIChanged.value = currenPOIChanged;
+}
+
+// Function to copy the asset to a file and use it as map
+Future<void> addMMPK() async {
+  File file = await copyAssetToFile('assets/MMPK.mmpk', 'MMPK.mmpk');
+  // Load the local mobile map package File.
+  final mmpk = MobileMapPackage.withFileUri(file.uri);
+  // Load the mobile map package.
+  await mmpk.load();
+  // Check if the mobile map package has loaded successfully.
+  if (mmpk.maps.isNotEmpty) {
+    // Use only MMPK, this is used when there is no map set (aka when offline)
+    if (mapViewController.arcGISMap == null) {
+      mapViewController.arcGISMap = mmpk.maps.first;
+      mapViewController.arcGISMap?.initialViewpoint =
+          mmpk.maps.first.initialViewpoint;
+      await mapViewController.setViewpointScale(20000);
+    }
+    // Overlay the MMPK on the map view
+    else if (mapViewController.arcGISMap?.item?.itemId !=
+        mmpk.maps.first.item?.itemId) {
+      final map = mmpk.maps.first;
+      mapViewController.arcGISMap?.operationalLayers.addAll(
+        map.operationalLayers,
+      );
+    }
+  }
 }
 
 class _MainAppState extends State<MainApp> {
   @override
   void initState() {
+    // Initialize the ArcGIS API key
     initialize();
+    // Clears the MMPK in case it is still loaded
+    clearMMPKStorage();
     // Locks Orientation
     WidgetsFlutterBinding.ensureInitialized();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+
     super.initState();
   }
 
@@ -85,7 +132,7 @@ class _MainAppState extends State<MainApp> {
     // Add the generated route lines
     graphicsOverlay.graphics.addAll(await generateLinesAndPoints(route));
     // Add the generated POI points
-    graphicsOverlay.graphics.addAll(generatePoiGraphics(pois));
+    graphicsOverlay.graphics.addAll(await generatePoiGraphics(pois));
     // The list which will be filled with descriptionPoints
     List<DescriptionPoint> routeDirections = [];
     // Loop that loops through all the descriptions
@@ -108,6 +155,8 @@ class _MainAppState extends State<MainApp> {
           angle: element.attributes['Azimuth'].toDouble(),
         ),
       );
+      mapViewController.locationDisplay.autoPanMode =
+          LocationDisplayAutoPanMode.compassNavigation;
     }
 
     // Setting the routeInfo and directionPoints (refreshing the state)
@@ -140,20 +189,22 @@ class _MainAppState extends State<MainApp> {
     });
   }
 
-  String test = 'tetst';
   @override
   Widget build(BuildContext context) {
     // Color variables, you can add more if needed (makes things easier to control, not necessary though)
-    const Color primaryAccent = Color.fromARGB(255, 255, 0, 0);
-    const Color primaryAppColor = Color.fromARGB(255, 255, 154, 154);
-    const Color primaryTextColor = Color.fromARGB(255, 73, 69, 79);
 
     return MaterialApp(
-      // theme: AppTheme,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // Makes the app use Material Design 3
         useMaterial3: true,
+
+        //Text Theme's (variables inside are the default Material Design text varaibles)
+        textTheme: TextTheme(
+          bodyLarge: const TextStyle(),
+          bodyMedium: const TextStyle(color: primaryTextColor),
+          labelLarge: const TextStyle(color: primaryAccent),
+        ),
 
         // Color Scheme Changes
         colorScheme: ColorScheme.fromSwatch().copyWith(
@@ -204,13 +255,6 @@ class _MainAppState extends State<MainApp> {
 
         // Devider Theme
         dividerTheme: const DividerThemeData(color: primaryAppColor),
-
-        //Text Theme's (variables inside are the default Material Design text varaibles)
-        textTheme: TextTheme(
-          bodyLarge: const TextStyle(),
-          bodyMedium: const TextStyle(color: primaryTextColor),
-          labelLarge: const TextStyle(color: primaryAccent),
-        ),
       ),
       home: Scaffold(
         appBar:
@@ -236,23 +280,6 @@ class _MainAppState extends State<MainApp> {
                 NavigationButtons(),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    TextButton(
-                      child: Text("Files Deleten"),
-                      onPressed: () {
-                        deleteAllSavedFiles();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ),
             // Bottomsheet, with loader wrapped over it (so when it downloads a route the user can't fuck it up)
             LoaderOverlay(
               child: BottomSheetWidget(
@@ -263,126 +290,6 @@ class _MainAppState extends State<MainApp> {
             ),
 
             // OfflineMapDownloadExample(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-Icon _centeredIcon = Icon(Icons.gps_fixed);
-Icon _currentIcon = Icon(Icons.notifications);
-late StreamSubscription<LocationDisplayAutoPanMode> subscription;
-
-class NavigationButtons extends StatefulWidget {
-  const NavigationButtons({super.key});
-
-  @override
-  State<NavigationButtons> createState() => _NavigationButtonsState();
-}
-
-class _NavigationButtonsState extends State<NavigationButtons> {
-  @override
-  void initState() {
-    super.initState();
-    subscription = mapViewController.locationDisplay.onAutoPanModeChanged
-        .listen((mode) {
-          if (mounted) {
-            setState(() {
-              mapViewController.locationDisplay.autoPanMode ==
-                      LocationDisplayAutoPanMode.off
-                  ? _centeredIcon = Icon(Icons.gps_not_fixed)
-                  : _centeredIcon = Icon(Icons.gps_fixed);
-            });
-          }
-        });
-  }
-
-  @override
-  void dispose() {
-    subscription.cancel();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Padding(
-        padding: EdgeInsets.only(
-          right: 12.0,
-          top:
-              directionList.isNotEmpty
-                  ? 8
-                  : MediaQuery.of(context).padding.top + 88,
-        ),
-        child: Column(
-          spacing: 12,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            FloatingActionButton(
-              heroTag: UniqueKey(),
-              onPressed:
-                  () async => {
-                    directionList.isNotEmpty
-                        ? (
-                          mapViewController.setViewpointRotation(
-                            angleDegrees: 0.0,
-                          ),
-                          mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.navigation,
-                        )
-                        : mapViewController.locationDisplay.autoPanMode =
-                            LocationDisplayAutoPanMode.recenter,
-                  },
-              child: _centeredIcon,
-            ),
-
-            // TODO: chilltse is LocationDisplayAutoPanMode.compassNavigation, dus die op 1ste zetten en 2de alleen noord gericht maken
-            // (verder checken met voorkeur van bijv. Thomas)
-            FloatingActionButton(
-              heroTag: UniqueKey(),
-              onPressed:
-                  () => {
-                    directionList.isNotEmpty
-                        ? (
-                          mapViewController.setViewpointRotation(
-                            angleDegrees: 0.0,
-                          ),
-                          mapViewController.locationDisplay.autoPanMode =
-                              LocationDisplayAutoPanMode.compassNavigation,
-                        )
-                        :
-                        // mapViewController.locationDisplay.autoPanMode =
-                        //     LocationDisplayAutoPanMode.compassNavigation,
-                        // LocationDisplayAutoPanMode.recenter,
-                        mapViewController.setViewpointRotation(
-                          angleDegrees: 0.0,
-                        ),
-                  },
-              child: Icon(Icons.compass_calibration),
-            ),
-
-            directionList.isNotEmpty
-                ? FloatingActionButton(
-                  heroTag: UniqueKey(),
-                  onPressed:
-                      () => {
-                        if (mounted)
-                          {
-                            setState(() {
-                              _currentIcon =
-                                  enabledNotifiation
-                                      ? Icon(Icons.notifications_off)
-                                      : Icon(Icons.notifications);
-                              enabledNotifiation = !enabledNotifiation;
-                            }),
-                          },
-                      },
-                  child: _currentIcon,
-                )
-                : Container(),
           ],
         ),
       ),

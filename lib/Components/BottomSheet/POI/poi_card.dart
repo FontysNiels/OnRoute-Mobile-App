@@ -80,19 +80,20 @@ class POICard extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      'assets/temp.png',
-                      height: 56,
-                      width: 56,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                  // ClipRRect(
+                  //   borderRadius: BorderRadius.circular(16),
+                  //   child: Image.asset(
+                  //     'assets/temp.png',
+                  //     height: 56,
+                  //     width: 56,
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
                   Expanded(
                     flex: 3,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      // padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -103,7 +104,7 @@ class POICard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            "POI Type",
+                            currentPoi.category ?? "POI",
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ],

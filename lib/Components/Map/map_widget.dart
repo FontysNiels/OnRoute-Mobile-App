@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:arcgis_maps/arcgis_maps.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/main.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class MapWidget extends StatefulWidget {
   final Function selectPoi;
@@ -11,6 +13,8 @@ class MapWidget extends StatefulWidget {
   State<MapWidget> createState() => _MapWidgetState();
 }
 
+enum AppPermissionStatus { denied, granted, permanentlyDenied }
+
 class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   @override
   void initState() {
@@ -19,21 +23,41 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed && dialogActive) {
+      initLocationPermissions();
+    }
+  }
+
+  Future<void> initLocationPermissions() async {
+    final status = await Permission.location.status;
+    switch (status) {
+      case PermissionStatus.granted:
+        await checkLocation();
+        Navigator.of(context, rootNavigator: true).pop();
+        setState(() {
+          _locationPermission = AppPermissionStatus.granted;
+          dialogActive = false;
+          _ready = true;
+        });
+        break;
+      case PermissionStatus.permanentlyDenied:
+        setState(
+          () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+        );
+        break;
+      case PermissionStatus.denied:
+      default:
+        setState(() => _locationPermission = AppPermissionStatus.denied);
+        break;
+    }
   }
 
   @override
-  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      await checkLocation();
-      if (_locationDataSource.status == LocationDataSourceStatus.started &&
-          dialogActive == true) {
-        Navigator.of(context, rootNavigator: true).pop();
-        dialogActive = false;
-      }
-    }
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   // Create a GlobalKey for the ArcGISMapView to persist its state.
@@ -50,6 +74,8 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   final _locationDataSource = SystemLocationDataSource();
   // Bool to check if the dialog is active.
   bool dialogActive = false;
+
+  var _locationPermission = AppPermissionStatus.denied;
 
   @override
   Widget build(BuildContext context) {
@@ -71,8 +97,7 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                           .identifyGraphicsOverlay(
                             _graphicsOverlay,
                             screenPoint: screenPoint,
-                            tolerance:
-                                10.0, // tolerance in screen points TODO: test for optimal size
+                            tolerance: 20.0, // tolerance in screen points
                           );
 
                       if (result.graphics.isNotEmpty) {
@@ -105,65 +130,50 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   }
 
   Future<void> onMapViewReady() async {
-    // print("onMapViewReady called");
     try {
       // set the map to the map view controller
       _mapViewController.setViewpoint(
         Viewpoint.withLatLongScale(
           latitude: 51.598289,
           longitude: 5.528469,
-          scale: 25000,
+          scale: 10000,
         ),
       );
 
-      PortalConnection connection = PortalConnection.anonymous;
-      final portalItem = PortalItem.withPortalAndItemId(
-        // portal: portal,
-        portal: Portal(
-          Uri.parse('https://gisportal.bragis.nl/arcgis'),
-          connection: connection,
-        ),
-        itemId: '50dd5ef186644d91902c2e77ddd7c414',
-      );
+      final List<ConnectivityResult> connectivityResult =
+          await (Connectivity().checkConnectivity());
 
-      _webMap = ArcGISMap.withItem(portalItem);
-      _mapViewController.arcGISMap = _webMap;
+      if (connectivityResult.contains(ConnectivityResult.mobile) ||
+          connectivityResult.contains(ConnectivityResult.wifi) ||
+          connectivityResult.contains(ConnectivityResult.ethernet)) {
+        PortalConnection connection = PortalConnection.anonymous;
+        final portalItem = PortalItem.withPortalAndItemId(
+          portal: Portal(
+            Uri.parse('https://gisportal.bragis.nl/arcgis'),
+            connection: connection,
+          ),
+          itemId: mapItemId,
+        );
 
-      // await downloadSampleData(['5f52e970830a4140bec9d69317d1399f']);
-      // // await downloadSampleData(['b75f95c720204d78b1eed8f98ccbe0d9']);
-      // final appDir = await getApplicationDocumentsDirectory();
-
-      // // Load the local mobile map package.
-      // final mmpkFile = File('${appDir.absolute.path}/offlinemap.mmpk');
-      // // final mmpkFile = File('${appDir.absolute.path}/MMP.mmpk');
-      // final mmpk = MobileMapPackage.withFileUri(mmpkFile.uri);
-      // await mmpk.load();
-
-      // if (mmpk.maps.isNotEmpty) {
-      //   // Get the first map in the mobile map package and set to the map view.
-
-      //   _mapViewController.arcGISMap = mmpk.maps.first;
-      // }
-
-      // _mapViewController.onScaleChanged.listen((scale) {
-      //   _mapViewController.locationDisplay.autoPanMode = LocationDisplayAutoPanMode.navigation;
-
-      // });
+        _webMap = ArcGISMap.withItem(portalItem);
+        // _webMap =  ArcGISMap.withBasemapStyle(BasemapStyle.arcGISImagery);
+        _mapViewController.arcGISMap = _webMap;
+      } else {
+        await addMMPK();
+      }
 
       // Add the graphics overlay to the map view.
       _mapViewController.graphicsOverlays.add(_graphicsOverlay);
-
+      await checkLocation();
       _mapViewController.locationDisplay.initialZoomScale = 5000;
       // Set the initial system location data source and auto-pan mode.
       _mapViewController.locationDisplay.dataSource = _locationDataSource;
       _mapViewController.locationDisplay.autoPanMode =
-          LocationDisplayAutoPanMode.navigation;
-
-      // Attempt to start the location data source (this will prompt the user for permission).
-      await checkLocation();
+          LocationDisplayAutoPanMode.recenter;
 
       // Set the ready state variable to true to enable the UI.
-      if (mounted) {
+      if (mounted &&
+          _locationDataSource.status == LocationDataSourceStatus.started) {
         setState(() {
           _ready = true;
         });
@@ -176,8 +186,9 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
   Future<void> checkLocation() async {
     try {
       await _locationDataSource.start();
-      print(_locationDataSource.status);
-    } on ArcGISException catch (e) {
+    }
+    //  } on ArcGISException catch (e) {
+    on ArcGISException {
       if (mounted) {
         if (!dialogActive) {
           showDialog(
@@ -200,6 +211,19 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
                           'De app heeft toegang nodig tot uw locatie.\n\nGa naar de instellingen van uw telefoon om de app toegang te geven tot uw locatie.',
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
+                        Builder(
+                          builder: (_) {
+                            switch (_locationPermission) {
+                              case AppPermissionStatus.granted:
+                                return Container(); // Widget to show map view
+                              case AppPermissionStatus.denied:
+                                // requestLocationPermissions();
+                                return _buildSettingsWidget(); // Widget to request location
+                              case AppPermissionStatus.permanentlyDenied:
+                                return _buildSettingsWidget(); // Widget to open app settings
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),
@@ -210,4 +234,33 @@ class _MapWidgetState extends State<MapWidget> with WidgetsBindingObserver {
       }
     }
   }
+
+  void requestLocationPermissions() async {
+    final requestPermission = await Permission.location.request();
+    if (requestPermission.isGranted) {
+      setState(() {
+        _locationPermission = AppPermissionStatus.granted;
+        _ready = false;
+      });
+    } else if (requestPermission.isPermanentlyDenied) {
+      setState(
+        () => _locationPermission = AppPermissionStatus.permanentlyDenied,
+      );
+    } else {
+      setState(() => _locationPermission = AppPermissionStatus.denied);
+    }
+  }
+
+  Widget _buildSettingsWidget() => const Center(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ElevatedButton(
+          onPressed: openAppSettings, // Opens app settings to change permission
+          child: Text('Open Instellingen'),
+        ),
+      ],
+    ),
+  );
 }
