@@ -199,6 +199,13 @@ class _MainAppState extends State<MainApp> {
         // Makes the app use Material Design 3
         useMaterial3: true,
 
+        //Text Theme's (variables inside are the default Material Design text varaibles)
+        textTheme: TextTheme(
+          bodyLarge: const TextStyle(),
+          bodyMedium: const TextStyle(color: primaryTextColor),
+          labelLarge: const TextStyle(color: primaryAccent),
+        ),
+
         // Color Scheme Changes
         colorScheme: ColorScheme.fromSwatch().copyWith(
           primary: primaryAccent, // Define primaryAccent in color scheme
@@ -248,13 +255,6 @@ class _MainAppState extends State<MainApp> {
 
         // Devider Theme
         dividerTheme: const DividerThemeData(color: primaryAppColor),
-
-        //Text Theme's (variables inside are the default Material Design text varaibles)
-        textTheme: TextTheme(
-          bodyLarge: const TextStyle(),
-          bodyMedium: const TextStyle(color: primaryTextColor),
-          labelLarge: const TextStyle(color: primaryAccent),
-        ),
       ),
       home: Scaffold(
         appBar:

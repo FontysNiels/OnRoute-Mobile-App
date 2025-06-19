@@ -53,9 +53,7 @@ class Layer {
   Layer({required this.featureSet});
 
   factory Layer.fromJson(Map<String, dynamic> json) {
-    return Layer(
-      featureSet: FeatureSet.fromJson(json['featureSet']),
-    );
+    return Layer(featureSet: FeatureSet.fromJson(json['featureSet']));
   }
   Map<String, dynamic> toJson() => {'featureSet': featureSet.toJson()};
 }
@@ -95,11 +93,7 @@ class RouteFeature {
   final RouteGeometry geometry;
   final Symbol? symbol;
 
-  RouteFeature({
-    required this.attributes,
-    required this.geometry,
-    this.symbol,
-  });
+  RouteFeature({required this.attributes, required this.geometry, this.symbol});
 
   factory RouteFeature.fromJson(Map<String, dynamic> json) {
     return RouteFeature(

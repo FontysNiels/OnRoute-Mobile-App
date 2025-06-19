@@ -70,10 +70,14 @@ class RouteCard extends StatelessWidget {
                                   width: 56,
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
-                                    return Icon(
-                                      Icons.wifi_off,
-                                      size: 25,
-                                      color: Colors.grey,
+                                    return SizedBox(
+                                      height: 56,
+                                      width: 56,
+                                      child: Icon(
+                                        Icons.wifi_off,
+                                        size: 25,
+                                        color: Colors.grey,
+                                      ),
                                     );
                                   },
                                 ),

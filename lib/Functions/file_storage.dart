@@ -180,41 +180,56 @@ Future<void> downloadRouteLayer(
 ) async {
   // Get ArcGIS route layer data JSON
   var routeResponse = await getArcgisItemData(route.availableRoute[0].routeID);
+  if (routeResponse.statusCode == 200) {
+    // Clean it up
+    RouteLayerData routeInfo = await filterRouteInfo(
+      routeResponse,
+      route,
+      true,
+    );
 
-  // Clean it up
-  RouteLayerData routeInfo = await filterRouteInfo(routeResponse, route, true);
 
-  Map<String, dynamic> allPoiJSON = {'points': []};
-  for (Poi point in route.pointsOfInterest) {
-    // Turning the Poi into JSON
-    var poiAsJSON = point.toJson();
-    // Save the image, ad set its path in the JSON
-    if (poiAsJSON['asset'] != '') {
-      poiAsJSON['asset'] = await saveImageFromUrl(
-        poiAsJSON['asset'],
-        route.webmapId + poiAsJSON['objectId'].toString(),
-        route.webmapId,
-      );
+    // Make sure the images inside are actually saved as files
+    if (['description', 'thumbnail', 'titleImage'].any(
+      (field) => routeInfo.toJson()[field].contains(RegExp(r'https?://')),
+    )) {
+      // If not, the user probably doesn't have internet, so return and don't save the route
+      return;
     }
-    // add the POI to the list of POIs
-    (allPoiJSON['points'] as List).add(poiAsJSON);
+
+    Map<String, dynamic> allPoiJSON = {'points': []};
+    for (Poi point in route.pointsOfInterest) {
+      // Turning the Poi into JSON
+      var poiAsJSON = point.toJson();
+      // Save the image, ad set its path in the JSON
+      if (poiAsJSON['asset'] != '') {
+        poiAsJSON['asset'] = await saveImageFromUrl(
+          poiAsJSON['asset'],
+          route.webmapId + poiAsJSON['objectId'].toString(),
+          route.webmapId,
+        );
+        if (poiAsJSON['asset'] == "ERROR") return;
+      }
+      // add the POI to the list of POIs
+      (allPoiJSON['points'] as List).add(poiAsJSON);
+    }
+
+    // used to be used for the potential package check, to see if the route was already downloaded
+    // var folderContent = await getRouteFolders();
+
+    // Encode the routeInfo so it can be saved as a JSON file
+    var encodeRoute = jsonEncode(routeInfo.toJson());
+    // Save the route info as a JSON file
+    await writeFile(
+      encodeRoute,
+      'route-${route.availableRoute[0].routeID}.json',
+      route.webmapId,
+    );
+    // Encode the poi info so it can be saved as a JSON file
+    var encodePoi = jsonEncode(allPoiJSON);
+    // Save the POI info as a JSON file
+    await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
   }
-
-  // used to be used for the potential package check, to see if the route was already downloaded
-  // var folderContent = await getRouteFolders();
-
-  // Encode the routeInfo so it can be saved as a JSON file
-  var encodeRoute = jsonEncode(routeInfo.toJson());
-  // Save the route info as a JSON file
-  await writeFile(
-    encodeRoute,
-    'route-${route.availableRoute[0].routeID}.json',
-    route.webmapId,
-  );
-  // Encode the poi info so it can be saved as a JSON file
-  var encodePoi = jsonEncode(allPoiJSON);
-  // Save the POI info as a JSON file
-  await writeFile(encodePoi, 'pois-${route.webmapId}.json', route.webmapId);
 }
 
 // Save a image to the device
@@ -244,7 +259,7 @@ Future<String> saveImageFromUrl(
     }
   } catch (e) {
     // print('Error saving image: $e');
-    rethrow;
+    return 'ERROR';
   }
 }
 

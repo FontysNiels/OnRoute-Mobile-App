@@ -37,7 +37,7 @@ Future<List<Graphic>> generatePointGraphics(RouteLayerData routeInfo) async {
 
       // Create graphic with picture marker symbol instead of blue dot
       final graphic = Graphic(geometry: startPoint, symbol: pictureMarker);
-
+      graphic.zIndex = 100;
       graphics.add(graphic);
     }
   }
@@ -66,14 +66,14 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
         spatialReference: SpatialReference.webMercator,
       );
       // Create a graphic for the POI with the picture marker symbol
-      graphics.add(
-        Graphic(
-          geometry: startPoint,
-          // symbol: routeStartCircleSymbol,
-          symbol: pictureMarkerSymbol,
-          attributes: {'objectId': element.objectId},
-        ),
+      Graphic poiPoint = Graphic(
+        geometry: startPoint,
+        // symbol: routeStartCircleSymbol,
+        symbol: pictureMarkerSymbol,
+        attributes: {'objectId': element.objectId},
       );
+      poiPoint.zIndex = 80;
+      graphics.add(poiPoint);
     }
   }
   // Return a list of graphics for each POI.
@@ -82,8 +82,9 @@ Future<List<Graphic>> generatePoiGraphics(List<Poi> routeInfo) async {
 
 // Generates graphics for lines and points of a route
 Future<List<Graphic>> generateLinesAndPoints(RouteLayerData routeID) async {
-  // Generate Lines
+  // List that will be returned
   List<Graphic> graphics = [];
+  // Generate Lines
   for (var element in routeID.layers[1].featureSet.features) {
     late final SimpleLineSymbol polylineSymbol = SimpleLineSymbol(
       style: SimpleLineSymbolStyle.solid,

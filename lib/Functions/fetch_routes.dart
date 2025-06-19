@@ -68,7 +68,10 @@ Future<List<WebMapCollection>> fetchLocalItems() async {
 // Fetches online routes that are not already downloaded
 Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   // Get all items from the OnRoute folder
-  var responseAll = await getAllFromFolder();
+  Response responseAll = await getAllFromFolder();
+  if (responseAll.statusCode != 200) {
+    return [];
+  }
   var content = jsonDecode(responseAll.body);
   // Turn it into a list
   List allFolderItems = content['items'];
@@ -79,6 +82,9 @@ Future<List<WebMapCollection>> fetchOnlineItems(BuildContext context) async {
   for (var webMap in allFolderItems.where((r) => r['type'] == 'Web Map')) {
     // Get data from Web Map
     var publishedRoute = await getArcgisItemData(webMap['id']);
+    if (publishedRoute.statusCode != 200) {
+      continue;
+    }
     var responseBodyPublished =
         jsonDecode(publishedRoute.body)['operationalLayers'];
 
@@ -146,6 +152,10 @@ Future<List<Poi>> getAllPoi(List<dynamic> allFolderItems) async {
       specificRoute['url'] != null &&
       specificRoute['type'] == "Feature Service") {
     var poiResponse = await getServiceContent('${specificRoute['url']}/0');
+    if (poiResponse.statusCode != 200) {
+      print('gang3');
+      return [];
+    }
     var poiResponseBody = jsonDecode(poiResponse.body)['features'];
 
     // create POIs per feature-layer
@@ -197,8 +207,18 @@ Future<RouteLayerData> filterRouteInfo(
       // Check if the part is a URL by simple pattern matching
       if (part.startsWith('https://') || part.startsWith('http://')) {
         // If it is a URL, save the image and replace the URL with the IMAGE tag
-        part =
-            "IMAGE/${await saveImageFromUrl(part, layerInfo.webmapId + layerInfo.availableRoute[0].routeID + descriptionImageNum.toString(), layerInfo.webmapId)}";
+        String imagePath = await saveImageFromUrl(
+          part,
+          layerInfo.webmapId +
+              layerInfo.availableRoute[0].routeID +
+              descriptionImageNum.toString(),
+          layerInfo.webmapId,
+        );
+        if (imagePath == "ERROR") {
+          // If there was an error saving the image, skip this part
+          continue;
+        }
+        part = "IMAGE/$imagePath";
         descriptionImageNum++;
       }
       // Add the edited part to the list
@@ -207,17 +227,30 @@ Future<RouteLayerData> filterRouteInfo(
     // Join the edited parts back into a single string
     modifiedResponse['description'] = editedList.join('\n');
     // Save the thumbnail and title image from the URLs
-    modifiedResponse['titleImage'] = await saveImageFromUrl(
+
+    String imagePath = await saveImageFromUrl(
       layerInfo.availableRoute[0].thumbnail,
       "${layerInfo.webmapId}${layerInfo.availableRoute[0].routeID}thumbnail",
       layerInfo.webmapId,
     );
-    // Save the thumbnail from the URL
-    modifiedResponse['thumbnail'] = await saveImageFromUrl(
+    if (imagePath != "ERROR") {
+      // Save the thumbnail from the URL
+      modifiedResponse['titleImage'] = imagePath;
+    } else {
+      modifiedResponse['titleImage'] = layerInfo.availableRoute[0].thumbnail;
+    }
+
+    String imagePath2 = await saveImageFromUrl(
       layerInfo.thumbnail,
       layerInfo.webmapId + layerInfo.availableRoute[0].routeID,
       layerInfo.webmapId,
     );
+    if (imagePath2 != "ERROR") {
+      // Save the thumbnail from the URL
+      modifiedResponse['thumbnail'] = imagePath2;
+    } else {
+      modifiedResponse['thumbnail'] = layerInfo.thumbnail;
+    }
   } else {
     // If the route is not downloaded or refreshed, just set the description and images as they are online
     modifiedResponse['description'] = layerInfo.availableRoute[0].description;
