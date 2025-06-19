@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:icon_decoration/icon_decoration.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
 
-class CardImageButton extends StatelessWidget {
-  const CardImageButton({super.key, required this.routeContent});
+class RouteCardImageIcon extends StatelessWidget {
+  const RouteCardImageIcon({super.key, required this.routeContent});
 
   final WebMapCollection routeContent;
 

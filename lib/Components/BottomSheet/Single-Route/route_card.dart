@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
-import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/card_image_button.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_card_image_icon.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/single_route.dart';
 import 'package:onroute_app/Components/BottomSheet/bottom_sheet_widget.dart';
 
@@ -98,7 +98,7 @@ class RouteCard extends StatelessWidget {
                       //         (context, url, error) => Icon(Icons.error),
                       //   ),
                       // ),
-                      CardImageButton(routeContent: routeContent),
+                      RouteCardImageIcon(routeContent: routeContent),
                     ],
                   ),
                   Expanded(

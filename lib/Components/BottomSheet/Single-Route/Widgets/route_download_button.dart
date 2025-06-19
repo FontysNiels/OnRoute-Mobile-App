@@ -44,7 +44,7 @@ class RouteDownloadButton extends StatelessWidget {
         },
         icon: const Icon(Icons.download),
         label: Text(
-          'Download route',
+          'Download Route',
           style: Theme.of(
             context,
           ).textTheme.labelLarge!.copyWith(color: Colors.white),

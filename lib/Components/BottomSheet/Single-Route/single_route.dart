@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:onroute_app/Classes/web_map_collection.dart';
-import 'package:onroute_app/Components/BottomSheet/Single-Route/route_image_preview.dart';
+import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_card_image.dart';
 import 'package:onroute_app/Components/BottomSheet/Route-Package/Widgets/package_tabs.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_download_button.dart';
 import 'package:onroute_app/Components/BottomSheet/Single-Route/Widgets/route_preview_button.dart';
@@ -63,7 +63,7 @@ class _SingleRouteState extends State<SingleRoute> {
                 ),
 
                 // Images (PACKAGE ONLY)
-                RouteImagePreview(routeContent: widget.routeContent),
+                RouteCardImage(routeContent: widget.routeContent),
 
                 // Download Button
                 Wrap(
